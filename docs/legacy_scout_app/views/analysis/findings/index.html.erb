@@ -1,0 +1,81 @@
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-8">Findings Analysis</h1>
+
+  <div class="space-y-8">
+    <!-- Daily Findings -->
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <h2 class="text-xl font-semibold mb-4">Daily Findings</h2>
+      <%= column_chart @daily_findings,
+          height: "400px",
+          colors: ["#3B82F6"],
+          library: {
+            scales: {
+              x: {
+                type: 'time',
+                time: {
+                  unit: 'day',
+                  parser: 'yyyy-MM-dd',
+                  tooltipFormat: 'dd/MM/yy',
+                  displayFormats: {
+                    day: 'dd/MM/yy'
+                  }
+                },
+                grid: {
+                  display: false
+                }
+              },
+              y: {
+                beginAtZero: true,
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.1)'
+                }
+              }
+            },
+            plugins: {
+              title: { 
+                display: true, 
+                text: "Number of findings per day" 
+              }
+            }
+          } %>
+    </div>
+
+    <!-- Cumulated Daily Findings -->
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <h2 class="text-xl font-semibold mb-4">Cumulated Daily Findings</h2>
+      <%= line_chart @cumulated_daily_findings,
+          height: "400px",
+          colors: ["#10B981"],
+          library: {
+            scales: {
+              x: {
+                type: 'time',
+                time: {
+                  unit: 'day',
+                  parser: 'yyyy-MM-dd',
+                  tooltipFormat: 'dd/MM/yy',
+                  displayFormats: {
+                    day: 'dd/MM/yy'
+                  }
+                },
+                grid: {
+                  display: false
+                }
+              },
+              y: {
+                beginAtZero: true,
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.1)'
+                }
+              }
+            },
+            plugins: {
+              title: { 
+                display: true, 
+                text: "Total findings over time" 
+              }
+            }
+          } %>
+    </div>
+  </div>
+</div>

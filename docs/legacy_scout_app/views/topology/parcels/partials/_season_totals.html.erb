@@ -1,0 +1,31 @@
+<!-- Season totals -->
+<% 
+  current_season_totals = season_totals[season_year]
+  season_actual = current_season_totals[:actual_plantings]
+  season_original = current_season_totals[:original_plantings]
+  season_findings = current_season_totals[:findings_count]
+  season_production = current_season_totals[:production_grams].round(2)
+  
+  season_yield = safe_division(season_production, season_actual)
+  season_avg = safe_division(season_production, season_findings)
+  
+  # Only show season totals if we have data
+  season_has_data = season_actual > 0 || season_original > 0 || season_findings > 0 || season_production > 0
+%>
+
+<% if season_has_data %>
+  <tr class="border-t-2 border-b bg-gray-200 hover:bg-gray-300">
+    <td class="px-3 py-4 font-semibold text-gray-900 bg-gray-50" colspan="3">TOTAL <%= season[:display] %></td>
+    <td class="px-3 py-4 font-semibold text-center text-gray-900"><%= season_original %></td>
+    <td class="px-3 py-4 font-semibold text-center text-gray-900"><%= season_actual %></td>
+    <td class="px-3 py-4 font-semibold text-center text-gray-900"><%= season_findings %></td>
+    <td class="px-3 py-4 font-semibold text-center text-gray-900"><%= number_with_precision(season_production, precision: 2) %></td>
+    <td class="px-3 py-4 font-semibold text-center text-gray-900"><%= season_yield ? number_with_precision(season_yield, precision: 2) : '-' %></td>
+    <td class="px-3 py-4 font-semibold text-center text-gray-900"><%= season_avg ? number_with_precision(season_avg, precision: 2) : '-' %></td>
+  </tr>
+<% end %>
+
+<!-- Add a spacer row between seasons -->
+<% if season_index < @seasons.length - 1 %>
+  <tr class="h-4"><td colspan="9" class="border-b-0"></td></tr>
+<% end %>

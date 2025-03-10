@@ -1,0 +1,2 @@
+module Market::PriceRecordsHelper
+end

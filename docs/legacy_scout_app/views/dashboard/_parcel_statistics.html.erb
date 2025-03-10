@@ -1,0 +1,50 @@
+<%# Cache based on parcel stats collection %>
+<% cache ["parcel_statistics", parcel_stats.map(&:cache_key).join('/')] do %>
+  <table class="w-full text-sm text-left text-gray-500">
+    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+      <tr>
+        <th class="px-4 py-3"><%= t('dashboard.reporting.columns.parcel') %></th>
+        <th class="px-4 py-3"><%= t('dashboard.reporting.columns.age') %></th>
+        <th class="px-4 py-3"><%= t('dashboard.reporting.columns.plants') %></th>
+        <th class="px-4 py-3"><%= t('dashboard.reporting.columns.findings') %></th>
+        <th class="px-4 py-3"><%= t('dashboard.reporting.columns.raw_weight') %></th>
+        <th class="px-4 py-3"><%= t('dashboard.reporting.columns.performance') %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% parcel_stats.group_by(&:orchard_name).each do |orchard_name, stats| %>
+        <!-- Orchard Header -->
+        <tr class="bg-gray-100">
+          <td colspan="6" class="px-4 py-2 font-medium">
+            <%= orchard_name || t('dashboard.reporting.ungrouped') %>
+          </td>
+        </tr>
+        
+        <!-- Parcel Rows -->
+        <% stats.each do |stat| %>
+          <tr class="border-b">
+            <td class="px-4 py-3 pl-8"><%= stat.name %></td>
+            <td class="px-4 py-3"><%= stat.leaf %></td>
+            <td class="px-4 py-3"><%= stat.plantings_count %></td>
+            <td class="px-4 py-3"><%= stat.findings_count %></td>
+            <td class="px-4 py-3"><%= format_weight(stat.total_raw_weight) %></td>
+            <td class="px-4 py-3"><%= format_performance(stat.performance) %></td>
+          </tr>
+        <% end %>
+        <!-- Orchard Total -->
+        <tr class="bg-gray-50 font-medium">
+          <td class="px-4 py-2"><%= t('dashboard.reporting.total') %></td>
+          <td class="px-4 py-2">-</td>
+          <td class="px-4 py-2"><%= stats.sum(&:plantings_count) %></td>
+          <td class="px-4 py-2"><%= stats.sum(&:findings_count) %></td>
+          <td class="px-4 py-2"><%= format_weight(stats.sum(&:total_raw_weight)) %></td>
+          <td class="px-4 py-2">
+            <% total_weight = stats.sum(&:total_raw_weight) %>
+            <% total_findings = stats.sum(&:findings_count) %>
+            <%= format_performance(total_findings > 0 ? total_weight.to_f / total_findings : 0) %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>

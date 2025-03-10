@@ -1,0 +1,28 @@
+<!-- Species Table -->
+<div class="bg-white border border-gray-200 rounded-lg p-3 mb-4">
+  <div class="text-sm font-medium text-gray-900 mb-2">Species Breakdown</div>
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200 text-sm">
+      <thead>
+        <tr class="bg-gray-50">
+          <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Species</th>
+          <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Plantings</th>
+          <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Findings</th>
+          <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">g/Plant</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% species_stats.sort_by { |s| -s[:production_per_planting].to_f }.each do |species_stat| %>
+          <tr>
+            <td class="px-3 py-2 text-gray-900"><%= species_stat[:species].name %></td>
+            <td class="px-3 py-2 text-right text-gray-900"><%= species_stat[:planting_count] %></td>
+            <td class="px-3 py-2 text-right text-gray-900"><%= species_stat[:findings_count] %></td>
+            <td class="px-3 py-2 text-right font-medium <%= species_stat[:production_per_planting].to_f > 0 ? 'text-primary-600' : 'text-gray-900' %>">
+              <%= number_to_human(species_stat[:production_per_planting], precision: 2, units: { unit: "g", thousand: "kg" }) %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

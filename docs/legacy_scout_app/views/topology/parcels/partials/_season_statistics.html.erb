@@ -1,0 +1,135 @@
+<% 
+  # First count total rows with data for the season
+  season_row_count = 0
+  spring_age_counts = {}
+  has_any_data_for_season = false
+  
+  # First pass - calculate spring ages with data
+  @spring_ages.each do |age|
+    spring_age_counts[age] = 0
+  end
+  
+  # Count rows per spring age and total for the season
+  @spring_ages.each do |age|
+    age_row_count = 0
+    @species_list.each do |sp|
+      stats = @age_species_stats[age]&.dig(sp.id, season_year) || {}
+      actual = stats[:actual_plantings].to_i
+      original = stats[:original_plantings].to_i
+      findings = stats[:findings_count].to_i
+      production = stats[:production_grams].to_f
+      has_data = actual > 0 || original > 0 || findings > 0 || production > 0
+      if has_data
+        age_row_count += 1
+        season_row_count += 1
+        has_any_data_for_season = true
+      end
+    end
+    spring_age_counts[age] = age_row_count > 0 ? age_row_count : 0
+  end
+  
+  # Initialize flags
+  first_row_of_season = true
+%>
+
+<% 
+  # If no data for this season, show a single row with the season name
+  if !has_any_data_for_season %>
+    <tr class="border-b hover:bg-gray-100 bg-white">
+      <td class="px-3 py-3 font-medium text-gray-900 border-r bg-gray-50">
+        <%= season[:display] %>
+      </td>
+      <td class="px-3 py-3 font-medium text-gray-900 border-r bg-gray-50">-</td>
+      <td class="px-3 py-3 font-medium text-gray-900">No data available</td>
+      <td class="px-3 py-3 text-center">0</td>
+      <td class="px-3 py-3 text-center">0</td>
+      <td class="px-3 py-3 text-center">0</td>
+      <td class="px-3 py-3 text-center">0.00</td>
+      <td class="px-3 py-3 text-center">-</td>
+      <td class="px-3 py-3 text-center">-</td>
+    </tr>
+  <% else %>
+    <% @spring_ages.each_with_index do |age, age_index| %>
+      <% if spring_age_counts[age] > 0 %>
+        <% age_species_count = 0 %>
+        <% @species_list.each_with_index do |species, species_index| %>
+          <%
+            # Get stats from structure
+            stats = @age_species_stats[age]&.dig(species.id, season_year) || {}
+            
+            # Extract values
+            actual_plantings = stats[:actual_plantings].to_i
+            original_plantings = stats[:original_plantings].to_i
+            findings_count = stats[:findings_count].to_i
+            production_grams = stats[:production_grams].to_f.round(2)
+            
+            # If we have findings but no plantings recorded, use the findings count as actual plantings
+            if findings_count > 0 && actual_plantings == 0
+              actual_plantings = findings_count
+              stats[:actual_plantings] = findings_count
+            end
+            
+            # If we have findings but no original plantings, set original plantings to 1
+            if findings_count > 0 && original_plantings == 0
+              original_plantings = 1
+              stats[:original_plantings] = 1
+            end
+            
+            # Only show rows with data
+            has_data = actual_plantings > 0 || original_plantings > 0 || findings_count > 0 || production_grams > 0
+            
+            if has_data
+              # Increment the totals
+              season_totals[season_year][:actual_plantings] += actual_plantings
+              season_totals[season_year][:original_plantings] += original_plantings
+              season_totals[season_year][:findings_count] += findings_count
+              season_totals[season_year][:production_grams] += production_grams
+              
+              species_totals[species.id][season_year][:actual_plantings] += actual_plantings
+              species_totals[species.id][season_year][:original_plantings] += original_plantings
+              species_totals[species.id][season_year][:findings_count] += findings_count
+              species_totals[species.id][season_year][:production_grams] += production_grams
+              
+              # Calculate yield and average weight
+              yield_per_plant = safe_division(production_grams, actual_plantings)
+              avg_weight = safe_division(production_grams, findings_count)
+              
+              age_species_count += 1
+          %>
+          
+          <tr class="border-b hover:bg-gray-100 bg-white">
+            <% if first_row_of_season %>
+              <td class="px-3 py-3 font-medium text-gray-900 border-r bg-gray-50" rowspan="<%= season_row_count %>">
+                <%= season[:display] %>
+              </td>
+              <% first_row_of_season = false %>
+            <% end %>
+            
+            <% if age_species_count == 1 %>
+              <td class="px-3 py-3 font-medium text-gray-900 border-r bg-gray-50" rowspan="<%= spring_age_counts[age] %>">
+                <%= age %>
+              </td>
+            <% end %>
+          
+          <td class="px-3 py-3 font-medium text-gray-900">
+            <div class="flex items-center">
+              <% if species.color_code.present? %>
+                <div class="w-3 h-3 rounded-full mr-2" style="background-color: <%= species.color_code %>"></div>
+              <% else %>
+                <div class="w-3 h-3 rounded-full bg-primary-500 mr-2"></div>
+              <% end %>
+              <%= species.name %>
+            </div>
+          </td>
+          <td class="px-3 py-3 text-center"><%= original_plantings %></td>
+          <td class="px-3 py-3 text-center"><%= actual_plantings %></td>
+          <td class="px-3 py-3 text-center"><%= findings_count %></td>
+          <td class="px-3 py-3 text-center"><%= number_with_precision(production_grams, precision: 2) %></td>
+          <td class="px-3 py-3 text-center"><%= yield_per_plant ? number_with_precision(yield_per_plant, precision: 2) : '-' %></td>
+          <td class="px-3 py-3 text-center"><%= avg_weight ? number_with_precision(avg_weight, precision: 2) : '-' %></td>
+          </tr>
+            <% end # if has_data %>
+          <% end # @species_list loop %>
+        <% end # if spring_age_counts[age] > 0 %>
+      <% end # @spring_ages loop %>
+    <% end # if !has_any_data_for_season %>

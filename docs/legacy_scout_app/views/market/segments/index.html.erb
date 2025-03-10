@@ -1,0 +1,107 @@
+<%# Header with action button %>
+<div class="flex justify-between items-center mb-6">
+  <h1 class="text-2xl font-semibold text-gray-900">Market Segments</h1>
+  <%= link_to new_market_segment_path, class: "inline-flex items-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800" do %>
+    <i class="fas fa-plus mr-2"></i> New Segment
+  <% end %>
+</div>
+
+<%# Segments Grid %>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <% @segments.each do |segment| %>
+    <div class="bg-white border border-gray-200 rounded-lg shadow hover:shadow-lg transition-shadow duration-200 dark:bg-gray-800 dark:border-gray-700">
+      <%# Header with fixed height %>
+      <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex justify-between items-start gap-4">
+          <div class="min-h-[4rem] flex flex-col justify-center">
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white line-clamp-2"><%= segment.name %></h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400"><%= segment.code %></p>
+          </div>
+          <div class="flex items-start gap-2 shrink-0">
+            <%= link_to market_segment_path(segment), class: "inline-flex items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" do %>
+              <i class="fas fa-eye mr-2"></i>Show
+            <% end %>
+            <%= link_to edit_market_segment_path(segment), class: "inline-flex items-center py-2 px-4 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" do %>
+              <i class="fas fa-edit mr-2"></i>Edit
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <%# Description %>
+      <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+        <p class="text-sm text-gray-600 dark:text-gray-400"><%= segment.description %></p>
+      </div>
+
+      <%# Stats Grid %>
+      <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+        <div class="grid grid-cols-2 gap-4">
+          <%# Market Places Count %>
+          <%= link_to market_places_path(segment: segment.id), class: "bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-600" do %>
+            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Markets</div>
+            <div class="text-2xl font-bold text-gray-900 dark:text-white"><%= segment.market_places.count %></div>
+          <% end %>
+
+          <%# Channels Count %>
+          <%= link_to market_channels_path(segment_id: segment.id), class: "bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-600" do %>
+            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Channels</div>
+            <div class="text-2xl font-bold text-gray-900 dark:text-white"><%= segment.market_channels.count %></div>
+          <% end %>
+        </div>
+      </div>
+
+      <%# Market Activity Chart %>
+      <div class="p-6">
+        <h5 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Market Activity This Season</h5>
+        <% if @weekly_stats[segment.id][:has_data] %>
+          <%= line_chart @weekly_stats[segment.id][:prices],
+              height: "120px",
+              points: true,
+              prefix: "€",
+              thousands: ",",
+              decimal: ".",
+              legend: false,
+              curve: false,
+              discrete: true,
+              library: {
+                elements: {
+                  point: {
+                    radius: 2,
+                    hitRadius: 4,
+                    hoverRadius: 4
+                  },
+                  line: {
+                    borderWidth: 1
+                  }
+                },
+                scales: {
+                  y: {
+                    grid: {
+                      display: false
+                    },
+                    display: true
+                  },
+                  x: {
+                    grid: {
+                      display: false
+                    }
+                  }
+                },
+                plugins: {
+                  legend: {
+                    display: false
+                  }
+                }
+              } %>
+        <% else %>
+          <div class="h-[120px] flex items-center justify-center bg-gray-50 rounded-lg dark:bg-gray-700">
+            <div class="text-center">
+              <i class="fas fa-chart-line text-gray-400 dark:text-gray-500 text-2xl mb-2"></i>
+              <p class="text-sm text-gray-500 dark:text-gray-400">No market data available<br>for current season</p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

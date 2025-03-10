@@ -1,0 +1,171 @@
+<%# Cache key includes the timestamp of the latest updates %>
+<% cache ["dashboard", @stats.hash] do %>
+  <div class="container mx-auto px-4 py-8">
+    <!-- Season Overview -->
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold mb-4 text-gray-800 flex items-center gap-4">
+        <%= t('dashboard.reporting.season_overview') %>
+        <span class="text-lg font-normal text-gray-600">
+          <%= l(@current_date, format: :long) %> (Week <%= @current_week %>)
+        </span>
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Total Raw Weight -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center">
+            <div class="inline-flex items-center justify-center flex-shrink-0 w-16 h-16 text-yellow-500 bg-yellow-100 rounded-lg">
+              <i class="fas fa-weight-hanging text-2xl"></i>
+            </div>
+            <div class="ml-6">
+              <div class="text-lg font-medium text-gray-500"><%= t('dashboard.reporting.total_raw_weight') %></div>
+              <div class="text-3xl font-semibold text-gray-900"><%= number_with_precision(@stats[:intake_stats][:total_intake_raw_weight] / 1000.0, precision: 2) %> kg</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Average Weight per Finding -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center">
+            <div class="inline-flex items-center justify-center flex-shrink-0 w-16 h-16 text-purple-500 bg-purple-100 rounded-lg">
+              <i class="fas fa-balance-scale text-2xl"></i>
+            </div>
+            <div class="ml-6">
+              <div class="text-lg font-medium text-gray-500"><%= t('dashboard.reporting.total_net_weight', default: 'Total Net Weight') %></div>
+              <div class="text-3xl font-semibold text-gray-900"><%= number_with_precision(@stats[:intake_stats][:total_intake_net_weight] / 1000.0, precision: 2) %> kg</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Findings and weights of the current week -->
+    <% if @weekly_intakes.any? %>
+      <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-8">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">
+          <%= t('dashboard.reporting.weekly_intakes', default: 'Intakes de la semaine %{week}') % { week: @current_week } %>
+          <span class="text-lg font-normal text-gray-600">
+            (<%= l(@week_start, format: :long) %> - <%= l(@week_end, format: :long) %>)
+          </span>
+        </h2>
+        <table class="w-full text-sm text-left text-gray-500">
+          <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3">Date</th>
+              <th scope="col" class="px-6 py-3">Findings</th>
+              <th scope="col" class="px-6 py-3 text-right">Raw Weight</th>
+              <th scope="col" class="px-6 py-3 text-right">Net Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @weekly_intakes.each do |intake| %>
+              <tr class="bg-white border-b hover:bg-gray-50">
+                <td class="px-6 py-4"><%= l intake.intake_at.to_date, format: :long %></td>
+                <td class="px-6 py-4"><%= intake.raw_number %></td>
+                <td class="px-6 py-4 text-right"><%= number_with_precision(intake.raw_weight, precision: 0) %> g</td>
+                <td class="px-6 py-4 text-right"><%= number_with_precision(intake.net_weight, precision: 0) %> g</td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+
+    <!-- Additional Season Stats -->
+    <div class="mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Average Time Stats -->
+        <div class="bg-white rounded-lg shadow p-4">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900"><%= t('dashboard.reporting.time_stats') %></h3>
+            </div>
+            <div class="p-2 bg-blue-100 rounded-full">
+              <i class="fas fa-clock text-blue-600"></i>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <p class="text-sm text-gray-500"><%= t('dashboard.reporting.avg_run_duration') %></p>
+              <p class="text-xl font-bold"><%= format_duration_simple(@stats[:season][:average_duration], false) %></p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500"><%= t('dashboard.reporting.avg_time_per_finding') %></p>
+              <p class="text-xl font-bold"><%= format_duration_simple(@stats[:season][:avg_time_per_finding], true) %></p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500"><%= t('dashboard.reporting.avg_runs_per_day') %></p>
+              <p class="text-xl font-bold"><%= number_with_precision(@stats[:season][:avg_runs_per_day], precision: 1) %></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Run Stats -->
+        <div class="bg-white rounded-lg shadow p-4">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900"><%= t('dashboard.reporting.run_stats') %></h3>
+            </div>
+            <div class="p-2 bg-green-100 rounded-full">
+              <i class="fas fa-chart-line text-green-600"></i>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <p class="text-sm text-gray-500"><%= t('dashboard.reporting.total_runs') %></p>
+              <p class="text-xl font-bold"><%= @stats[:season][:total_runs] %></p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500"><%= t('dashboard.reporting.total_findings') %></p>
+              <p class="text-xl font-bold"><%= @stats[:season][:total_findings] %></p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500"><%= t('dashboard.reporting.unproductive_runs') %></p>
+              <p class="text-xl font-bold"><%= @stats[:season][:unproductive_runs] %></p>
+              <p class="text-xs text-gray-500 mt-1">*<%= t('dashboard.reporting.runs_with_three_or_less_findings') %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Topology Stats -->
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold mb-4 text-gray-800">Topology Statistics</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <% @topology_stats.each do |key, value| %>
+          <div class="bg-white rounded-lg shadow p-4">
+            <div class="flex items-center">
+              <div class="inline-flex items-center justify-center flex-shrink-0 w-12 h-12 text-blue-500 bg-blue-100 rounded-lg">
+                <i class="fas fa-chart-bar text-xl"></i>
+              </div>
+              <div class="ml-4">
+                <div class="text-sm font-medium text-gray-500"><%= key.to_s.titleize %></div>
+                <div class="text-2xl font-semibold text-gray-900"><%= value %></div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Plantation Stats -->
+    <div>
+      <h2 class="text-2xl font-bold mb-4 text-gray-800">Plantation Statistics</h2>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <% @plantation_stats.each do |key, value| %>
+          <div class="bg-white rounded-lg shadow p-4">
+            <div class="flex items-center">
+              <div class="inline-flex items-center justify-center flex-shrink-0 w-12 h-12 text-green-500 bg-green-100 rounded-lg">
+                <i class="fas fa-seedling text-xl"></i>
+              </div>
+              <div class="ml-4">
+                <div class="text-sm font-medium text-gray-500"><%= key.to_s.titleize %></div>
+                <div class="text-2xl font-semibold text-gray-900"><%= value %></div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

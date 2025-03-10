@@ -1,0 +1,84 @@
+<%# Header with breadcrumb and actions %>
+<div class="mb-6">
+  <nav class="flex mb-5" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <%= link_to root_path, class: "inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600" do %>
+          <svg class="w-3 h-3 mr-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"/>
+          </svg>
+          Home
+        <% end %>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+          </svg>
+          <%= link_to "Market Places", market_places_path, class: "ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2" %>
+        </div>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+          </svg>
+          <%= link_to @market_place.name, market_place_path(@market_place), class: "ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2" %>
+        </div>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+          </svg>
+          <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Price Records</span>
+        </div>
+      </li>
+    </ol>
+  </nav>
+
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div>
+      <h1 class="text-2xl font-semibold text-gray-900">Market Price Records</h1>
+      <p class="text-sm text-gray-600">
+        View and manage price records for <%= @market_place.name %>
+      </p>
+    </div>
+    
+    <div class="flex items-center gap-2">
+      <%= link_to new_market_place_price_record_path(@market_place), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 focus:outline-none" do %>
+        Add Price Record
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<%# Filters %>
+<div class="mb-6">
+  <div class="flex flex-wrap gap-4">
+    <div class="w-48">
+      <label for="season" class="block mb-2 text-sm font-medium text-gray-900">Season</label>
+      <%= select_tag :season,
+          options_for_select(@market_place.available_seasons.map { |year|
+            ["#{year} - #{year + 1}", year]
+          }, params[:season]),
+          class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5",
+          data: {
+            controller: "filter",
+            filter_target: "select",
+            action: "change->filter#updateTable",
+            filter_url_value: market_place_price_records_path(@market_place)
+          }
+      %>
+    </div>
+  </div>
+</div>
+
+<%# Price Records Table %>
+<div class="bg-white border border-gray-200 rounded-lg shadow">
+  <div class="p-6">
+    <%= turbo_frame_tag "price_records_table" do %>
+      <%= render "price_records_table", place: @market_place, price_records: @price_records %>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,23 @@
+<div class="container mx-auto px-4 py-4 max-w-md">
+
+  <% content_for :title, "Findings" %>
+
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Findings</h1>
+    <%= link_to new_finding_path, class: "inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300" do %>
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      New
+    <% end %>
+  </div>
+
+  <div id="findings" class="space-y-4">
+    <% @findings.each do |finding| %>
+      <%= render finding %>
+      <p>
+        <%= link_to "Show this finding", finding, class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+      </p>
+    <% end %>
+  </div>
+</div>

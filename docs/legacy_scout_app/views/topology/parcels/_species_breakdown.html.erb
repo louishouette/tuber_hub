@@ -1,0 +1,70 @@
+<!-- Species Breakdown Table -->
+<div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-6">
+  <h2 class="text-lg font-semibold text-gray-900 mb-4">Species Breakdown</h2>
+  <% species_distribution = @stats[:species_distribution] || [] %>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm text-left text-gray-500">
+      <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+        <tr>
+          <th scope="col" class="px-4 py-3">Species</th>
+          <th scope="col" class="px-4 py-3 text-right">Planting Count</th>
+          <th scope="col" class="px-4 py-3 text-right">Planting Ratio</th>
+          <th scope="col" class="px-4 py-3 text-right">Total Replacements</th>
+          <th scope="col" class="px-4 py-3 text-right">Replacements Ratio</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% total_count = 0 %>
+        <% total_locations = @stats[:total_locations] || 0 %>
+        <% total_replacements = 0 %>
+        <% if species_distribution.present? %>
+          <% species_distribution.each_with_index do |species_data, index| %>
+            <% 
+              # Get the species data from the pre-calculated hash
+              species_id = species_data[:id]
+              species_replacements_info = @stats[:species_replacements_data][species_id] || {}
+              
+              # Use the location count (one planting per location) instead of total plantings
+              actual_planting_count = species_replacements_info[:location_count] || 0
+              total_count += actual_planting_count
+              
+              # Get the replacements count
+              species_replacements = species_replacements_info[:replacements] || 0
+              
+              # Add to the total replacements
+              total_replacements += species_replacements
+            %>
+            <tr class="<%= index.even? ? 'bg-white' : 'bg-gray-50' %> border-b hover:bg-gray-100">
+              <td class="px-4 py-3 font-medium text-gray-900">
+                <div class="flex items-center">
+                  <% if species_data[:color_code].present? %>
+                    <div class="w-3 h-3 rounded-full mr-2" style="background-color: <%= species_data[:color_code] %>"></div>
+                  <% else %>
+                    <div class="w-3 h-3 rounded-full bg-primary-500 mr-2"></div>
+                  <% end %>
+                  <%= species_data[:name] %>
+                </div>
+              </td>
+              <td class="px-4 py-3 text-right"><%= actual_planting_count %></td>
+              <td class="px-4 py-3 text-right"><%= total_locations > 0 ? (actual_planting_count.to_f / total_locations * 100).round : 0 %>%</td>
+              <td class="px-4 py-3 text-right"><%= species_replacements %></td>
+              <td class="px-4 py-3 text-right"><%= actual_planting_count > 0 ? (species_replacements.to_f / actual_planting_count * 100).round(1) : 0 %>%</td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="5" class="px-4 py-3 text-center text-gray-500">No species data available</td>
+          </tr>
+        <% end %>
+        <!-- Total Row -->
+        <tr class="bg-gray-50 border-t-2 border-gray-300 font-medium">
+          <td class="px-4 py-3 text-gray-900">Total</td>
+          <td class="px-4 py-3 text-right text-gray-900"><%= total_locations %></td>
+          <td class="px-4 py-3 text-right text-gray-900">100%</td>
+          <td class="px-4 py-3 text-right text-gray-900"><%= @stats[:total_replacements_count] %></td>
+          <td class="px-4 py-3 text-right text-gray-900"><%= total_locations > 0 ? (@stats[:total_replacements_count].to_f / total_locations * 100).round(1) : 0 %>%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

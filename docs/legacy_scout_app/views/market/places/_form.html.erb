@@ -1,0 +1,86 @@
+<%# Form errors %>
+<% if market_place.errors.any? %>
+  <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50" role="alert">
+    <h2 class="font-medium mb-2"><%= pluralize(market_place.errors.count, "error") %> prohibited this market place from being saved:</h2>
+    <ul class="list-disc list-inside">
+      <% market_place.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with(model: market_place, url: market_place.new_record? ? market_places_path : market_place_path(market_place), class: "space-y-6") do |form| %>
+  <div class="grid gap-4 sm:grid-cols-2">
+    <div class="sm:col-span-2">
+      <%= form.label :name, class: "block mb-2 text-sm font-medium text-gray-900" do %>
+        Name <span class="text-red-500">*</span>
+      <% end %>
+      <%= form.text_field :name, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5", placeholder: "Enter market place name" %>
+    </div>
+
+    <div class="sm:col-span-2">
+      <%= form.label :description, class: "block mb-2 text-sm font-medium text-gray-900" do %>
+        Description <span class="text-gray-400">(optional)</span>
+      <% end %>
+      <%= form.text_area :description, rows: 4, class: "block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500", placeholder: "Write market place description here" %>
+    </div>
+
+    <div>
+      <%= form.label :market_segment_id, class: "block mb-2 text-sm font-medium text-gray-900" do %>
+        Market Segment <span class="text-red-500">*</span>
+      <% end %>
+      <div class="relative">
+        <%= form.collection_select :market_segment_id, 
+            MarketSegment.all, 
+            :id, 
+            :name,
+            { prompt: "Select a market segment" },
+            class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" %>
+      </div>
+    </div>
+
+
+
+    <div>
+      <%= form.label :country, class: "block mb-2 text-sm font-medium text-gray-900" do %>
+        Country <span class="text-red-500">*</span>
+      <% end %>
+      <div class="relative">
+        <%= form.text_field :country, 
+            class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5", 
+            placeholder: "Select or enter country",
+            list: "countries" %>
+        <datalist id="countries">
+          <% (@existing_countries || []).each do |country| %>
+            <option value="<%= country %>">
+          <% end %>
+        </datalist>
+      </div>
+    </div>
+
+    <div>
+      <%= form.label :region, class: "block mb-2 text-sm font-medium text-gray-900" do %>
+        Region <span class="text-gray-400">(optional)</span>
+      <% end %>
+      <div class="relative">
+        <%= form.text_field :region, 
+            class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5", 
+            placeholder: "Select or enter region",
+            list: "regions" %>
+        <datalist id="regions">
+          <% (@existing_regions || []).each do |region| %>
+            <option value="<%= region %>">
+          <% end %>
+        </datalist>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex justify-end space-x-4 mt-6">
+    <%= link_to "Cancel", market_places_path, class: "py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200" %>
+    <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+      Save Market Place
+    </button>
+  </div>
+<% end %>

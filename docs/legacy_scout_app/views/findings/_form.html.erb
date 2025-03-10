@@ -1,0 +1,109 @@
+<%= form_with(model: [finding.harvesting_run, finding].compact, class: "contents") do |form| %>
+  <div class="my-5">
+    <%= form.label :created_at, "Created At" %>
+    <%= form.datetime_field :created_at,
+        value: (finding.created_at || Time.current).strftime("%Y-%m-%dT%H:%M"),
+        class: "block shadow rounded-md border border-gray-400 outline-none px-3 py-2 mt-2 w-full" %>
+  </div>
+
+  <% if finding.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+      <h2><%= pluralize(finding.errors.count, "error") %> prohibited this finding from being saved:</h2>
+
+      <ul>
+        <% finding.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <% unless finding.harvesting_run %>
+    <div class="my-5">
+      <%= form.label :dog_id, "Dog" %>
+      <%= form.collection_select :dog_id, Dog.order(:name), :id, :name, 
+          { prompt: "Select a dog" }, 
+          class: "block shadow rounded-md border border-gray-400 outline-none px-3 py-2 mt-2 w-full" %>
+      
+      <div class="mt-2">
+        <%= link_to "Create New Dog", new_dog_path, 
+            class: "text-blue-600 hover:text-blue-800 text-sm",
+            data: { turbo_frame: "new_dog" } %>
+      </div>
+    </div>
+
+    <div class="my-5">
+      <%= form.label :harvester_id, "Harvester" %>
+      <%= form.collection_select :harvester_id, User.can_harvest.active.order(:first_name), :id, :name, 
+          { prompt: "Select a harvester" }, 
+          class: "block shadow rounded-md border border-gray-400 outline-none px-3 py-2 mt-2 w-full" %>
+      
+      <div class="mt-2">
+        <%= link_to "Create New Harvester", new_user_path(role: :employee, can_harvest: true), 
+            class: "text-blue-600 hover:text-blue-800 text-sm",
+            data: { turbo_frame: "new_harvester" } %>
+      </div>
+    </div>
+
+    <% if finding.persisted? %>
+      <div class="my-5">
+        <%= form.label :finding_raw_weight %>
+        <%= form.number_field :finding_raw_weight, 
+            class: "block shadow rounded-md border border-gray-400 outline-none px-3 py-2 mt-2 w-full" %>
+      </div>
+
+      <div class="my-5">
+        <%= form.label :finding_net_weight %>
+        <%= form.number_field :finding_net_weight, 
+            class: "block shadow rounded-md border border-gray-400 outline-none px-3 py-2 mt-2 w-full" %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <div class="my-5" data-controller="location-search" data-location-search-url-value="/locations/search">
+    <%= form.label :location_id, "Location", class: "required" %>
+    <div class="relative">
+      <%= form.text_field :location_search, 
+          value: finding.location&.name,
+          class: "block shadow rounded-md border border-gray-400 outline-none px-3 py-2 mt-2 w-full",
+          placeholder: "Search location (required)",
+          data: {
+            location_search_target: "input",
+            action: "input->location-search#search"
+          } %>
+      <%= form.hidden_field :location_id, 
+          data: { location_search_target: "hiddenInput" } %>
+      <div class="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg hidden mt-1"
+           data-location-search-target="results">
+      </div>
+    </div>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :depth, class: "block mb-2 required" %>
+    <div class="flex gap-2" data-controller="button-group">
+      <%= form.hidden_field :depth, 
+          value: finding.depth || :intermediate, 
+          data: { button_group_target: "input" } %>
+      <% Finding.depths.each do |name, value| %>
+        <%= form.label "depth_#{name}_label",
+            t(".depth.#{name}", default: name.titleize),
+            class: "flex-1 text-center py-2 px-4 border rounded cursor-pointer select-none
+                   #{(finding.depth || 'intermediate') == name.to_s ? 'bg-blue-600 text-white' : 'bg-gray-200'} hover:bg-gray-300",
+            data: {
+              action: "click->button-group#select",
+              value: name
+            } %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :observation %>
+    <%= form.text_area :observation, rows: 4, class: "block shadow rounded-md border border-gray-400 outline-none px-3 py-2 mt-2 w-full" %>
+  </div>
+
+  <div class="inline">
+    <%= form.submit class: "rounded-lg py-3 px-5 bg-blue-600 text-white inline-block font-medium cursor-pointer" %>
+  </div>
+<% end %>

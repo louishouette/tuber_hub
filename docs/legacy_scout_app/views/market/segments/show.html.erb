@@ -1,0 +1,180 @@
+<%# Header with actions %>
+<div class="flex justify-between items-center mb-6">
+  <div>
+    <h1 class="text-2xl font-semibold text-gray-900"><%= @segment.name %></h1>
+    <p class="mt-1 text-sm text-gray-600"><%= @segment.description %></p>
+  </div>
+  
+  <div class="flex gap-2">
+    <%= link_to edit_market_segment_path(@segment), class: "text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none" do %>
+      <i class="fas fa-edit mr-2"></i> Edit
+    <% end %>
+    <%= button_to market_segment_path(@segment), method: :delete, class: "text-red-700 bg-white border border-red-300 hover:bg-red-50 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none", data: { turbo_confirm: 'Are you sure?' } do %>
+      <i class="fas fa-trash mr-2"></i> Delete
+    <% end %>
+  </div>
+</div>
+
+<%# Stats Overview %>
+<% if @current_season_records.exists? %>
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+    <%# Markets %>
+    <div class="bg-white border border-gray-200 rounded-lg p-4">
+      <div class="text-sm font-medium text-gray-500">Total Markets</div>
+      <div class="text-2xl font-semibold text-gray-900"><%= @stats[:total_markets] %></div>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-lg p-4">
+      <div class="text-sm font-medium text-gray-500">Active Markets</div>
+      <div class="text-2xl font-semibold text-gray-900"><%= @stats[:active_markets] %></div>
+    </div>
+
+    <%# Channels %>
+    <div class="bg-white border border-gray-200 rounded-lg p-4">
+      <div class="text-sm font-medium text-gray-500">Total Channels</div>
+      <div class="text-2xl font-semibold text-gray-900"><%= @stats[:total_channels] %></div>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-lg p-4">
+      <div class="text-sm font-medium text-gray-500">Active Channels</div>
+      <div class="text-2xl font-semibold text-gray-900"><%= @stats[:active_channels] %></div>
+    </div>
+
+    <%# Volume & Price %>
+    <div class="bg-white border border-gray-200 rounded-lg p-4">
+      <div class="text-sm font-medium text-gray-500">Total Volume</div>
+      <div class="text-2xl font-semibold text-gray-900"><%= number_with_delimiter(@stats[:total_volume]) %> kg</div>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-lg p-4">
+      <div class="text-sm font-medium text-gray-500">Avg Price</div>
+      <div class="text-2xl font-semibold text-gray-900"><%= number_to_currency(@stats[:avg_price], unit: '€') %></div>
+    </div>
+  </div>
+<% end %>
+
+<%# Charts Section %>
+<% if @current_season_records.exists? %>
+  <%# Price and Volume Evolution %>
+  <div class="bg-white border border-gray-200 rounded-lg p-6 mb-8">
+    <h3 class="text-lg font-medium text-gray-900 mb-4">Market Activity</h3>
+    <%= line_chart [
+          {
+            name: "Average Price (€/kg)",
+            data: @weekly_stats[:prices],
+            dataset: { yAxisID: 'y-price', type: 'line', tension: 0.4 }
+          },
+          {
+            name: "Historical Trend (€/kg)",
+            data: @historical_trend,
+            dataset: { 
+              yAxisID: 'y-price',
+              type: 'line',
+              borderDash: [5, 5],
+              borderColor: '#9CA3AF',
+              backgroundColor: '#9CA3AF',
+              tension: 0.4,
+              pointRadius: 0
+            }
+          },
+          {
+            name: "Volume (kg)",
+            data: @weekly_stats[:volumes],
+            dataset: { yAxisID: 'y-volume', type: 'bar' }
+          }
+        ],
+        height: "300px",
+        points: { show: true },
+        legend: true,
+        discrete: true,
+        library: {
+          scales: {
+            y: {
+              type: 'linear',
+              display: false,
+              stacked: false
+            },
+            'y-volume': {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              stacked: false,
+              grid: { display: false },
+              title: {
+                display: true,
+                text: 'Volume (kg)'
+              }
+            },
+            'y-price': {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              stacked: false,
+              grid: { display: false },
+              title: {
+                display: true,
+                text: 'Price (€/kg)'
+              }
+            }
+          }
+        } %>
+  </div>
+
+  <%# Market Activity Distribution %>
+  <div class="bg-white border border-gray-200 rounded-lg p-6 mb-8">
+    <h3 class="text-lg font-medium text-gray-900 mb-4">Active Markets Distribution</h3>
+    <%= area_chart @weekly_stats[:active_markets],
+        height: "200px",
+        points: false,
+        legend: false,
+        suffix: " markets",
+        curve: true %>
+  </div>
+
+  <%# Price Range Distribution %>
+  <div class="bg-white border border-gray-200 rounded-lg p-6 mb-8">
+    <h3 class="text-lg font-medium text-gray-900 mb-4">Price Distribution</h3>
+    <%= column_chart @current_season_records
+                      .group("ROUND(avg_price_per_kg)")
+                      .count,
+        height: "200px",
+        points: false,
+        legend: false,
+        prefix: "€",
+        library: {
+          scales: {
+            y: { title: { display: true, text: 'Number of Records' } },
+            x: { title: { display: true, text: 'Price (€/kg)' } }
+          }
+        } %>
+  </div>
+<% end %>
+
+<%# Market Places List %>
+<div class="bg-white border border-gray-200 rounded-lg p-6 mb-8">
+  <div class="flex justify-between items-center mb-4">
+    <h3 class="text-lg font-medium text-gray-900">Associated Markets</h3>
+    <div class="text-sm text-gray-500"><%= pluralize(@stats[:total_markets], 'market') %> total</div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <% @segment.market_places.includes(:market_price_records).order(:name).each do |market| %>
+      <%= link_to market_place_path(market), class: "bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-600" do %>
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h4 class="font-medium text-gray-900 dark:text-white"><%= market.name %></h4>
+            <p class="text-sm text-gray-500 dark:text-gray-400"><%= market.region %>, <%= market.country %></p>
+            <% if market.market_price_records.in_current_season.exists? %>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                Last price: <%= number_to_currency(market.market_price_records.in_current_season.last&.avg_price_per_kg, unit: '€') %>/kg
+              </p>
+            <% end %>
+          </div>
+          <% if market.recent_activity? %>
+            <span class="flex h-2 w-2 relative">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            </span>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

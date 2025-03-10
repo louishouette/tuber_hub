@@ -1,0 +1,37 @@
+<%# Cache based on species stats collection %>
+<% cache ["species_statistics", species_stats.map { |s| "#{s.name}/#{s.findings_count}/#{s.total_raw_weight}" }.join('/')] do %>
+  <table class="w-full text-sm text-left text-gray-500">
+    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+      <tr>
+        <th class="px-4 py-3"><%= t('dashboard.reporting.columns.species') %></th>
+        <th class="px-4 py-3"><%= t('dashboard.reporting.columns.plants') %></th>
+        <th class="px-4 py-3"><%= t('dashboard.reporting.columns.findings') %></th>
+        <th class="px-4 py-3"><%= t('dashboard.reporting.columns.raw_weight') %></th>
+        <th class="px-4 py-3"><%= t('dashboard.reporting.columns.avg_weight') %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% species_stats.each do |stat| %>
+        <tr class="border-b">
+          <td class="px-4 py-3"><%= stat.name %></td>
+          <td class="px-4 py-3"><%= stat.plantings_count %></td>
+          <td class="px-4 py-3"><%= stat.findings_count %></td>
+          <td class="px-4 py-3"><%= format_weight(stat.total_raw_weight) %></td>
+          <td class="px-4 py-3"><%= format_weight(stat.average_weight) %></td>
+        </tr>
+      <% end %>
+      <!-- Total Row -->
+      <tr class="bg-gray-50 font-medium">
+        <td class="px-4 py-2"><%= t('dashboard.reporting.total') %></td>
+        <td class="px-4 py-2"><%= species_stats.sum(&:plantings_count) %></td>
+        <td class="px-4 py-2"><%= species_stats.sum(&:findings_count) %></td>
+        <td class="px-4 py-2"><%= format_weight(species_stats.sum(&:total_raw_weight)) %></td>
+        <td class="px-4 py-2">
+          <% total_weight = species_stats.sum(&:total_raw_weight) %>
+          <% total_findings = species_stats.sum(&:findings_count) %>
+          <%= format_weight(total_findings > 0 ? total_weight.to_f / total_findings : 0) %>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+<% end %>

@@ -1,0 +1,54 @@
+<div id="<%= dom_id harvesting_run %>" class="p-6 bg-white border border-gray-200 rounded-lg shadow">
+  <div class="flex justify-between items-start mb-4">
+    <div>
+      <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900">
+        <%= harvesting_run.harvester.name %> the <%= harvesting_run.started_at.strftime("%d %B %Y at %H:%M") %>
+      </h5>
+      <p class="text-sm text-gray-600">
+        with <%= harvesting_run.dog.name %> on <%= harvesting_run.harvesting_sector.name %>
+      </p>
+    </div>
+    
+    <div class="flex flex-col items-end gap-2">
+      <div class="flex items-center gap-2">
+        <span class="<%= harvesting_run.stopped_at.nil? ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800' %> text-xs font-medium px-2.5 py-0.5 rounded-full">
+          <%= harvesting_run.stopped_at.nil? ? 'Active' : 'Completed' %>
+        </span>
+        <%= link_to edit_harvesting_run_path(harvesting_run), class: "text-gray-500 hover:text-gray-700" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+          </svg>
+        <% end %>
+      </div>
+      
+      <% if harvesting_run.stopped_at %>
+        <span class="text-xs text-gray-500">
+          Duration: <%= distance_of_time_in_words(harvesting_run.started_at, harvesting_run.stopped_at) %>
+        </span>
+      <% end %>
+      
+      <span class="text-xs text-gray-500">
+        Findings: <%= harvesting_run.findings.count %>
+      </span>
+
+      <% if harvesting_run.run_raw_weight || harvesting_run.run_net_weight %>
+        <div class="text-xs text-gray-500 text-right">
+          <% if harvesting_run.run_raw_weight %>
+            <div>Raw weight: <%= harvesting_run.run_raw_weight %>g</div>
+          <% end %>
+          <% if harvesting_run.run_net_weight %>
+            <div>Net weight: <%= harvesting_run.run_net_weight %>g</div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <% if harvesting_run.comment.present? %>
+    <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+      <p class="text-sm text-gray-700">
+        <%= harvesting_run.comment %>
+      </p>
+    </div>
+  <% end %>
+</div>

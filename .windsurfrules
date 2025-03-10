@@ -1,0 +1,110 @@
+## GENERAL RULES
+1. Regularly suggest short one line text content for git commit messages
+2. Just suggest the text, do not offer to run git commands
+3. Do not edit the files in requirements/ or docs/
+
+## RAILS RULES
+1. Use Rails 8.0.1 : see the docs for Rails 8 in docs/rails_8
+2. Always make sure the code is up to date with Rails 8 and isn't using deprecated ways
+  a. Use Kamal 2 (with Thruster) for zero-downtime deployments without relying on external PaaS solutions
+  b. Adopt Solid Cable for Action Cable (pub/sub), Solid Cache for caching (disk-based, scalable, and secure), and Solid Queue for background job processing
+  c. Leverage the new authentication generator (rails generate authentication) to scaffold a secure auth session management without third-party gems like Devise
+  d. Utilize the new dedicated script folder and script generator (rails generate script <name>) to organize one-off and utility scripts
+  e. Use the new `params.expect` method instead of `params.require` and `params.permit` to require and permit parameters in one concise call
+  f. Stick with the modern hash syntax for enums (e.g. enum status: { pending: 0, active: 1 })
+3. Always favor a rails generator when possible instead of writing code yourself
+4. Always use timezone-aware methods: Time.zone.now instead of Time.current/Time.now, Time.zone.parse instead of Time.parse
+5. If you want to debug the code against real data, you can use 'rails runner' commands if it is relevant
+6. Database and ActiveRecord Rules:
+  a. ALWAYS check model associations (belongs_to, has_many, etc.) and schema.rb BEFORE writing queries
+  b. Start queries from the highest-level model in the relationship chain
+  c. Use association methods to traverse relationships
+  d. Use scopes defined in models
+  e. NEVER use raw SQL - use ActiveRecord query methods (where, joins, includes)
+  f. If a query seems complex, first check if it can be simplified by:
+    - Adding a new association to the model
+    - Creating a new scope
+    - Using existing scopes with merge
+  g. For unavoidable complex SQL, use Arel instead of raw SQL strings
+  h. For complex queries:
+    - Break down into smaller, readable chunks using scopes
+    - Use merge to combine scopes from different models
+    - Use includes/preload/eager_load to avoid N+1 queries
+  i. For date-based grouping:
+    - ALWAYS use the groupdate gem
+    - Configure week start to Monday using week_start: :monday
+    - Example: Model.group_by_week(:created_at, week_start: :monday).count
+    - See documentation in docs/groupdate/README.md
+  j. Take advantage of new data type support (e.g. float4/float8 in PostgreSQL) and performance enhancements.
+7. Embrace the "Convention over Configuration" philosophy by following Rails' naming conventions and project structures
+8. Maintain a clear separation of concerns by ensuring controllers handle request-response cycles and models encapsulate business logic
+9. Delegate complex logic to service objects or concerns as needed
+10. Make sure the timestamps attribute fields are called [timed_subject]_at and that durations are called [timed_subject]_in_[duration_unit]
+11. Use Chartkick for charts : see the docs for chartkick in docs/chartkick.md
+12. Do not precompile the assets in dev
+13. The dev server (bin/dev) is always running, don't offer to start new ones
+14. You can reset the cache with `rails runner 'Rails.cache.clear' && rm -rf tmp/cache` but do not do it unless absolutely necessary
+
+## FLOWBITE UI STYLING RULES
+1. Use flowbite for designing the apps components : see the docs for flowbite in docs/flowbite
+2. Color Scheme:
+  a. Use light backgrounds (bg-gray-50, bg-white) for containers
+  b. Use subtle borders (border-gray-200) for separation
+  c. Use gray-500 to gray-700 for text
+  d. Use primary-500 for interactive elements and focus states
+3. Component Styling:
+  a. Buttons:
+    - Default: "text-sm font-medium rounded-lg px-4 py-2"
+    - Primary: "text-white bg-primary-500 hover:bg-primary-600"
+    - Secondary: "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100"
+    - Light: "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+  b. Forms:
+    - Inputs: "bg-gray-50 border border-gray-300 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500"
+    - Labels: "text-sm font-medium text-gray-900"
+    - Help text: "mt-1 text-sm text-gray-500"
+  c. Cards:
+    - Container: "bg-white rounded-lg border border-gray-200 p-4"
+    - Headers: "text-lg font-semibold text-gray-900"
+    - Content: "text-base text-gray-500"
+  d. Navigation:
+    - Navbar: "bg-white border-b border-gray-200"
+    - Sidebar: "bg-white border-r border-gray-200"
+    - Menu items: "text-base font-medium text-gray-900 hover:bg-gray-100"
+4. Typography:
+  a. Font weights:
+    - Regular text: font-normal
+    - Section headers: font-medium
+    - Page titles: font-semibold
+  b. Font sizes:
+    - Body text: text-sm or text-base
+    - Headers: text-lg for cards, text-xl for sections
+    - Titles: text-2xl
+  c. Line heights:
+    - Default: leading-normal
+    - Tight: leading-snug for headers
+5. Spacing:
+  a. Padding:
+    - Containers: p-4
+    - Buttons: px-4 py-2
+    - Form fields: p-2.5
+  b. Margins:
+    - Between sections: mb-4
+    - Between items in a list: space-y-2
+    - Between related elements: mt-2
+6. Interactions:
+  a. Hover states:
+    - Use hover:bg-gray-100 for light interactions
+    - Use hover:text-gray-900 for text emphasis
+  b. Focus states:
+    - Use focus:ring-4 focus:ring-primary-500
+    - Use focus:border-primary-500 for form elements
+7. Layout:
+  a. Grid system:
+    - Use grid grid-cols-1 as base
+    - Responsive: sm:grid-cols-2 lg:grid-cols-4
+  b. Flex containers:
+    - Use flex items-center for vertical alignment
+    - Use justify-between for space distribution
+8. Responsive Design:
+  a. Always use mobile-first approach (smaller screen styles as default)
+  b. Add responsive variants (sm:, md:, lg:) only when needed to adapt for larger screens

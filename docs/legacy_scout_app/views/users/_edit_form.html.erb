@@ -1,0 +1,52 @@
+<%= form_with(model: user, class: "space-y-6") do |form| %>
+  <% if user.errors.any? %>
+    <div id="error_explanation" class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50" role="alert">
+      <div class="font-medium"><%= pluralize(user.errors.count, "error") %> prohibited this user from being saved:</div>
+      <ul class="mt-1.5 list-disc list-inside">
+        <% user.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid gap-6 mb-6 md:grid-cols-2">
+    <div>
+      <%= form.label :first_name, class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <%= form.text_field :first_name, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5", placeholder: "John" %>
+    </div>
+    <div>
+      <%= form.label :last_name, class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <%= form.text_field :last_name, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5", placeholder: "Doe" %>
+    </div>
+  </div>
+
+  <div class="mb-6">
+    <%= form.label :email_address, class: "block mb-2 text-sm font-medium text-gray-900" %>
+    <%= form.email_field :email_address, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5", placeholder: "john.doe@company.com" %>
+  </div>
+
+  <div class="mb-6">
+    <%= form.label :role, class: "block mb-2 text-sm font-medium text-gray-900" %>
+    <%= form.select :role, User.roles.keys.map { |role| [role.titleize, role] }, {}, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+  </div>
+
+  <div class="grid gap-6 mb-6 md:grid-cols-3">
+    <div class="flex items-center">
+      <%= form.check_box :is_active, class: "w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2" %>
+      <%= form.label :is_active, class: "ml-2 text-sm font-medium text-gray-900" %>
+    </div>
+    <div class="flex items-center">
+      <%= form.check_box :can_survey, class: "w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2" %>
+      <%= form.label :can_survey, class: "ml-2 text-sm font-medium text-gray-900" %>
+    </div>
+    <div class="flex items-center">
+      <%= form.check_box :can_harvest, class: "w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2" %>
+      <%= form.label :can_harvest, class: "ml-2 text-sm font-medium text-gray-900" %>
+    </div>
+  </div>
+
+  <div>
+    <%= form.submit class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center" %>
+  </div>
+<% end %>

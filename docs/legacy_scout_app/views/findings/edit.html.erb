@@ -1,0 +1,12 @@
+<div class="mx-auto md:w-2/3 w-full">
+  <h1 class="font-bold text-4xl">Editing finding</h1>
+
+  <%= render "form", finding: @finding %>
+
+  <% if @finding.harvesting_run %>
+    <%= link_to "Back to harvesting run", harvesting_run_path(@finding.harvesting_run), class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+  <% else %>
+    <%= link_to "Show this finding", @finding, class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+    <%= link_to "Back to findings", findings_path, class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+  <% end %>
+</div>

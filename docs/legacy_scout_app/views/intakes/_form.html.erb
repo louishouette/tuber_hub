@@ -1,0 +1,90 @@
+<%= form_with(model: intake) do |form| %>
+  <% if intake.errors.any? %>
+    <div id="error_explanation" class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50" role="alert">
+      <div class="font-medium"><%= pluralize(intake.errors.count, "error") %> prohibited this intake from being saved:</div>
+      <ul class="mt-1.5 list-disc list-inside">
+        <% intake.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid gap-6 mb-6 grid-cols-1 lg:grid-cols-2">
+    <div>
+      <%= form.label :intake_at, class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <div class="relative">
+        <%= form.date_field :intake_at, 
+            class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5",
+            value: @intake.intake_at&.strftime("%Y-%m-%d")
+        %>
+      </div>
+    </div>
+
+    <div>
+      <%= form.label :operator_id, class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <%= form.collection_select :operator_id, 
+          User.all, 
+          :id, 
+          :name,
+          { selected: Current.user.id }, 
+          class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+    </div>
+  </div>
+
+  <div class="grid gap-6 mb-6 grid-cols-1 lg:grid-cols-4">
+    <div class="p-4 bg-gray-100 rounded-lg">
+      <h3 class="mb-4 text-lg font-medium">Raw</h3>
+      <div class="space-y-4">
+        <%= form.label :raw_number, class: "block mb-2 text-sm font-medium text-gray-900" %>
+        <%= form.number_field :raw_number, min: 0, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+
+        <%= form.label :raw_weight, class: "block mb-2 text-sm font-medium text-gray-900" %>
+        <%= form.number_field :raw_weight, min: 0, step: 0.01, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      </div>
+    </div>
+
+    <div class="p-4 bg-gray-100 rounded-lg">
+      <h3 class="mb-4 text-lg font-medium">Net</h3>
+      <div class="space-y-4">
+        <%= form.label :net_number, class: "block mb-2 text-sm font-medium text-gray-900" %>
+        <%= form.number_field :net_number, min: 0, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+
+        <%= form.label :net_weight, class: "block mb-2 text-sm font-medium text-gray-900" %>
+        <%= form.number_field :net_weight, min: 0, step: 0.01, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      </div>
+    </div>
+
+    <div class="p-4 bg-gray-100 rounded-lg">
+      <h3 class="mb-4 text-lg font-medium">Edible</h3>
+      <div class="space-y-4">
+        <%= form.label :edible_number, class: "block mb-2 text-sm font-medium text-gray-900" %>
+        <%= form.number_field :edible_number, min: 0, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+
+        <%= form.label :edible_weight, class: "block mb-2 text-sm font-medium text-gray-900" %>
+        <%= form.number_field :edible_weight, min: 0, step: 0.01, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      </div>
+    </div>
+
+    <div class="p-4 bg-gray-100 rounded-lg">
+      <h3 class="mb-4 text-lg font-medium">Non-Edible</h3>
+      <div class="space-y-4">
+        <%= form.label :non_edible_number, class: "block mb-2 text-sm font-medium text-gray-900" %>
+        <%= form.number_field :non_edible_number, min: 0, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+
+        <%= form.label :non_edible_weight, class: "block mb-2 text-sm font-medium text-gray-900" %>
+        <%= form.number_field :non_edible_weight, min: 0, step: 0.01, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-6">
+    <%= form.label :comment, class: "block mb-2 text-sm font-medium text-gray-900" %>
+    <%= form.text_area :comment, rows: 4, class: "block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" %>
+  </div>
+
+  <div class="flex items-center justify-end space-x-4">
+    <%= link_to "Cancel", intakes_path, class: "text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5" %>
+    <%= form.submit class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none" %>
+  </div>
+<% end %>

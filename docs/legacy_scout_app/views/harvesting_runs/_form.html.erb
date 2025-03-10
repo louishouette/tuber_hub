@@ -1,0 +1,102 @@
+<%= form_with(model: harvesting_run, class: "space-y-6") do |form| %>
+  <% if harvesting_run.errors.any? %>
+    <div id="error_explanation" class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50">
+      <h2 class="text-base font-semibold mb-2"><%= pluralize(harvesting_run.errors.count, "error") %> prohibited this harvesting run from being saved:</h2>
+      <ul class="list-disc list-inside">
+        <% harvesting_run.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid gap-6 md:grid-cols-2">
+    <div>
+      <%= form.label :dog_id, class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <%= form.collection_select :dog_id, Dog.all, :id, :name, 
+          { prompt: "Select a dog" }, 
+          { class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" } %>
+    </div>
+
+    <div>
+      <%= form.label :harvester_id, class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <%= form.select :harvester_id, 
+          options_from_collection_for_select(@harvesters, :id, :name, harvesting_run.harvester_id),
+          { prompt: "Select a harvester" },
+          { class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" } %>
+    </div>
+  </div>
+
+  <div data-controller="harvesting-sector-search" 
+       data-harvesting-sector-search-sectors-value="<%= @harvesting_sectors.map { |hs| { id: hs.id, name: hs.name } }.to_json %>">
+    <%= form.label :harvesting_sector_id, class: "block mb-2 text-sm font-medium text-gray-900" %>
+    <div class="relative">
+      <%= text_field_tag :harvesting_sector_search, harvesting_run.harvesting_sector&.name,
+          placeholder: "Search for a sector (e.g. FBH-QG-A1)",
+          class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5",
+          data: {
+            harvesting_sector_search_target: "input",
+            action: "input->harvesting-sector-search#search click@window->harvesting-sector-search#clickOutside"
+          } %>
+      
+      <%= form.hidden_field :harvesting_sector_id, 
+          data: { harvesting_sector_search_target: "selectedId" } %>
+      
+      <div data-harvesting-sector-search-target="results"
+           class="absolute left-0 right-0 z-50 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg overflow-hidden hidden">
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <%= form.label :comment, class: "block mb-2 text-sm font-medium text-gray-900" %>
+    <%= form.text_area :comment, rows: 4, class: "block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" %>
+  </div>
+
+  <div>
+    <%= form.label :started_at, class: "block mb-2 text-sm font-medium text-gray-900" %>
+    <%= form.datetime_local_field :started_at, 
+        class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+  </div>
+
+  <% if harvesting_run.persisted? %>
+    <div class="grid gap-6 md:grid-cols-2">
+      <div>
+        <%= form.label :run_raw_weight, class: "block mb-2 text-sm font-medium text-gray-900" %>
+        <div class="flex">
+          <%= form.number_field :run_raw_weight, 
+              class: "rounded-none rounded-l-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5",
+              placeholder: "Enter raw weight" %>
+          <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-l-0 border-gray-300 rounded-r-lg">
+            g
+          </span>
+        </div>
+      </div>
+
+      <div>
+        <%= form.label :run_net_weight, class: "block mb-2 text-sm font-medium text-gray-900" %>
+        <div class="flex">
+          <%= form.number_field :run_net_weight, 
+              class: "rounded-none rounded-l-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5",
+              placeholder: "Enter net weight" %>
+          <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-l-0 border-gray-300 rounded-r-lg">
+            g
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <%= form.label :stopped_at, class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <%= form.datetime_local_field :stopped_at, 
+          class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+    </div>
+  <% end %>
+
+  <%= form.hidden_field :surveyor_id %>
+
+  <div class="flex items-center gap-3 pt-4 border-t border-gray-200">
+    <%= form.submit harvesting_run.persisted? ? "Update Run" : "Start Run", class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" %>
+    <%= link_to "Cancel", harvesting_runs_path, class: "text-gray-700 bg-white hover:bg-gray-50 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg text-sm font-medium px-5 py-2.5 border border-gray-200" %>
+  </div>
+<% end %>

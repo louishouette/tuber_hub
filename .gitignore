@@ -4,11 +4,19 @@
 # belong in git's global ignore instead:
 # `$XDG_CONFIG_HOME/git/ignore` or `~/.config/git/ignore`
 
+# Ignore the erd file
+erd.pdf
+
+# Ignore macOS system files
+.DS_Store
+**/.DS_Store
+
 # Ignore bundler config.
 /.bundle
 
 # Ignore all environment files.
 /.env*
+.envrc
 
 # Ignore all logfiles and tempfiles.
 /log/*

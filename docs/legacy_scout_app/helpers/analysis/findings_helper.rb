@@ -1,0 +1,2 @@
+module Analysis::FindingsHelper
+end

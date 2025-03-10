@@ -1,0 +1,99 @@
+<div id="<%= dom_id dog %>" class="bg-white border border-gray-200 rounded-lg shadow-sm">
+  <div class="relative">
+    <% if dog.photo.present? %>
+      <%= image_tag dog.photo.url, class: "rounded-t-lg w-full h-48 object-cover" %>
+    <% else %>
+      <div class="rounded-t-lg w-full h-48 bg-gray-200 flex items-center justify-center">
+        <i class="fas fa-paw text-gray-400 text-4xl"></i>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="p-5">
+    <div class="flex items-center justify-between mb-4">
+      <h5 class="text-2xl font-bold tracking-tight text-gray-900"><%= dog.name %></h5>
+      <div class="flex space-x-2">
+        <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+          <%= dog.breed %>
+        </span>
+        <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+          <%= dog.age %> years
+        </span>
+      </div>
+    </div>
+
+    <% if dog.comment.present? %>
+      <p class="mb-4 text-sm text-gray-600"><%= dog.comment %></p>
+    <% end %>
+
+    <!-- Stats Overview -->
+    <div class="grid grid-cols-2 gap-4 mb-4">
+      <div class="p-3 bg-gray-50 rounded-lg">
+        <div class="text-sm text-gray-500">Total Findings</div>
+        <div class="text-lg font-semibold"><%= dog.total_findings_count %></div>
+      </div>
+      <div class="p-3 bg-gray-50 rounded-lg">
+        <div class="text-sm text-gray-500">Total Time</div>
+        <div class="text-lg font-semibold"><%= distance_of_time_in_words(dog.total_harvesting_time) %></div>
+      </div>
+    </div>
+
+    <!-- Top 3 Harvesters -->
+    <div class="mb-4">
+      <h6 class="text-sm font-semibold text-gray-900 mb-2">Top Harvesters</h6>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 text-sm">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Harvester</th>
+              <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Findings</th>
+              <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Avg. First Find</th>
+              <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Avg. Between</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% dog.top_harvesters.each do |harvester| %>
+              <tr>
+                <td class="px-3 py-2 whitespace-nowrap"><%= harvester.name %></td>
+                <td class="px-3 py-2 whitespace-nowrap"><%= harvester.findings_count %></td>
+                <td class="px-3 py-2 whitespace-nowrap"><%= pluralize(harvester.avg_time_to_first_finding.to_i, 'min') %></td>
+                <td class="px-3 py-2 whitespace-nowrap"><%= pluralize(harvester.avg_time_between_findings.to_i, 'min') %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Top 5 Parcels -->
+    <div class="mb-4">
+      <h6 class="text-sm font-semibold text-gray-900 mb-2">Top Parcels</h6>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 text-sm">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Parcel</th>
+              <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Findings</th>
+              <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Avg. First Find</th>
+              <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Avg. Between</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% dog.top_parcels.each do |parcel| %>
+              <tr>
+                <td class="px-3 py-2 whitespace-nowrap"><%= parcel.name %></td>
+                <td class="px-3 py-2 whitespace-nowrap"><%= parcel.findings_count %></td>
+                <td class="px-3 py-2 whitespace-nowrap"><%= pluralize(parcel.avg_time_to_first_finding.to_i, 'min') %></td>
+                <td class="px-3 py-2 whitespace-nowrap"><%= pluralize(parcel.avg_time_between_findings.to_i, 'min') %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="flex justify-end mt-4">
+      <%= link_to "View Details", dog, class: "inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300" %>
+    </div>
+  </div>
+</div>

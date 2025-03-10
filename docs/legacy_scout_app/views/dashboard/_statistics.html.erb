@@ -1,0 +1,133 @@
+<!-- Statistics Cards -->
+<div class="flex flex-col gap-4">
+  <!-- Line 1: Raw Weight and Avg Truffle Weight -->
+  <div class="grid grid-cols-2 gap-4">
+    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow">
+      <div class="flex items-center justify-between mb-1">
+        <h5 class="text-sm font-bold text-gray-900"><%= t('dashboard.index.total_intake_raw_weight', default: 'Total Intake Raw Weight') %></h5>
+        <i class="text-purple-600 fas fa-balance-scale"></i>
+      </div>
+      <div class="flex items-baseline">
+        <span class="text-2xl font-bold text-purple-600"><%= format_weight_value(stats[:intake_stats][:total_intake_raw_weight]) %><%= format_weight_unit(stats[:intake_stats][:total_intake_raw_weight]) %></span>
+      </div>
+      <p class="text-xs text-gray-500 mt-1">*<%= t('dashboard.index.current_season') %></p>
+    </div>
+
+    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow">
+      <div class="flex items-center justify-between mb-1">
+        <h5 class="text-sm font-bold text-gray-900"><%= t('dashboard.index.total_intake_net_weight', default: 'Total Intake Net Weight') %></h5>
+        <i class="text-pink-600 fas fa-balance-scale-right"></i>
+      </div>
+      <div class="flex items-baseline">
+        <span class="text-2xl font-bold text-pink-600"><%= format_weight_value(stats[:intake_stats][:total_intake_net_weight]) %><%= format_weight_unit(stats[:intake_stats][:total_intake_net_weight]) %></span>
+      </div>
+      <p class="text-xs text-gray-500 mt-1">*<%= t('dashboard.index.current_season') %></p>
+    </div>
+  </div>
+
+  <!-- Line 2: Runs and Findings -->
+  <div class="grid grid-cols-2 gap-4">
+    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow">
+      <div class="flex items-center justify-between mb-1">
+        <h5 class="text-sm font-bold text-gray-900"><%= t('dashboard.index.total_runs') %></h5>
+        <i class="text-green-600 fas fa-running"></i>
+      </div>
+      <div class="flex items-baseline">
+        <span class="text-2xl font-bold text-green-600"><%= number_with_delimiter(stats[:total_runs]) %></span>
+      </div>
+      <p class="text-xs text-gray-500 mt-1">*<%= t('dashboard.index.current_season') %></p>
+    </div>
+
+    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow">
+      <div class="flex items-center justify-between mb-1">
+        <h5 class="text-sm font-bold text-gray-900"><%= t('dashboard.index.findings') %></h5>
+        <i class="text-blue-600 fas fa-search"></i>
+      </div>
+      <div class="flex items-baseline">
+        <span class="text-2xl font-bold text-blue-600"><%= number_with_delimiter(stats[:total_findings]) %></span>
+      </div>
+      <p class="text-xs text-gray-500 mt-1">*<%= t('dashboard.index.current_season') %></p>
+    </div>
+  </div>
+
+  <!-- Line 3: Run Duration and Runs per Day -->
+  <div class="grid grid-cols-2 gap-4">
+    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow">
+      <div class="flex items-center justify-between mb-1">
+        <h5 class="text-sm font-bold text-gray-900"><%= t('dashboard.index.avg_run_duration') %></h5>
+        <i class="text-indigo-600 fas fa-clock"></i>
+      </div>
+      <div class="flex items-baseline">
+        <span class="text-2xl font-bold text-indigo-600"><%= format_duration(stats[:average_duration]) %></span>
+      </div>
+      <p class="text-xs text-gray-500 mt-1">*<%= t('dashboard.index.current_season') %></p>
+    </div>
+
+    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow">
+      <div class="flex items-center justify-between mb-1">
+        <h5 class="text-sm font-bold text-gray-900"><%= t('dashboard.index.avg_runs_per_day', default: 'Avg Runs/Day') %></h5>
+        <i class="text-orange-600 fas fa-calendar-day"></i>
+      </div>
+      <div class="flex items-baseline">
+        <span class="text-2xl font-bold text-orange-600">
+          <%= number_with_precision(stats[:average_runs_per_day], precision: 1) %>
+          <span class="text-sm ml-1"><%= t('dashboard.index.per_day') %></span>
+        </span>
+      </div>
+      <p class="text-xs text-gray-500 mt-1">*<%= t('dashboard.index.on_days_with_three_runs') %></p>
+    </div>
+  </div>
+
+  <!-- Line 4: Average Time Per Truffle and Unproductive Runs -->
+  <div class="grid grid-cols-2 gap-4">
+    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow">
+      <div class="flex items-center justify-between mb-1">
+        <h5 class="text-sm font-bold text-gray-900"><%= t('dashboard.index.avg_time_per_truffle') %></h5>
+        <i class="text-teal-600 fas fa-stopwatch"></i>
+      </div>
+      <div class="flex items-baseline">
+        <span class="text-2xl font-bold text-teal-600"><%= format_duration(stats[:average_time_per_truffle]) %></span>
+      </div>
+      <p class="text-xs text-gray-500 mt-1">*<%= t('dashboard.index.based_on_runs_with_more_than_two_findings') %></p>
+    </div>
+
+    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow">
+      <div class="flex items-center justify-between mb-1">
+        <h5 class="text-sm font-bold text-gray-900"><%= t('dashboard.index.unproductive_runs') %></h5>
+        <i class="text-red-600 fas fa-times-circle"></i>
+      </div>
+      <div class="flex items-baseline">
+        <span class="text-2xl font-bold text-red-600"><%= number_to_percentage(stats[:unproductive_runs_percentage], precision: 0) %></span>
+      </div>
+      <p class="text-xs text-gray-500 mt-1">*<%= t('dashboard.index.current_season') %></p>
+    </div>
+  </div>
+
+  <% if @weekly_intakes.any? %>
+    <div class="mt-8">
+      <h3 class="text-lg font-semibold mb-4"><%= t('dashboard.index.weekly_intakes', default: 'This Week\'s Intakes') %></h3>
+      <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+        <table class="w-full text-sm text-left text-gray-500">
+          <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3"><%= t('dashboard.index.date', default: 'Date') %></th>
+              <th scope="col" class="px-6 py-3"><%= t('dashboard.index.findings_count', default: 'Findings') %></th>
+              <th scope="col" class="px-6 py-3 text-right"><%= t('dashboard.index.raw_weight', default: 'Raw Weight') %></th>
+              <th scope="col" class="px-6 py-3 text-right"><%= t('dashboard.index.net_weight', default: 'Net Weight') %></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @weekly_intakes.each do |intake| %>
+              <tr class="bg-white border-b hover:bg-gray-50">
+                <td class="px-6 py-4"><%= l intake.intake_at, format: :short %></td>
+                <td class="px-6 py-4"><%= intake.raw_number %></td>
+                <td class="px-6 py-4 text-right"><%= number_with_precision(intake.raw_weight, precision: 0) %> g</td>
+                <td class="px-6 py-4 text-right"><%= number_with_precision(intake.net_weight, precision: 0) %> g</td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% end %>
+</div>

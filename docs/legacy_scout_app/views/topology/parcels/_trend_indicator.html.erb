@@ -1,0 +1,41 @@
+<%
+  # Determine the color and icon based on the change value
+  if change.nil?
+    color_class = "text-gray-900 font-medium"
+    icon = "flat"
+    text = "N/A"
+  elsif change == 0
+    color_class = "text-gray-500"
+    icon = "minus"
+    text = "0%"
+  elsif change > 0
+    color_class = "text-green-500"
+    icon = "arrow-up"
+    text = "+#{change}%"
+  else
+    color_class = "text-red-500"
+    icon = "arrow-down"
+    text = "#{change}%"
+  end
+%>
+
+<span class="<%= color_class %> text-xs flex items-center gap-1" title="<%= change.nil? ? 'No previous data' : 'vs previous season' %>">
+  <% if icon == "arrow-up" %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+    </svg>
+  <% elsif icon == "arrow-down" %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+    </svg>
+  <% elsif icon == "flat" %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 12H6" />
+    </svg>
+  <% else %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 12H6" />
+    </svg>
+  <% end %>
+  <span class="font-medium"><%= text %></span>
+</span>

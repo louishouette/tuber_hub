@@ -1,0 +1,131 @@
+<%= form_with(url: @price.new_record? ? market_prices_path : market_price_path(@price),
+              method: @price.new_record? ? :post : :patch,
+              scope: :price,
+              class: "space-y-6") do |f| %>
+  <% if @price.errors.any? %>
+    <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <i class="fas fa-exclamation-circle text-red-400"></i>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">
+            <%= pluralize(@price.errors.count, "error") %> prohibited this price from being saved:
+          </h3>
+          <div class="mt-2 text-sm text-red-700">
+            <ul class="list-disc pl-5 space-y-1">
+              <% @price.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <%# Channel Selection %>
+      <div>
+        <%= f.label :channel_id, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.select :channel_id, @channels.map { |c| [c.name, c.id] }, { prompt: "Select a channel" },
+                     class: "block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500",
+                     required: true %>
+      </div>
+
+      <%# Effective Date %>
+      <div>
+        <%= f.label :applicable_at, "Effective Date", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.datetime_field :applicable_at,
+                            class: "block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500",
+                            required: true %>
+      </div>
+    </div>
+  </div>
+
+  <%# Price Inputs %>
+  <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+    <h3 class="text-lg font-medium text-gray-900 mb-4">Price Details</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <%# Extra Grade %>
+      <div>
+        <%= f.label :extra_price_per_kg, "Extra Grade (€/kg)", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <div class="mt-1 relative rounded-md shadow-sm">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-gray-500 sm:text-sm">€</span>
+          </div>
+          <%= f.number_field :extra_price_per_kg,
+                            class: "block w-full pl-7 pr-12 rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500",
+                            step: "0.01",
+                            placeholder: "0.00" %>
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <span class="text-gray-500 sm:text-sm">/kg</span>
+          </div>
+        </div>
+      </div>
+
+      <%# C1 Grade %>
+      <div>
+        <%= f.label :c1_price_per_kg, "C1 Grade (€/kg)", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <div class="mt-1 relative rounded-md shadow-sm">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-gray-500 sm:text-sm">€</span>
+          </div>
+          <%= f.number_field :c1_price_per_kg,
+                            class: "block w-full pl-7 pr-12 rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500",
+                            step: "0.01",
+                            placeholder: "0.00" %>
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <span class="text-gray-500 sm:text-sm">/kg</span>
+          </div>
+        </div>
+      </div>
+
+      <%# C2 Grade %>
+      <div>
+        <%= f.label :c2_price_per_kg, "C2 Grade (€/kg)", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <div class="mt-1 relative rounded-md shadow-sm">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-gray-500 sm:text-sm">€</span>
+          </div>
+          <%= f.number_field :c2_price_per_kg,
+                            class: "block w-full pl-7 pr-12 rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500",
+                            step: "0.01",
+                            placeholder: "0.00" %>
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <span class="text-gray-500 sm:text-sm">/kg</span>
+          </div>
+        </div>
+      </div>
+
+      <%# C3 Grade %>
+      <div>
+        <%= f.label :c3_price_per_kg, "C3 Grade (€/kg)", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <div class="mt-1 relative rounded-md shadow-sm">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-gray-500 sm:text-sm">€</span>
+          </div>
+          <%= f.number_field :c3_price_per_kg,
+                            class: "block w-full pl-7 pr-12 rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500",
+                            step: "0.01",
+                            placeholder: "0.00" %>
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <span class="text-gray-500 sm:text-sm">/kg</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-sm text-gray-600 mt-4">
+      <i class="fas fa-info-circle mr-1"></i>
+      At least one price must be set
+    </div>
+  </div>
+
+  <%# Form Actions %>
+  <div class="flex justify-end space-x-2">
+    <%= link_to "Cancel", market_prices_path, class: "text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none" %>
+    <%= f.submit class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none" %>
+  </div>
+<% end %>

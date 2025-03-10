@@ -18,9 +18,6 @@ gem "stimulus-rails"
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 gem "bcrypt", "~> 3.1.7"
 
-# Use Pundit for authorization
-gem "pundit"
-
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 
@@ -39,7 +36,37 @@ gem "kamal", require: false
 gem "thruster", require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-# gem "image_processing", "~> 1.2"
+gem "image_processing", "~> 1.2"
+
+# Use Tailwind CSS [https://github.com/rails/tailwindcss-rails]
+gem "tailwindcss-rails", "~> 4.2"
+
+# https://github.com/ruby/csv
+gem "csv"
+
+# https://github.com/ankane/chartkick
+gem "chartkick"
+
+# https://github.com/holidays/holidays
+gem "holidays"
+
+# https://github.com/ankane/groupdate
+gem "groupdate"
+
+# https://github.com/zdennis/activerecord-import
+gem "activerecord-import"
+
+# https://github.com/jfelchner/ruby-progressbar
+gem "ruby-progressbar"
+
+# https://github.com/weshatheleopard/rubyXL
+gem "rubyXL", "~> 3.4"
+
+# https://github.com/varvet/pundit
+gem "pundit"
+
+# https://github.com/weppos/breadcrumbs_on_rails
+# gem "breadcrumbs_on_rails"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
@@ -55,7 +82,14 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+
+  # https://github.com/drwl/annotaterb
+  gem "annotaterb"
+
+  # https://github.com/voormedia/rails-erd
+  gem "rails-erd"
+
+  # https://github.com/BetterErrors/better_errors
+  # gem 'better_errors'
+  # gem 'binding_of_caller'
 end
-
-
-gem "tailwindcss-rails", "~> 4.2"

@@ -1,0 +1,137 @@
+<div class="p-4">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">
+      <%= t('.title', default: 'Intakes') %>
+    </h1>
+
+    <div class="flex gap-4">
+      <%= link_to intakes_path(format: :xlsx), class: "text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5" do %>
+        <i class="fas fa-file-excel mr-2"></i>Export Weekly Stats
+      <% end %>
+
+      <%= link_to new_intake_path, class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5" do %>
+        <i class="fas fa-plus mr-2"></i>New Intake
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid gap-4 mb-8 grid-cols-1 md:grid-cols-5">
+    <!-- Findings Stats -->
+    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex-shrink-0">
+          <span class="text-xl font-bold leading-none text-gray-900"><%= @intakes.sum(:raw_number) %></span>
+          <h3 class="text-base font-light text-gray-500">Season's Truffle Found</h3>
+        </div>
+        <div class="flex items-center justify-center w-8 h-8 text-yellow-600 bg-yellow-100 rounded-lg">
+          <i class="fas fa-hashtag"></i>
+        </div>
+      </div>
+      <div class="text-sm text-gray-500">
+        <%= number_with_precision (@intakes.sum(:raw_weight) / @intakes.sum(:raw_number).to_f), precision: 0 %> g avg/truffle
+      </div>
+    </div>
+
+    <!-- Raw Weight -->
+    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex-shrink-0">
+          <span class="text-xl font-bold leading-none text-gray-900"><%= number_with_precision @intakes.sum(:raw_weight) / 1000.0, precision: 2 %> kg</span>
+          <h3 class="text-base font-light text-gray-500">Season Raw Weight</h3>
+        </div>
+        <div class="flex items-center justify-center w-8 h-8 text-blue-600 bg-blue-100 rounded-lg">
+          <i class="fas fa-weight"></i>
+        </div>
+      </div>
+      <div class="text-sm text-gray-500">
+        Including <%= number_with_precision (@intakes.sum(:raw_weight) - @intakes.sum(:net_weight)) / 1000.0, precision: 2 %> kg of dirt
+      </div>
+    </div>
+
+    <!-- Net Weight -->
+    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex-shrink-0">
+          <span class="text-xl font-bold leading-none text-gray-900"><%= number_with_precision @intakes.where.not(net_weight: nil).sum(:net_weight) / 1000.0, precision: 2 %> kg</span>
+          <h3 class="text-base font-light text-gray-500">Season Net Weight</h3>
+        </div>
+        <div class="flex items-center justify-center w-8 h-8 text-purple-600 bg-purple-100 rounded-lg">
+          <i class="fas fa-balance-scale"></i>
+        </div>
+      </div>
+      <div class="text-sm text-gray-500">
+        <%= number_to_percentage((@intakes.where.not(net_weight: nil).sum(:net_weight) / @intakes.sum(:raw_weight)) * 100, precision: 1) %> of raw weight
+      </div>
+    </div>
+
+    <!-- Edible Weight -->
+    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex-shrink-0">
+          <span class="text-xl font-bold leading-none text-gray-900"><%= number_with_precision @intakes.where.not(edible_weight: nil).sum(:edible_weight) / 1000.0, precision: 2 %> kg</span>
+          <h3 class="text-base font-light text-gray-500">Season Edible Weight</h3>
+        </div>
+        <div class="flex items-center justify-center w-8 h-8 text-green-600 bg-green-100 rounded-lg">
+          <i class="fas fa-check"></i>
+        </div>
+      </div>
+      <div class="text-sm text-gray-500">
+        <%= number_to_percentage((@intakes.where.not(edible_weight: nil).sum(:edible_weight) / @intakes.sum(:raw_weight)) * 100, precision: 1) %> of raw weight
+      </div>
+    </div>
+
+    <!-- Waste Weight -->
+    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex-shrink-0">
+          <span class="text-xl font-bold leading-none text-gray-900"><%= number_with_precision @intakes.where.not(non_edible_weight: nil).sum(:non_edible_weight) / 1000.0, precision: 2 %> kg</span>
+          <h3 class="text-base font-light text-gray-500">Season Waste Weight</h3>
+        </div>
+        <div class="flex items-center justify-center w-8 h-8 text-red-600 bg-red-100 rounded-lg">
+          <i class="fas fa-ban"></i>
+        </div>
+      </div>
+      <div class="text-sm text-gray-500">
+        <%= number_to_percentage((@intakes.where.not(non_edible_weight: nil).sum(:non_edible_weight) / @intakes.sum(:raw_weight)) * 100, precision: 1) %> of raw weight
+      </div>
+    </div>
+  </div>
+
+  <% @intakes.group_by { |intake| intake.intake_at.beginning_of_week }.sort.reverse.each do |week_start, week_intakes| %>
+    <div class="mb-8">
+      <h2 class="text-lg font-semibold mb-4">
+        W<%= week_start.strftime("%V") %> : from the <%= week_start.strftime("%-d %B") %> to the <%= (week_start + 6.days).strftime("%-d %B") %>
+      </h2>
+
+      <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+        <table class="w-full text-sm text-left text-gray-500">
+          <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3">Date</th>
+              <th scope="col" class="px-6 py-3">Raw Number</th>
+              <th scope="col" class="px-6 py-3 text-right">Raw Weight</th>
+              <th scope="col" class="px-6 py-3 text-right">Net Weight</th>
+              <th scope="col" class="px-6 py-3 text-right">Edible Weight</th>
+              <th scope="col" class="px-6 py-3 text-right">Non-Edible Weight</th>
+              <th scope="col" class="px-6 py-3"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <%= render week_intakes.sort_by(&:intake_at).reverse %>
+            <!-- Week Subtotals -->
+            <tr class="bg-gray-50 font-medium border-t-2 border-gray-200">
+              <td class="px-6 py-4">Week Subtotal</td>
+              <td class="px-6 py-4"><%= week_intakes.sum(&:raw_number) %></td>
+              <td class="px-6 py-4 text-right"><%= number_with_precision week_intakes.sum(&:raw_weight), precision: 0 %> g</td>
+              <td class="px-6 py-4 text-right"><%= number_with_precision week_intakes.sum(&:net_weight), precision: 0 %> g</td>
+              <td class="px-6 py-4 text-right"><%= number_with_precision week_intakes.sum(&:edible_weight), precision: 0 %> g</td>
+              <td class="px-6 py-4 text-right"><%= number_with_precision week_intakes.sum(&:non_edible_weight), precision: 0 %> g</td>
+              <td class="px-6 py-4"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,50 @@
+<!-- Findings Distribution -->
+<div class="bg-white border border-gray-200 rounded-lg p-3 mb-2">
+  <div class="text-sm font-medium text-gray-900 mb-2">Findings Distribution</div>
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200 text-sm">
+      <thead>
+        <tr class="bg-gray-50">
+          <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Findings</th>
+          <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Count</th>
+          <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">%</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% total = findings_distribution.values.sum %>
+        <% percentage = lambda { |value| total > 0 ? ((value.to_f / total) * 100).round : 0 } %>
+        
+        <tr>
+          <td class="px-3 py-2 text-gray-700">0</td>
+          <td class="px-3 py-2 text-right text-gray-900"><%= findings_distribution[:no_findings] %></td>
+          <td class="px-3 py-2 text-right text-gray-900"><%= percentage.call(findings_distribution[:no_findings]) %>%</td>
+        </tr>
+        <tr>
+          <td class="px-3 py-2 text-gray-700">1</td>
+          <td class="px-3 py-2 text-right text-gray-900"><%= findings_distribution[:one_finding] %></td>
+          <td class="px-3 py-2 text-right text-gray-900"><%= percentage.call(findings_distribution[:one_finding]) %>%</td>
+        </tr>
+        <tr>
+          <td class="px-3 py-2 text-gray-700">2</td>
+          <td class="px-3 py-2 text-right text-gray-900"><%= findings_distribution[:two_findings] %></td>
+          <td class="px-3 py-2 text-right text-gray-900"><%= percentage.call(findings_distribution[:two_findings]) %>%</td>
+        </tr>
+        <tr>
+          <td class="px-3 py-2 text-gray-700">3</td>
+          <td class="px-3 py-2 text-right text-gray-900"><%= findings_distribution[:three_findings] %></td>
+          <td class="px-3 py-2 text-right text-gray-900"><%= percentage.call(findings_distribution[:three_findings]) %>%</td>
+        </tr>
+        <tr>
+          <td class="px-3 py-2 text-gray-700">4+</td>
+          <td class="px-3 py-2 text-right text-gray-900"><%= findings_distribution[:four_plus_findings] %></td>
+          <td class="px-3 py-2 text-right text-gray-900"><%= percentage.call(findings_distribution[:four_plus_findings]) %>%</td>
+        </tr>
+        <tr class="bg-gray-50 font-medium">
+          <td class="px-3 py-2 text-gray-900">Replacements</td>
+          <td class="px-3 py-2 text-right text-gray-900"><%= findings_distribution[:replacements] %></td>
+          <td class="px-3 py-2 text-right text-gray-900"><%= percentage.call(findings_distribution[:replacements]) %>%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

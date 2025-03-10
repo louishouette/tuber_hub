@@ -1,0 +1,64 @@
+We want to record the CULTIVATIONS :
+- irrigations
+    - tertiary : diameter, flow, pressure, spacing, type (drip, sprinkler, spray), radius (if not drip), regulation (yes or no), flush valve (yes or no)
+    - admission : tap type, diameter, pressure
+    - irrigation_sector : rows, admission, tertiary
+    - application : started_at, duration, irrigation_sector, operator
+    - extrapolation : ended_at, volume per tree, volume in mm per tree, map to locations through attached rows
+- fertilizations
+    - formula : origin (nursery), name, description, density (ratio truffle per substract), weight of one dose
+    - tool : name, description
+    - application : application_at (day), tool, row, dosage, settings (text), operator
+- treatments
+    - family : name, description
+    - application : family, molecule
+    - application : application_at (day), specific_treatment, row, dosage, settings (text), operator
+- plantings
+    - planting : planted_at (day), species, location, settings (text), planter, nursery
+- harvests
+    - harvesting_run : harvesting_sector, dog, harvester, started_at, stopped_at, comment, raw_weight, net_weight, surveyor
+    - finding_in_run
+    - standalone_finding : dog, harvester, surveyor
+    - findings : standalone_finding or finding_in_run, location, depth, finding_raw_weight, finding_net_weight, comment
+- tilings
+    - tooling : name, description
+    - application : tiling_at (day), tooling, row, settings (text), operator
+- mowings
+    - tooling : name, description
+    - application : mowing_at (day), tooling, row, settings (text), operator
+- prunnings
+    - prunning_type : name, description
+    - application : prunning_at (day), prunning_type, row, settings (text), operator
+
+We want to record some MEASURES :
+- soil analysis (using different laboratory menus)
+    - laboratory, menu, latitude, longitude, sample_at, azote total (%), calcaire total (%), ph eau, carbone organique (%), azote dumas (%), c/n (rapport), matière organique (%), phosphore p2o5 jh (mg/kg), cec (méq/100g), calcium cao éch (mg/kg) , potassium k2o éch (mg/kg), magnésium mgo éch (mg/kg), sodium na2o éch (mg/kg), phosphate p2o5 total (%), capacité de rétention en eau à pf 2,5 moy, réserve facilement utilisable - rfu (mm/m), calcaire actif (%), sables grossiers (%), sables fins (%), limons grossiers (%), limons fins (%), argile (%), limons (%), sables (%)
+- soil resistivity (using various services)
+    - service_provider : name, description
+    - map : service_provider, collect_at, raster
+- soil moisture (using different type of sensors)
+    - service_provider : name, description
+    - sensor : name, description, service_provider, type (capacitive, resistive)
+    - probe : sensor, location, comment
+    - reading : measure_at, probe, depth, value
+- meteorological data (using different weather stations)
+    - station : name, type (local, remote), precision, description
+    - reading : measure_at, station, temperature, humidity, wind direction, wind speed, ETP etc...
+- plant stress (using electrophysiology sensors)
+    - service_provider : name, description
+    - sensor : name, description, service_provider
+    - probe : sensor, location, comment
+    - reading : measure_at, probe, value
+- multispectral data (using various drones and cameras)
+    - sensor : name, description
+    - flight : sensor, orchard, comment, started_at, ended_at, duration, settings (text), operator, conditions (text)
+    - map : flight, raster
+
+We want to record some OBSERVATIONS :
+- different types :
+    - Faunistic : Ants, Hares, Moles...
+    - Floristic : Blackthorns, Brambles, Sedum...
+    - Infrastuctural : Tuteur, Fence, Label, Pole...
+    - Phenological : Bud breaking, Flowering, Leaf fall...
+    - Abiotictical : Drought, Frost, Soil depression...
+    - Biotictical : Anthracnose, Phylloxera, Aphids...

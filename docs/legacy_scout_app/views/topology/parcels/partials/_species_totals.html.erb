@@ -1,0 +1,38 @@
+<!-- Species totals for this season -->
+<% @species_list.each do |species| %>
+  <% 
+    species_season_totals = species_totals[species.id][season_year]
+    species_actual = species_season_totals[:actual_plantings]
+    species_original = species_season_totals[:original_plantings]
+    species_findings = species_season_totals[:findings_count]
+    species_production = species_season_totals[:production_grams].round(2)
+    
+    species_yield = safe_division(species_production, species_actual)
+    species_avg = safe_division(species_production, species_findings)
+    
+    # Only show species totals when we have data
+    species_has_data = species_actual > 0 || species_original > 0 || species_findings > 0 || species_production > 0
+  %>
+  
+  <% if species_has_data %>
+    <tr class="border-b bg-gray-100 hover:bg-gray-200">
+      <td class="px-3 py-3 text-right font-medium text-gray-700 border-r bg-gray-50" colspan="2">Subtotal</td>
+      <td class="px-3 py-3 font-medium text-gray-700">
+        <div class="flex items-center">
+          <% if species.color_code.present? %>
+            <div class="w-3 h-3 rounded-full mr-2" style="background-color: <%= species.color_code %>"></div>
+          <% else %>
+            <div class="w-3 h-3 rounded-full bg-primary-500 mr-2"></div>
+          <% end %>
+          <%= species.name %>
+        </div>
+      </td>
+      <td class="px-3 py-3 font-medium text-center"><%= species_original %></td>
+      <td class="px-3 py-3 font-medium text-center"><%= species_actual %></td>
+      <td class="px-3 py-3 font-medium text-center"><%= species_findings %></td>
+      <td class="px-3 py-3 font-medium text-center"><%= number_with_precision(species_production, precision: 2) %></td>
+      <td class="px-3 py-3 font-medium text-center"><%= species_yield ? number_with_precision(species_yield, precision: 2) : '-' %></td>
+      <td class="px-3 py-3 font-medium text-center"><%= species_avg ? number_with_precision(species_avg, precision: 2) : '-' %></td>
+    </tr>
+  <% end %>
+<% end %>

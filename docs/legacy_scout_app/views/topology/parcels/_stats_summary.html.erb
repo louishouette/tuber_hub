@@ -1,0 +1,22 @@
+<!-- Parcel Stats Summary -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+  <div class="bg-gray-50 rounded p-2">
+    <div class="text-sm font-medium text-gray-700 mb-1">Locations</div>
+    <div class="text-lg font-medium text-gray-900"><%= stats[:total_locations] %></div>
+  </div>
+  
+  <div class="bg-gray-50 rounded p-2">
+    <div class="text-sm font-medium text-gray-700 mb-1">Plantings</div>
+    <div class="text-lg font-medium text-gray-900"><%= stats[:total_plantings] %></div>
+  </div>
+  
+  <div class="bg-gray-50 rounded p-2">
+    <div class="text-sm font-medium text-gray-700 mb-1">Findings</div>
+    <div class="text-lg font-medium text-gray-900"><%= stats[:findings_count] || 0 %></div>
+  </div>
+  
+  <div class="bg-gray-50 rounded p-2">
+    <div class="text-sm font-medium text-gray-700 mb-1">Species</div>
+    <div class="text-lg font-medium text-gray-900"><%= stats[:species_stats]&.size || 0 %></div>
+  </div>
+</div>

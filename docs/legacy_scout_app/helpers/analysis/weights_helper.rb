@@ -1,0 +1,2 @@
+module Analysis::WeightsHelper
+end

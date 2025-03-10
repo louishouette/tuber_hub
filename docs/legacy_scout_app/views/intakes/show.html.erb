@@ -1,0 +1,206 @@
+<div class="p-4 sm:ml-64">
+  <!-- Header Section -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <nav class="flex mb-2" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+          <li class="inline-flex items-center">
+            <%= link_to intakes_path, class: "inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600" do %>
+              <i class="fas fa-home mr-2"></i>
+              Intakes
+            <% end %>
+          </li>
+          <li aria-current="page">
+            <div class="flex items-center">
+              <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+              <span class="text-sm font-medium text-gray-500 md:ml-2">Details</span>
+            </div>
+          </li>
+        </ol>
+      </nav>
+      <h1 class="text-2xl font-bold text-gray-900">
+        Intake #<%= @intake.id %>
+        <span class="ml-2 text-sm font-medium px-2.5 py-0.5 rounded 
+          <%= @intake.edible_weight.present? ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %>">
+          <%= @intake.edible_weight.present? ? 'Processed' : 'Raw' %>
+        </span>
+      </h1>
+    </div>
+    
+    <div class="flex items-center space-x-3">
+      <%= link_to edit_intake_path(@intake), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5" do %>
+        <i class="fas fa-edit mr-2"></i>Edit
+      <% end %>
+      <%= button_to @intake, method: :delete, class: "text-red-600 hover:text-white border border-red-600 hover:bg-red-600 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5", data: { turbo_confirm: 'Are you sure?' } do %>
+        <i class="fas fa-trash-alt mr-2"></i>Delete
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <!-- Left Column - General Info -->
+    <div class="lg:col-span-2">
+      <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm mb-4">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">General Information</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <p class="text-sm text-gray-500">Intake Date</p>
+            <p class="text-base font-medium text-gray-900"><%= l @intake.intake_at, format: :default %></p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">Operator</p>
+            <p class="text-base font-medium text-gray-900"><%= @intake.operator.name %></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weight Stats Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+        <!-- Raw Stats -->
+        <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Raw</h3>
+            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Initial</span>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <p class="text-sm text-gray-500">Weight</p>
+              <p class="text-xl font-bold text-gray-900"><%= @intake.raw_weight.to_i if @intake.raw_weight %> g</p>
+            </div>
+            <div class="text-sm text-gray-500">
+              Including <%= (@intake.raw_weight - @intake.net_weight).to_i if @intake.raw_weight && @intake.net_weight %> g of dirt
+            </div>
+          </div>
+        </div>
+
+        <!-- Net Stats -->
+        <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Net</h3>
+            <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full">After Cleaning</span>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <p class="text-sm text-gray-500">Weight</p>
+              <p class="text-xl font-bold text-gray-900"><%= @intake.net_weight.to_i if @intake.net_weight %> g</p>
+            </div>
+            <div class="text-sm text-gray-500">
+              <%= number_to_percentage((@intake.net_weight.to_f / @intake.raw_weight.to_f) * 100, precision: 1) if @intake.net_weight && @intake.raw_weight %> of raw weight
+            </div>
+          </div>
+        </div>
+
+        <!-- Edible Stats -->
+        <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Edible</h3>
+            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Good</span>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <p class="text-sm text-gray-500">Weight</p>
+              <p class="text-xl font-bold text-gray-900"><%= @intake.edible_weight.to_i if @intake.edible_weight %> g</p>
+            </div>
+            <div class="text-sm text-gray-500">
+              <%= number_to_percentage((@intake.edible_weight.to_f / @intake.raw_weight.to_f) * 100, precision: 1) if @intake.edible_weight && @intake.raw_weight %> of raw weight
+            </div>
+          </div>
+        </div>
+
+        <!-- Waste Stats -->
+        <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Waste</h3>
+            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Non-Edible</span>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <p class="text-sm text-gray-500">Weight</p>
+              <p class="text-xl font-bold text-gray-900"><%= @intake.non_edible_weight.to_i if @intake.non_edible_weight %> g</p>
+            </div>
+            <div class="text-sm text-gray-500">
+              <%= number_to_percentage((@intake.non_edible_weight.to_f / @intake.raw_weight.to_f) * 100, precision: 1) if @intake.non_edible_weight && @intake.raw_weight %> of raw weight
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Findings Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Findings</h3>
+            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Truffles</span>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <p class="text-sm text-gray-500">Number</p>
+              <p class="text-xl font-bold text-gray-900"><%= @intake.raw_number || '-' %></p>
+            </div>
+            <div class="text-sm text-gray-500">
+              <%= number_with_precision (@intake.raw_weight.to_f / @intake.raw_number.to_f), precision: 0 if @intake.raw_weight && @intake.raw_number %> g avg/truffle
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column - Stats & Comments -->
+    <div>
+      <!-- Percentages Card -->
+      <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm mb-4">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Processing Stats</h3>
+        
+        <!-- Edible Rate -->
+        <div class="mb-4">
+          <div class="flex justify-between mb-1">
+            <span class="text-sm font-medium text-gray-500">Edible Rate</span>
+            <span class="text-sm font-medium text-gray-700">
+              <%= number_to_percentage((@intake.edible_weight.to_f / @intake.raw_weight.to_f) * 100, precision: 1) if @intake.edible_weight && @intake.raw_weight %>
+            </span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div class="bg-green-600 h-2.5 rounded-full" style="width: <%= (@intake.edible_weight.to_f / @intake.raw_weight.to_f) * 100 if @intake.edible_weight && @intake.raw_weight %>%"></div>
+          </div>
+        </div>
+
+        <!-- Non-Edible Rate -->
+        <div class="mb-4">
+          <div class="flex justify-between mb-1">
+            <span class="text-sm font-medium text-gray-500">Non-Edible Rate</span>
+            <span class="text-sm font-medium text-gray-700">
+              <%= number_to_percentage((@intake.non_edible_weight.to_f / @intake.raw_weight.to_f) * 100, precision: 1) if @intake.non_edible_weight && @intake.raw_weight %>
+            </span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div class="bg-red-600 h-2.5 rounded-full" style="width: <%= (@intake.non_edible_weight.to_f / @intake.raw_weight.to_f) * 100 if @intake.non_edible_weight && @intake.raw_weight %>%"></div>
+          </div>
+        </div>
+
+        <!-- Net Rate -->
+        <div>
+          <div class="flex justify-between mb-1">
+            <span class="text-sm font-medium text-gray-500">Net Rate</span>
+            <span class="text-sm font-medium text-gray-700">
+              <%= number_to_percentage((@intake.net_weight.to_f / @intake.raw_weight.to_f) * 100, precision: 1) if @intake.net_weight && @intake.raw_weight %>
+            </span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div class="bg-purple-600 h-2.5 rounded-full" style="width: <%= (@intake.net_weight.to_f / @intake.raw_weight.to_f) * 100 if @intake.net_weight && @intake.raw_weight %>%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comments Card -->
+      <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Comments</h3>
+        <% if @intake.comment.present? %>
+          <p class="text-gray-700 whitespace-pre-wrap"><%= @intake.comment %></p>
+        <% else %>
+          <p class="text-gray-500 italic">No comments provided</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,84 @@
+<!-- Species Statistics -->
+<div>
+  <div class="text-sm text-gray-700 mb-2">Species Statistics</div>
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200 text-sm">
+      <thead>
+        <tr class="bg-gray-50">
+          <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Species</th>
+          <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Count</th>
+          <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Prod/Plant</th>
+          <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Tot. Weight</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% species_stats.each do |species_stat| %>
+          <tr>
+            <td class="px-3 py-2"><%= species_stat[:species].name %></td>
+            <td class="px-3 py-2 text-right"><%= species_stat[:planting_count] %></td>
+            <td class="px-3 py-2 text-right"><%= species_stat[:production_per_planting] %>g</td>
+            <td class="px-3 py-2 text-right"><%= species_stat[:total_weight] %>g</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Species Detailed Statistics -->
+<div class="mt-4">
+  <button class="text-primary-600 hover:text-primary-700 text-xs font-medium inline-flex items-center" 
+          onclick="toggleSpeciesDetails_<%= parcel_id %>()">
+    <span id="species_details_text_<%= parcel_id %>">Show Detailed Stats</span>
+    <svg id="species_details_icon_<%= parcel_id %>" class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+    </svg>
+  </button>
+  
+  <div id="species_details_<%= parcel_id %>" class="hidden mt-2 overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200 text-xs">
+      <thead>
+        <tr class="bg-gray-50">
+          <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Species</th>
+          <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Plantings</th>
+          <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Never Replaced</th>
+          <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Findings</th>
+          <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Weight</th>
+          <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total Weight</th>
+          <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Prod/Plant</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% species_stats.each do |species_stat| %>
+          <tr>
+            <td class="px-3 py-2"><%= species_stat[:species].name %></td>
+            <td class="px-3 py-2 text-right"><%= species_stat[:planting_count] %></td>
+            <td class="px-3 py-2 text-right"><%= species_stat[:never_replaced_count] %></td>
+            <td class="px-3 py-2 text-right"><%= species_stat[:findings_count] %></td>
+            <td class="px-3 py-2 text-right"><%= species_stat[:average_weight] %>g</td>
+            <td class="px-3 py-2 text-right"><%= species_stat[:total_weight] %>g</td>
+            <td class="px-3 py-2 text-right"><%= species_stat[:production_per_planting] %>g</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  function toggleSpeciesDetails_<%= parcel_id %>() {
+    const detailsElement = document.getElementById('species_details_<%= parcel_id %>');
+    const textElement = document.getElementById('species_details_text_<%= parcel_id %>');
+    const iconElement = document.getElementById('species_details_icon_<%= parcel_id %>');
+    
+    if (detailsElement.classList.contains('hidden')) {
+      detailsElement.classList.remove('hidden');
+      textElement.innerText = 'Hide Detailed Stats';
+      iconElement.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>';
+    } else {
+      detailsElement.classList.add('hidden');
+      textElement.innerText = 'Show Detailed Stats';
+      iconElement.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>';
+    }
+  }
+</script>

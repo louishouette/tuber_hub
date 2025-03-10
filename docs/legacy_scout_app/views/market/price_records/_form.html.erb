@@ -1,0 +1,130 @@
+<%= form_with(model: price_record, url: price_record.new_record? ? market_place_price_records_path(market_place) : market_place_price_record_path(market_place, price_record), class: "space-y-6") do |form| %>
+  <% if price_record.errors.any? %>
+    <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50" role="alert">
+      <h2><%= pluralize(price_record.errors.count, "error") %> prohibited this price record from being saved:</h2>
+      <ul class="mt-1.5 list-disc list-inside">
+        <% price_record.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%# Basic Information %>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div>
+      <%= form.label :source, class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <%= form.text_field :source, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+    </div>
+
+    <div>
+      <%= form.label :published_at, class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <%= form.date_field :published_at, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+    </div>
+  </div>
+
+  <%# Price Information %>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div>
+      <%= form.label :min_price_per_kg, class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <span class="text-gray-500 sm:text-sm">€</span>
+        </div>
+        <%= form.number_field :min_price_per_kg, step: :any, class: "pl-7 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      </div>
+    </div>
+
+    <div>
+      <%= form.label :avg_price_per_kg, class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <span class="text-gray-500 sm:text-sm">€</span>
+        </div>
+        <%= form.number_field :avg_price_per_kg, step: :any, class: "pl-7 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      </div>
+    </div>
+
+    <div>
+      <%= form.label :max_price_per_kg, class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <span class="text-gray-500 sm:text-sm">€</span>
+        </div>
+        <%= form.number_field :max_price_per_kg, step: :any, class: "pl-7 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      </div>
+    </div>
+  </div>
+
+  <%# Quality Grade Prices %>
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div>
+      <%= form.label :extra_price_per_kg, "Extra Grade Price", class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <span class="text-gray-500 sm:text-sm">€</span>
+        </div>
+        <%= form.number_field :extra_price_per_kg, step: :any, class: "pl-7 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      </div>
+    </div>
+
+    <div>
+      <%= form.label :c1_price_per_kg, "Grade C1 Price", class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <span class="text-gray-500 sm:text-sm">€</span>
+        </div>
+        <%= form.number_field :c1_price_per_kg, step: :any, class: "pl-7 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      </div>
+    </div>
+
+    <div>
+      <%= form.label :c2_price_per_kg, "Grade C2 Price", class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <span class="text-gray-500 sm:text-sm">€</span>
+        </div>
+        <%= form.number_field :c2_price_per_kg, step: :any, class: "pl-7 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      </div>
+    </div>
+
+    <div>
+      <%= form.label :c3_price_per_kg, "Grade C3 Price", class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <span class="text-gray-500 sm:text-sm">€</span>
+        </div>
+        <%= form.number_field :c3_price_per_kg, step: :any, class: "pl-7 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      </div>
+    </div>
+  </div>
+
+  <%# Quantity Information %>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div>
+      <%= form.label :quantities_presented_per_kg, class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <span class="text-gray-500 sm:text-sm">kg</span>
+        </div>
+        <%= form.number_field :quantities_presented_per_kg, step: :any, class: "pl-10 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      </div>
+    </div>
+
+    <div>
+      <%= form.label :quantities_sold_per_kg, class: "block mb-2 text-sm font-medium text-gray-900" %>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <span class="text-gray-500 sm:text-sm">kg</span>
+        </div>
+        <%= form.number_field :quantities_sold_per_kg, step: :any, class: "pl-10 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" %>
+      </div>
+    </div>
+  </div>
+
+  <%# Submit Button %>
+  <div class="flex justify-end gap-4">
+    <%= link_to "Cancel", price_record.new_record? ? market_place_price_records_path(market_place) : market_place_price_record_path(market_place, price_record), class: "text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none" %>
+    <%= form.submit class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none" %>
+  </div>
+<% end %>

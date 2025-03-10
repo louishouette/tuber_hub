@@ -1,0 +1,63 @@
+<%= turbo_frame_tag "price_records_table" do %>
+  <%# Price Records Table %>
+  <div class="relative overflow-x-auto">
+  <table class="w-full text-sm text-left text-gray-500">
+    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+      <tr>
+        <th scope="col" class="px-6 py-3">Date</th>
+        <th scope="col" class="px-6 py-3">Source</th>
+        <th scope="col" class="px-6 py-3">Min Price</th>
+        <th scope="col" class="px-6 py-3">Avg Price</th>
+        <th scope="col" class="px-6 py-3">Max Price</th>
+        <th scope="col" class="px-6 py-3">Quantity</th>
+        <th scope="col" class="px-6 py-3">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if price_records.any? %>
+        <% price_records.each do |record| %>
+          <tr class="bg-white border-b hover:bg-gray-50">
+            <td class="px-6 py-4"><%= record.published_at.strftime("%d %b %Y") %></td>
+            <td class="px-6 py-4"><%= record.source %></td>
+            <td class="px-6 py-4"><%= number_to_currency(record.min_price_per_kg, unit: "€") %>/kg</td>
+            <td class="px-6 py-4"><%= number_to_currency(record.avg_price_per_kg, unit: "€") %>/kg</td>
+            <td class="px-6 py-4"><%= number_to_currency(record.max_price_per_kg, unit: "€") %>/kg</td>
+            <td class="px-6 py-4"><%= number_with_delimiter(record.quantities_presented_per_kg) %> kg</td>
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-2">
+                <%= link_to market_place_price_record_path(place, record), 
+                    class: "text-blue-600 hover:text-blue-900",
+                    data: { turbo_frame: "_top" } do %>
+                  View
+                <% end %>
+                <%= link_to edit_market_place_price_record_path(place, record),
+                    class: "text-blue-600 hover:text-blue-900",
+                    data: { turbo_frame: "_top" } do %>
+                  Edit
+                <% end %>
+                <%= button_to market_place_price_record_path(place, record), 
+                      method: :delete,
+                      class: "text-red-600 hover:text-red-900",
+                      form: { 
+                        data: { 
+                          turbo_confirm: "Are you sure you want to delete this price record?",
+                          turbo_frame: "price_records_table"
+                        }
+                      } do %>
+                  Delete
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      <% else %>
+        <tr class="bg-white border-b">
+          <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+            No price records found for this season
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+<% end %>

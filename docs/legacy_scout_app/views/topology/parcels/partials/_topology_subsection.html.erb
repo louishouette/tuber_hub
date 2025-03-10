@@ -1,0 +1,28 @@
+<!-- Topology Subsection -->
+<div class="space-y-4">
+  <h3 class="text-lg font-medium text-gray-900 border-b pb-2">Topology</h3>
+  <div class="space-y-3">
+    <div>
+      <div class="text-sm text-gray-700 font-medium mb-1">Planting Date</div>
+      <div class="text-sm text-gray-600"><%= @presenter.display_plantation_date %> (<%= @presenter.display_age %> springs)</div>
+    </div>
+    <div>
+      <div class="text-sm text-gray-700 font-medium mb-1">Number of Locations</div>
+      <div class="text-sm text-gray-600"><%= number_with_delimiter(@stats[:total_locations] || 0, delimiter: " ") %> locations</div>
+    </div>
+    <div>
+      <div class="text-sm text-gray-700 font-medium mb-1">Harvesting Sectors</div>
+      <% harvesting_sectors = @parcel.harvesting_sectors %>
+      <% if harvesting_sectors.any? %>
+        <div class="mt-1">
+          <% harvesting_sectors.each do |sector| %>
+            <% sector_locations_count = sector.locations.count %>
+            <div class="text-sm text-gray-600 mb-1"><%= sector.name.split('-').last %> (<%= sector_locations_count %> locations)</div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="text-sm text-gray-500">No harvesting sectors defined</div>
+      <% end %>
+    </div>
+  </div>
+</div>

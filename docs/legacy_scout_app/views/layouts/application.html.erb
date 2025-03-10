@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>" class="dark:bg-gray-900">
+  <head>
+    <title><%= content_for(:title) || t('app_name') %></title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="color-scheme" content="light dark">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <%# Enable PWA manifest for installable apps %>
+    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+
+    <script>
+      // On page load or when changing themes, best to add inline in `head` to avoid FOUC
+      if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
+    </script>
+  </head>
+
+  <body class="antialiased bg-gray-50 dark:bg-gray-900" data-controller="debug-turbo">
+    <div data-controller="sidebar">
+      <%= render "layouts/navbar" %>
+      
+      <!-- Main Layout Container -->
+      <div class="flex min-h-screen pt-16 relative">
+        <!-- Sidebar -->
+        <% if Current.user %>
+          <%= render "layouts/menu" %>
+        <% end %>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 bg-gray-50 dark:bg-gray-900 min-h-screen md:ml-64">
+          <%# Breadcrumbs have been removed as per requirement %>
+          <div class="p-4">
+            <% if flash.any? %>
+              <div class="mb-4">
+                <% flash.each do |type, message| %>
+                  <% alert_class = case type.to_sym
+                     when :notice then "bg-blue-100 text-blue-700 border-blue-200"
+                     when :success then "bg-green-100 text-green-700 border-green-200"
+                     when :error, :alert then "bg-red-100 text-red-700 border-red-200"
+                     else "bg-gray-100 text-gray-700 border-gray-200"
+                     end
+                  %>
+                  <div class="p-4 mb-2 rounded-lg border <%= alert_class %>">
+                    <%= message %>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+            <%= yield %>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <%# Dark mode toggle script %>
+    <script>
+      var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+      var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+      // Change the icons inside the button based on previous settings
+      if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        themeToggleLightIcon?.classList.remove('hidden');
+      } else {
+        themeToggleDarkIcon?.classList.remove('hidden');
+      }
+
+      var themeToggleBtn = document.getElementById('theme-toggle');
+
+      themeToggleBtn?.addEventListener('click', function() {
+        // Toggle icons
+        themeToggleDarkIcon?.classList.toggle('hidden');
+        themeToggleLightIcon?.classList.toggle('hidden');
+
+        // If is set in localStorage
+        if (localStorage.getItem('color-theme')) {
+          if (localStorage.getItem('color-theme') === 'light') {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('color-theme', 'dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('color-theme', 'light');
+          }
+        } else {
+          if (document.documentElement.classList.contains('dark')) {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('color-theme', 'light');
+          } else {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('color-theme', 'dark');
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

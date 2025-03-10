@@ -1,0 +1,81 @@
+<%# Header with actions %>
+<div class="flex justify-between items-center mb-6">
+  <div>
+    <h1 class="text-2xl font-semibold text-gray-900"><%= @channel.name %></h1>
+    <p class="mt-1 text-sm text-gray-600"><%= @channel.description %></p>
+  </div>
+  
+  <div class="flex gap-2">
+    <%= link_to edit_market_channel_path(@channel), class: "text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none" do %>
+      <i class="fas fa-edit mr-2"></i> Edit
+    <% end %>
+    <%= button_to market_channel_path(@channel), method: :delete, class: "text-red-700 bg-white border border-red-300 hover:bg-red-50 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none", data: { turbo_confirm: 'Are you sure?' } do %>
+      <i class="fas fa-trash mr-2"></i> Delete
+    <% end %>
+  </div>
+</div>
+
+<%# Market Segment Badge %>
+<div class="flex gap-2 mb-6">
+  <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
+    <%= @channel.market_segment.name %>
+  </span>
+</div>
+
+<%# Metrics Cards %>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+  <div class="bg-white border border-gray-200 rounded-lg p-4">
+    <div class="text-sm font-medium text-gray-500 mb-2">Last Activity</div>
+    <div class="text-2xl font-semibold text-gray-900">
+      <%= @channel.last_activity_at ? time_ago_in_words(@channel.last_activity_at) + ' ago' : 'Never' %>
+    </div>
+  </div>
+  
+  <div class="bg-white border border-gray-200 rounded-lg p-4">
+    <div class="text-sm font-medium text-gray-500 mb-2">Market Segment</div>
+    <div class="text-2xl font-semibold text-gray-900">
+      <%= @channel.market_segment.name %>
+    </div>
+  </div>
+  
+  <div class="bg-white border border-gray-200 rounded-lg p-4">
+    <div class="text-sm font-medium text-gray-500 mb-2">Created</div>
+    <div class="text-2xl font-semibold text-gray-900">
+      <%= time_ago_in_words(@channel.created_at) + ' ago' %>
+    </div>
+  </div>
+  
+  <div class="bg-white border border-gray-200 rounded-lg p-4">
+    <div class="text-sm font-medium text-gray-500 mb-2">Last Price Update</div>
+    <div class="text-2xl font-semibold text-gray-900">
+      <% if @channel.metrics['last_price_update'] %>
+        <%= time_ago_in_words(@channel.metrics['last_price_update']) %> ago
+      <% else %>
+        Never
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<%# Market Segment Details %>
+<div class="mb-8">
+  <h2 class="text-lg font-semibold text-gray-900 mb-4">Market Segment Details</h2>
+  <div class="bg-white border border-gray-200 rounded-lg p-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 mb-1">Segment Name</h3>
+        <p class="text-lg text-gray-900"><%= @market_segment.name %></p>
+      </div>
+      
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 mb-1">Last Updated</h3>
+        <p class="text-lg text-gray-900">
+          <%= time_ago_in_words(@channel.metrics['last_update']) if @channel.metrics['last_update'] %> ago
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+  </div>
+</div>
+

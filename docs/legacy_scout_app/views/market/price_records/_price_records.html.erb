@@ -1,0 +1,38 @@
+<%# Market Prices Section %>
+<div class="bg-white border border-gray-200 rounded-lg shadow">
+  <div class="p-6 space-y-4">
+    <%# Header and Actions %>
+    <div class="flex justify-between items-center">
+      <h2 class="text-xl font-semibold text-gray-900">Market Prices</h2>
+      <div class="flex items-center gap-4">
+        <%= link_to new_market_place_price_record_path(place), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 focus:outline-none" do %>
+          Add Price
+        <% end %>
+      </div>
+    </div>
+
+    <%# Filters %>
+    <div class="flex flex-wrap gap-4 pb-4">
+      <div class="w-48">
+        <label for="season" class="block mb-2 text-sm font-medium text-gray-900">Season</label>
+        <%= select_tag :season,
+            options_for_select(place.available_seasons.map { |year|
+              ["#{year} - #{year + 1}", year]
+            }, params[:season]),
+            class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5",
+            data: {
+              controller: "filter",
+              filter_target: "select",
+              action: "change->filter#updateTable",
+              filter_url_value: market_place_price_records_path(place)
+            }
+        %>
+      </div>
+    </div>
+
+    <%# Table in Turbo Frame %>
+    <%= turbo_frame_tag "price_records_table", src: market_place_price_records_path(place, season: params[:season]) do %>
+      <%= render "market/price_records/price_records_table", place: place, price_records: price_records %>
+    <% end %>
+  </div>
+</div>

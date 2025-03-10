@@ -1,0 +1,164 @@
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-8">Weights Analysis</h1>
+
+  <div class="space-y-8">
+    <!-- Average Weight per Species -->
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <h2 class="text-xl font-semibold mb-4">Average Weight per Species per Week</h2>
+      <%= line_chart @species_weights,
+          height: "400px",
+          library: {
+            scales: {
+              x: {
+                type: 'category',
+                grid: {
+                  display: false
+                }
+              },
+              y: {
+                beginAtZero: true,
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.1)'
+                }
+              }
+            },
+            plugins: {
+              title: { 
+                display: true, 
+                text: "Average weight by species over time" 
+              }
+            }
+          } %>
+    </div>
+
+    <!-- Average Weight per Parcel Age Group -->
+    <div class="space-y-8">
+      <% if @parcel_weights_by_age.empty? %>
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-yellow-700">
+                No data available for parcels older than 3 springs with at least 20 findings per week.
+              </p>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <% @parcel_weights_by_age.each do |age, data| %>
+        <div class="bg-white rounded-lg shadow-lg p-6">
+          <h2 class="text-xl font-semibold mb-4">Parcels with <%= age %> Springs</h2>
+          <div class="mb-4">
+            <h3 class="text-lg font-medium mb-2">Parcels in this group:</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <% data[:parcels].each do |parcel| %>
+                <div class="p-3 bg-gray-50 rounded">
+                  <p class="font-medium"><%= parcel.name %> : planted in <%= parcel.planted_at.strftime('%B %Y') %></p>
+                </div>
+              <% end %>
+            </div>
+          </div>
+          
+          <%= line_chart data[:weights_by_species].map { |species, weights| 
+                { 
+                  name: species,
+                  data: weights
+                }
+              },
+              height: "400px",
+              library: {
+                scales: {
+                  x: {
+                    type: 'category',
+                    grid: {
+                      display: false
+                    }
+                  },
+                  y: {
+                    beginAtZero: true,
+                    grid: {
+                      color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                  }
+                },
+                plugins: {
+                  title: { 
+                    display: true, 
+                    text: "Average weight by species over time" 
+                  }
+                }
+              } %>
+          
+          <div class="mt-4">
+            <p class="text-sm text-gray-600">* Only showing weeks with 20 or more findings</p>
+            <p class="text-sm text-gray-600">* Total parcels in this group: <%= data[:parcels].size %></p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Findings vs Weights -->
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <h2 class="text-xl font-semibold mb-4">Findings Count vs Average Weight per Week</h2>
+      <%= line_chart [
+            { 
+              name: "Number of Findings",
+              data: @findings_vs_weights[:findings],
+              dataset: { yAxisID: 'y-findings' }
+            },
+            { 
+              name: "Average Weight",
+              data: @findings_vs_weights[:weights],
+              dataset: { yAxisID: 'y-weight' }
+            }
+          ],
+          height: "400px",
+          library: {
+            scales: {
+              y: {
+                type: 'linear',
+                display: false,
+                stacked: false
+              },
+              'y-findings': {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                stacked: false,
+                grid: {
+                  display: false
+                },
+                title: {
+                  display: true,
+                  text: 'Number of Findings'
+                }
+              },
+              'y-weight': {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                stacked: false,
+                grid: {
+                  display: false
+                },
+                title: {
+                  display: true,
+                  text: 'Average Weight (g)'
+                }
+              }
+            },
+            plugins: {
+              title: { 
+                display: true, 
+                text: "Correlation between findings count and average weight" 
+              }
+            }
+          } %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,2 @@
+class NurseriesController < ApplicationController
+end

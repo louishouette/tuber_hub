@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .required:after {
+    @apply content-['*'] text-red-500 ml-0.5;
+  }
+}

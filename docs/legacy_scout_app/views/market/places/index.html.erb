@@ -1,0 +1,130 @@
+<%# Header with title and actions %>
+<div class="mb-6">
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <h1 class="text-2xl font-semibold text-gray-900">Market Places</h1>
+    <%= link_to new_market_place_path, class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none" do %>
+      <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+      </svg>
+      Add Market Place
+    <% end %>
+  </div>
+</div>
+
+<%# Search and filters %>
+<div class="mb-6">
+  <%= form_tag market_places_path, method: :get, class: "flex flex-col md:flex-row gap-4" do %>
+    <div class="flex-1">
+      <label for="search" class="sr-only">Search</label>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+          <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+          </svg>
+        </div>
+        <%= search_field_tag :search, params[:search], 
+            class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5", 
+            placeholder: "Search market places..." %>
+      </div>
+    </div>
+    
+    <div class="flex flex-wrap gap-2">
+      <%= select_tag :country, 
+          options_for_select([['All Countries', '']] + MarketPlace.distinct.pluck(:country).compact.sort, params[:country]),
+          class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5" %>
+
+      <%= select_tag :region, 
+          options_for_select([['All Regions', '']] + MarketPlace.distinct.pluck(:region).compact.sort, params[:region]),
+          class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5" %>
+
+      <%= select_tag :segment, 
+          options_for_select([['All Segments', '']] + @segments.map { |s| [s.name, s.id] }, params[:segment]),
+          class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5" %>
+
+      <%= select_tag :sort, 
+          options_for_select([
+            ['Sort by Name', ''],
+            ['Latest Activity', 'activity_desc'],
+            ['Oldest Activity', 'activity_asc']
+          ], params[:sort]),
+          class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5" %>
+
+      <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
+        Filter
+      </button>
+
+      <%= link_to 'Reset', market_places_path, 
+          class: "text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none" %>
+    </div>
+  <% end %>
+</div>
+
+<%# Market places grid %>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <% @places.each do |place| %>
+    <div class="bg-white border border-gray-200 rounded-lg shadow">
+      <div class="p-5">
+        <div class="flex justify-between items-start">
+          <div class="flex-1">
+            <h5 class="mb-1 text-xl font-semibold tracking-tight text-gray-900">
+              <%= place.name %>
+            </h5>
+            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
+              <%= place.market_segment&.name || 'No Segment' %>
+            </span>
+            <p class="mt-2 text-sm text-gray-600">
+              <%= place.description.presence || 'No description available' %>
+            </p>
+          </div>
+          <div class="flex items-center space-x-2 ml-4">
+            <%= link_to edit_market_place_path(place), class: "text-gray-500 hover:text-gray-900" do %>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+              </svg>
+            <% end %>
+          </div>
+        </div>
+        <div class="mt-3 text-sm text-gray-500">
+          Last activity: <%= place.last_activity_at ? time_ago_in_words(place.last_activity_at) + ' ago' : 'Never' %>
+        </div>
+
+        <div class="mt-4 space-y-2">
+          <div class="flex items-center text-sm text-gray-500">
+            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <%= place.region %>, <%= place.country %>
+          </div>
+        </div>
+
+        <%= link_to market_place_path(place), class: "inline-flex items-center mt-4 text-sm font-medium text-blue-600 hover:text-blue-700" do %>
+          View Details
+          <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<%# Empty state %>
+<% if @places.empty? %>
+  <div class="text-center py-12">
+    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+    </svg>
+    <h3 class="mt-2 text-sm font-medium text-gray-900">No market places</h3>
+    <p class="mt-1 text-sm text-gray-500">Get started by creating a new market place.</p>
+    <div class="mt-6">
+      <%= link_to new_market_place_path, class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" do %>
+        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+        </svg>
+        New Market Place
+      <% end %>
+    </div>
+  </div>
+<% end %>

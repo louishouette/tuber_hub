@@ -1,0 +1,32 @@
+attributes:
+  - content
+  - foreign_keys
+  - inheritance
+disconnected: true
+filename: erd
+filetype: pdf
+indirect: false
+inheritance: false
+# markup: true
+notation: simple
+# orientation: horizontal
+orientation: vertical
+polymorphism: false
+# sort: true
+warn: false
+title: Tuber Scout ERD
+exclude: 
+  - SolidQueue::RecurringTask
+  - SolidQueue::Pause
+  - SolidQueue::Process
+  - SolidQueue::Job
+  - SolidQueue::ClaimedExecution
+  - SolidQueue::BlockedExecution
+  - SolidQueue::Semaphore
+  - SolidQueue::FailedExecution
+  - SolidQueue::ReadyExecution
+  - SolidQueue::RecurringExecution
+  - SolidQueue::ScheduledExecution
+  - ActiveStorage::VariantRecord
+  - ActiveStorage::Attachment
+  - ActiveStorage::Blob

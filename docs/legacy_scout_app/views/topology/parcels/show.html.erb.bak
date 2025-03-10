@@ -1,0 +1,415 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="mb-6 flex justify-between items-center">
+    <h1 class="text-2xl font-semibold text-gray-900">Parcel <%= @parcel.canonical_name %></h1>
+    <%= link_to "Back to Parcels", topology_parcels_path, class: "text-sm font-medium rounded-lg px-4 py-2 text-gray-500 bg-white border border-gray-300 hover:bg-gray-100" %>
+  </div>
+
+  <!-- Overview Card -->
+  <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Parcel Overview</h2>
+    
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- Topology Subsection -->
+      <div class="space-y-4">
+        <h3 class="text-lg font-medium text-gray-900 border-b pb-2">Topology</h3>
+        <div class="space-y-3">
+          <div>
+            <div class="text-sm text-gray-700 font-medium mb-1">Planting Date</div>
+            <div class="text-sm text-gray-600"><%= @presenter.display_plantation_date %> (<%= @presenter.display_age %> springs)</div>
+          </div>
+          <div>
+            <div class="text-sm text-gray-700 font-medium mb-1">Number of Locations</div>
+            <div class="text-sm text-gray-600"><%= number_with_delimiter(@stats[:total_locations] || 0, delimiter: " ") %> locations</div>
+          </div>
+          <div>
+            <div class="text-sm text-gray-700 font-medium mb-1">Harvesting Sectors</div>
+            <% harvesting_sectors = @parcel.harvesting_sectors %>
+            <% if harvesting_sectors.any? %>
+              <div class="mt-1">
+                <% harvesting_sectors.each do |sector| %>
+                  <% sector_locations_count = sector.locations.count %>
+                  <div class="text-sm text-gray-600 mb-1"><%= sector.name.split('-').last %> (<%= sector_locations_count %> locations)</div>
+                <% end %>
+              </div>
+            <% else %>
+              <div class="text-sm text-gray-500">No harvesting sectors defined</div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Plantings Subsection -->
+      <div class="space-y-4">
+        <h3 class="text-lg font-medium text-gray-900 border-b pb-2">Plantings</h3>
+        <div class="space-y-3">
+          <% 
+            # Use the already calculated values from the stats hash
+            total_locations = @stats[:total_locations].to_i
+            
+            # Get values for original plantings
+            original_plantings = @stats[:original_plantings_count].to_i
+            original_plantings_ratio = total_locations > 0 ? (original_plantings.to_f / total_locations * 100).round : 0
+            
+            # Get values for total replacements
+            total_replacements = @stats[:total_replacements_count].to_i
+            total_replacements_ratio = total_locations > 0 ? (total_replacements.to_f / total_locations * 100).round : 0
+            
+            # Get values for actual replacements
+            actual_replacements = @stats[:actual_replacements_count].to_i
+            actual_replacements_ratio = total_locations > 0 ? (actual_replacements.to_f / total_locations * 100).round : 0
+          %>
+          <div>
+            <div class="text-sm text-gray-700 font-medium mb-1">Original Plantings</div>
+            <div class="text-sm text-gray-600"><%= number_with_delimiter(original_plantings, delimiter: " ") %> (<%= original_plantings_ratio %>% of locations)</div>
+          </div>
+          <div>
+            <div class="text-sm text-gray-700 font-medium mb-1">Total Replacements</div>
+            <div class="text-sm text-gray-600"><%= number_with_delimiter(total_replacements, delimiter: " ") %> (<%= total_replacements_ratio %>% of locations)</div>
+          </div>
+          <div>
+            <div class="text-sm text-gray-700 font-medium mb-1">Actual Replacements</div>
+            <div class="text-sm text-gray-600"><%= number_with_delimiter(actual_replacements, delimiter: " ") %> (<%= actual_replacements_ratio %>% of locations)</div>
+          </div>
+          <div>
+            <div class="text-sm text-gray-700 font-medium mb-1">Inoculation</div>
+            <% if @stats[:inoculation].present? %>
+              <div class="text-sm text-gray-600"><%= @stats[:inoculation].name %></div>
+            <% else %>
+              <div class="text-sm text-gray-600">Not specified</div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Production Subsection -->
+      <div class="space-y-4">
+        <h3 class="text-lg font-medium text-gray-900 border-b pb-2">Production (<%= @stats[:season_display] %>)</h3>
+        <div class="space-y-3">
+          <div>
+            <div class="text-sm text-gray-700 font-medium mb-1">Total Raw Production</div>
+            <div class="text-sm text-gray-600">
+              <%= number_to_human(@presenter.display_total_weight, precision: 2, units: { unit: "g", thousand: "kg" }) %>
+              <% findings_count = @presenter.display_findings_count %>
+              <% if findings_count > 0 %>
+                (<%= findings_count %> truffles)
+              <% end %>
+            </div>
+          </div>
+          <div>
+            <div class="text-sm text-gray-700 font-medium mb-1">Average Raw Weight</div>
+            <div class="text-sm text-gray-600"><%= number_to_human(@presenter.display_average_weight, precision: 2, units: { unit: "g", thousand: "kg" }) %></div>
+          </div>
+          <div>
+            <div class="text-sm text-gray-700 font-medium mb-1">Ratio per Original Planting</div>
+            <% 
+              per_original_planting = original_plantings > 0 ? (@presenter.display_total_weight.to_f / original_plantings).round(1) : 0
+            %>
+            <div class="text-sm text-gray-600"><%= number_with_precision(per_original_planting, precision: 1) %> g</div>
+          </div>
+          <div>
+            <div class="text-sm text-gray-700 font-medium mb-1">Producers per Original Plantings</div>
+            <% 
+              producers_count = @presenter.display_producers_count 
+              producers_ratio = original_plantings > 0 ? (producers_count.to_f / original_plantings * 100).round : 0
+            %>
+            <div class="text-sm text-gray-600"><%= producers_count %> (<%= producers_ratio %>%)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Species Breakdown Table -->
+  <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Species Breakdown</h2>
+    <% species_distribution = @stats[:species_distribution] || [] %>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm text-left text-gray-500">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+          <tr>
+            <th scope="col" class="px-4 py-3">Species</th>
+            <th scope="col" class="px-4 py-3 text-right">Planting Count</th>
+            <th scope="col" class="px-4 py-3 text-right">Planting Ratio</th>
+            <th scope="col" class="px-4 py-3 text-right">Total Replacements</th>
+            <th scope="col" class="px-4 py-3 text-right">Replacements Ratio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% total_count = 0 %>
+          <% total_locations = @stats[:total_locations] || 0 %>
+          <% total_replacements = 0 %>
+          <% if species_distribution.present? %>
+            <% species_distribution.each_with_index do |species_data, index| %>
+              <% 
+                # Get the species data from the pre-calculated hash
+                species_id = species_data[:id]
+                species_replacements_info = @stats[:species_replacements_data][species_id] || {}
+                
+                # Use the location count (one planting per location) instead of total plantings
+                actual_planting_count = species_replacements_info[:location_count] || 0
+                total_count += actual_planting_count
+                
+                # Get the replacements count
+                species_replacements = species_replacements_info[:replacements] || 0
+                
+                # Add to the total replacements
+                total_replacements += species_replacements
+              %>
+              <tr class="<%= index.even? ? 'bg-white' : 'bg-gray-50' %> border-b hover:bg-gray-100">
+                <td class="px-4 py-3 font-medium text-gray-900">
+                  <div class="flex items-center">
+                    <% if species_data[:color_code].present? %>
+                      <div class="w-3 h-3 rounded-full mr-2" style="background-color: <%= species_data[:color_code] %>"></div>
+                    <% else %>
+                      <div class="w-3 h-3 rounded-full bg-primary-500 mr-2"></div>
+                    <% end %>
+                    <%= species_data[:name] %>
+                  </div>
+                </td>
+                <td class="px-4 py-3 text-right"><%= actual_planting_count %></td>
+                <td class="px-4 py-3 text-right"><%= total_locations > 0 ? (actual_planting_count.to_f / total_locations * 100).round : 0 %>%</td>
+                <td class="px-4 py-3 text-right"><%= species_replacements %></td>
+                <td class="px-4 py-3 text-right"><%= actual_planting_count > 0 ? (species_replacements.to_f / actual_planting_count * 100).round(1) : 0 %>%</td>
+              </tr>
+            <% end %>
+          <% else %>
+            <tr>
+              <td colspan="5" class="px-4 py-3 text-center text-gray-500">No species data available</td>
+            </tr>
+          <% end %>
+          <!-- Total Row -->
+          <tr class="bg-gray-50 border-t-2 border-gray-300 font-medium">
+            <td class="px-4 py-3 text-gray-900">Total</td>
+            <td class="px-4 py-3 text-right text-gray-900"><%= total_locations %></td>
+            <td class="px-4 py-3 text-right text-gray-900">100%</td>
+            <td class="px-4 py-3 text-right text-gray-900"><%= @stats[:total_replacements_count] %></td>
+            <td class="px-4 py-3 text-right text-gray-900"><%= total_locations > 0 ? (@stats[:total_replacements_count].to_f / total_locations * 100).round(1) : 0 %>%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <!-- Complete Statistics Table with Totals -->
+  <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Statistics by Planting Age</h2>
+    
+    <% if @spring_ages.any? && @species_list.any? && @seasons.any? %>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left text-gray-500">
+          <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+            <tr>
+              <th scope="col" class="px-3 py-3">Season</th>
+              <th scope="col" class="px-3 py-3">Spring Age</th>
+              <th scope="col" class="px-3 py-3">Species</th>
+              <th scope="col" class="px-3 py-3">Original Plantings</th>
+              <th scope="col" class="px-3 py-3">Actual Plantings</th>
+              <th scope="col" class="px-3 py-3">Findings</th>
+              <th scope="col" class="px-3 py-3">Production (g)</th>
+              <th scope="col" class="px-3 py-3">Yield (g/plant)</th>
+              <th scope="col" class="px-3 py-3">Avg Weight (g)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <%
+              # Initialize totals hashes
+              season_totals = {}
+              species_totals = {}
+              @seasons.each do |season|
+                season_year = season[:start_date].year
+                season_totals[season_year] = {
+                  actual_plantings: 0,
+                  original_plantings: 0,
+                  findings_count: 0,
+                  production_grams: 0
+                }
+              end
+              
+              @species_list.each do |species|
+                species_totals[species.id] = {}
+                @seasons.each do |season|
+                  season_year = season[:start_date].year
+                  species_totals[species.id][season_year] = {
+                    actual_plantings: 0,
+                    original_plantings: 0,
+                    findings_count: 0,
+                    production_grams: 0
+                  }
+                end
+              end
+              
+              # Helper method to calculate yield and average weight
+              def safe_division(numerator, denominator)
+                denominator.to_i > 0 ? (numerator.to_f / denominator).round(2) : nil
+              end
+            %>
+            
+            <% @seasons.reverse.each_with_index do |season, season_index| %>
+              <% season_year = season[:start_date].year %>
+              <% 
+                # First count total rows with data for the season
+                season_row_count = 0
+                spring_age_counts = {}
+                
+                # Count how many rows per spring age
+                @spring_ages.each do |age|
+                  spring_age_counts[age] = 0
+                  @species_list.each do |sp|
+                    stats = @age_species_stats[age]&.dig(sp.id, season_year) || {}
+                    actual = stats[:actual_plantings].to_i
+                    original = stats[:original_plantings].to_i
+                    findings = stats[:findings_count].to_i
+                    production = stats[:production_grams].to_f
+                    has_data = actual > 0 || original > 0 || findings > 0 || production > 0
+                    spring_age_counts[age] += 1 if has_data
+                    season_row_count += 1 if has_data
+                  end
+                end
+                
+                # Make sure we have at least one row for the season
+                season_row_count = 1 if season_row_count == 0
+                first_age_displayed = false
+              %>
+              
+              <% @spring_ages.each_with_index do |age, age_index| %>
+                <% age_has_data = spring_age_counts[age] > 0 %>
+                <% if age_has_data || !first_age_displayed %>
+                  <% first_age_displayed = true if !first_age_displayed %>
+                  <% @species_list.each_with_index do |species, species_index| %>
+                  <%
+                    # Get stats from structure
+                    stats = @age_species_stats[age]&.dig(species.id, season_year) || {}
+                    
+                    # Extract values
+                    actual_plantings = stats[:actual_plantings].to_i
+                    original_plantings = stats[:original_plantings].to_i
+                    findings_count = stats[:findings_count].to_i
+                    production_grams = stats[:production_grams].to_f.round(2)
+                    
+                    # If we have findings but no plantings recorded, use the findings count as actual plantings
+                    # This is to handle case where we have findings but no plantings were recorded
+                    if findings_count > 0 && actual_plantings == 0
+                      actual_plantings = findings_count
+                      stats[:actual_plantings] = findings_count
+                    end
+                    
+                    # If we have findings but no original plantings, set original plantings to 1
+                    # This ensures we show at least 1 original planting when there are findings
+                    if findings_count > 0 && original_plantings == 0
+                      original_plantings = 1
+                      stats[:original_plantings] = 1
+                    end
+                    
+                    # Increment the totals
+                    season_totals[season_year][:actual_plantings] += actual_plantings
+                    season_totals[season_year][:original_plantings] += original_plantings
+                    season_totals[season_year][:findings_count] += findings_count
+                    season_totals[season_year][:production_grams] += production_grams
+                    
+                    species_totals[species.id][season_year][:actual_plantings] += actual_plantings
+                    species_totals[species.id][season_year][:original_plantings] += original_plantings
+                    species_totals[species.id][season_year][:findings_count] += findings_count
+                    species_totals[species.id][season_year][:production_grams] += production_grams
+                    
+                    # Calculate yield and average weight
+                    yield_per_plant = safe_division(production_grams, actual_plantings)
+                    avg_weight = safe_division(production_grams, findings_count)
+                    
+                    # Only show rows with data
+                    has_data = actual_plantings > 0 || original_plantings > 0 || findings_count > 0 || production_grams > 0
+                  %>
+                  
+                  <% if has_data %>
+                    <tr class="border-b hover:bg-gray-100 <%= species_index.even? ? 'bg-white' : 'bg-gray-50' %>">
+                      <% if species_index == 0 && age_index == 0 %>
+                        <td class="px-3 py-3 font-medium text-gray-900" rowspan="<%= season_row_count %>">
+                          <%= season[:display] %>
+                        </td>
+                      <% end %>
+                      
+                      <% if species_index == 0 %>
+                        <td class="px-3 py-3 font-medium text-gray-900" rowspan="<%= spring_age_counts[age] > 0 ? spring_age_counts[age] : 1 %>">
+                          <%= age %>
+                        </td>
+                      <% end %>
+                      
+                      <td class="px-3 py-3 font-medium text-gray-900"><%= species.name %></td>
+                      <td class="px-3 py-3 text-center"><%= original_plantings %></td>
+                      <td class="px-3 py-3 text-center"><%= actual_plantings %></td>
+                      <td class="px-3 py-3 text-center"><%= findings_count %></td>
+                      <td class="px-3 py-3 text-right"><%= number_with_precision(production_grams, precision: 2) %></td>
+                      <td class="px-3 py-3 text-right"><%= yield_per_plant ? number_with_precision(yield_per_plant, precision: 2) : '-' %></td>
+                      <td class="px-3 py-3 text-right"><%= avg_weight ? number_with_precision(avg_weight, precision: 2) : '-' %></td>
+                    </tr>
+                  <% end %>
+                <% end %>
+                
+                <!-- Species totals for this season -->
+                <% 
+                  species_season_totals = species_totals[species.id][season_year]
+                  species_actual = species_season_totals[:actual_plantings]
+                  species_original = species_season_totals[:original_plantings]
+                  species_findings = species_season_totals[:findings_count]
+                  species_production = species_season_totals[:production_grams].round(2)
+                  
+                  species_yield = safe_division(species_production, species_actual)
+                  species_avg = safe_division(species_production, species_findings)
+                  
+                  # Only show species totals when we have data
+                  species_has_data = species_actual > 0 || species_original > 0 || species_findings > 0 || species_production > 0
+                %>
+                
+                <% if species_has_data %>
+                  <tr class="border-b bg-gray-100 hover:bg-gray-200">
+                    <td class="px-3 py-3 text-right font-medium text-gray-700" colspan="2">Subtotal <%= species.name %></td>
+                    <td class="px-3 py-3 font-medium text-gray-700"><%= species.name %></td>
+                    <td class="px-3 py-3 font-medium text-center"><%= species_original %></td>
+                    <td class="px-3 py-3 font-medium text-center"><%= species_actual %></td>
+                    <td class="px-3 py-3 font-medium text-center"><%= species_findings %></td>
+                    <td class="px-3 py-3 font-medium text-right"><%= number_with_precision(species_production, precision: 2) %></td>
+                    <td class="px-3 py-3 font-medium text-right"><%= species_yield ? number_with_precision(species_yield, precision: 2) : '-' %></td>
+                    <td class="px-3 py-3 font-medium text-right"><%= species_avg ? number_with_precision(species_avg, precision: 2) : '-' %></td>
+                  </tr>
+                <% end %>
+              <% end %>
+              
+              <!-- Season totals -->
+              <% 
+                current_season_totals = season_totals[season_year]
+                season_actual = current_season_totals[:actual_plantings]
+                season_original = current_season_totals[:original_plantings]
+                season_findings = current_season_totals[:findings_count]
+                season_production = current_season_totals[:production_grams].round(2)
+                
+                season_yield = safe_division(season_production, season_actual)
+                season_avg = safe_division(season_production, season_findings)
+                
+                # Only show season totals if we have data
+                season_has_data = season_actual > 0 || season_original > 0 || season_findings > 0 || season_production > 0
+              %>
+              
+              <% if season_has_data %>
+                <tr class="border-b bg-gray-200 hover:bg-gray-300">
+                  <td class="px-3 py-3 font-semibold text-gray-900" colspan="3">TOTAL <%= season[:display] %></td>
+                  <td class="px-3 py-3 font-semibold text-center text-gray-900"><%= season_original %></td>
+                  <td class="px-3 py-3 font-semibold text-center text-gray-900"><%= season_actual %></td>
+                  <td class="px-3 py-3 font-semibold text-center text-gray-900"><%= season_findings %></td>
+                  <td class="px-3 py-3 font-semibold text-right text-gray-900"><%= number_with_precision(season_production, precision: 2) %></td>
+                  <td class="px-3 py-3 font-semibold text-right text-gray-900"><%= season_yield ? number_with_precision(season_yield, precision: 2) : '-' %></td>
+                  <td class="px-3 py-3 font-semibold text-right text-gray-900"><%= season_avg ? number_with_precision(season_avg, precision: 2) : '-' %></td>
+                </tr>
+              <% end %>
+              
+              <!-- Add a spacer row between seasons -->
+              <% if season_index < @seasons.length - 1 %>
+                <tr class="h-4"><td colspan="9" class="border-b-0"></td></tr>
+              <% end %>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="text-gray-500 text-center py-4">No data available for statistics by planting age and species.</div>
+    <% end %>
+  </div>

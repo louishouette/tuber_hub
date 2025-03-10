@@ -1,0 +1,2 @@
+class InoculationsController < ApplicationController
+end

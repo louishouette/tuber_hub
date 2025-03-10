@@ -1,0 +1,71 @@
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-8">Harvests Analysis</h1>
+
+  <div class="space-y-8">
+    <!-- Average Time to First Finding -->
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <h2 class="text-xl font-semibold mb-4">Average Time to First Finding</h2>
+      <%= line_chart @time_to_first_finding,
+          height: "400px",
+          library: {
+            scales: {
+              x: {
+                type: 'category',
+                grid: {
+                  display: false
+                }
+              },
+              y: {
+                beginAtZero: true,
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.1)'
+                },
+                title: {
+                  display: true,
+                  text: 'Minutes'
+                }
+              }
+            },
+            plugins: {
+              title: { 
+                display: true, 
+                text: "Average time before first finding" 
+              }
+            }
+          } %>
+    </div>
+
+    <!-- Average Time Between Findings -->
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <h2 class="text-xl font-semibold mb-4">Average Time Between Findings</h2>
+      <%= line_chart @time_between_findings,
+          height: "400px",
+          library: {
+            scales: {
+              x: {
+                type: 'category',
+                grid: {
+                  display: false
+                }
+              },
+              y: {
+                beginAtZero: true,
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.1)'
+                },
+                title: {
+                  display: true,
+                  text: 'Minutes'
+                }
+              }
+            },
+            plugins: {
+              title: { 
+                display: true, 
+                text: "Average time between consecutive findings" 
+              }
+            }
+          } %>
+    </div>
+  </div>
+</div>

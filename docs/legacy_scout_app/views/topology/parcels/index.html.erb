@@ -1,0 +1,211 @@
+<div class="p-4 bg-gray-50 min-h-screen">
+
+
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900"><%= t('.title', default: 'Parcels Overview') %></h1>
+    </div>
+    <div class="flex gap-4">
+
+      <%= link_to topology_parcels_path(format: :xlsx, report_type: 'weekly_summary'), class: "inline-flex items-center px-4 py-2 text-white bg-green-600 hover:bg-green-700 font-medium text-sm rounded-lg shadow-sm" do %>
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
+        </svg>
+        Export Weekly Report
+      <% end %>
+      <%= link_to topology_parcels_path(format: :xlsx, report_type: 'full_production'), class: "inline-flex items-center px-4 py-2 text-white bg-green-600 hover:bg-green-700 font-medium text-sm rounded-lg shadow-sm ml-2" do %>
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
+        </svg>
+        Export Full Production
+      <% end %>
+
+    </div>
+  </div>
+
+  <!-- Filter Section -->
+  <div class="bg-white rounded-lg shadow mb-6 p-4">
+    <h2 class="text-lg font-semibold mb-4 text-gray-900">Filters</h2>
+    
+    <%= form_with url: topology_parcels_path, method: :get, class: "", data: { turbo_frame: "_top" }, id: "parcels-filter-form" do |f| %>
+      <!-- Debug: Add hidden fields to ensure proper parameter encoding -->
+      <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
+
+        <!-- Orchard Filter -->
+        <div>
+          <label for="orchard_ids" class="block text-sm font-medium text-gray-900 mb-1">Orchard</label>
+          <div data-controller="multi-select">
+            <%= f.select :orchard_ids, 
+                     options_for_select(@orchards.map { |o| [o.canonical_name, o.id] }, @filter_params[:orchard_ids]), 
+                     { include_blank: true },
+                     class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5",
+                     multiple: true,
+                     data: { multi_select_target: "select", placeholder: "Select orchards..." } %>
+          </div>
+        </div>
+
+        <!-- Parcel Name Filter -->
+        <div>
+          <label for="parcel_ids" class="block text-sm font-medium text-gray-900 mb-1">Parcel</label>
+          <div data-controller="multi-select">
+            <%= f.select :parcel_ids, 
+                      options_for_select(@parcels.map { |p| [p.canonical_name, p.id] }, @filter_params[:parcel_ids]), 
+                      { include_blank: true },
+                      class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5",
+                      multiple: true,
+                      data: { multi_select_target: "select", placeholder: "Select parcels..." } %>
+          </div>
+        </div>
+
+        <!-- Spring Age Filter - Using Multi-select -->
+        <div>
+          <label for="spring_age" class="block text-sm font-medium text-gray-900 mb-1">Spring Age</label>
+          <div data-controller="multi-select">
+            <%= f.select :spring_age, 
+                     options_for_select(@available_spring_ages.map { |age| ["#{age} years", age] }, @filter_params[:spring_age]), 
+                     { include_blank: true },
+                     class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5",
+                     multiple: true,
+                     data: { multi_select_target: "select", placeholder: "Select spring ages..." } %>
+          </div>
+        </div>
+
+        <!-- Species Filter - Using Multi-select -->
+        <div>
+          <label for="species_ids" class="block text-sm font-medium text-gray-900 mb-1">Species</label>
+          <div data-controller="multi-select">
+            <%= f.select :species_ids, 
+                     options_for_select(@species.map { |species| [species.name, species.id] }, @filter_params[:species_ids]), 
+                     { include_blank: true },
+                     class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5",
+                     multiple: true,
+                     data: { multi_select_target: "select", placeholder: "Select species..." } %>
+          </div>
+        </div>
+        
+        <!-- Inoculation Filter -->
+        <div>
+          <label for="inoculation_ids" class="block text-sm font-medium text-gray-900 mb-1">Inoculation</label>
+          <div data-controller="multi-select">
+            <%= f.select :inoculation_ids, 
+                     options_for_select(@inoculations.map { |i| [i.name, i.id] }, @filter_params[:inoculation_ids]),
+                     { include_blank: true }, 
+                     class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5",
+                     multiple: true,
+                     data: { multi_select_target: "select", placeholder: "Select inoculations..." } %>
+          </div>
+        </div>
+
+        <!-- Button Group -->
+        <div>
+          <div class="flex space-x-2">
+            <%= link_to topology_parcels_path, class: "text-sm font-medium rounded-lg px-4 py-2 text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200" do %>
+              <i class="fas fa-undo mr-1"></i> Reset
+            <% end %>
+            
+            <%= button_tag type: :submit, class: "text-sm font-medium rounded-lg px-4 py-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none" do %>
+              <i class="fas fa-search mr-1"></i> Search
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Summary Statistics Card -->
+  <div class="bg-white rounded-lg shadow mb-6">
+    <div class="p-4">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Parcel Overview Statistics</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <!-- Total Locations -->
+        <div class="bg-gray-50 rounded-lg p-4">
+          <div class="text-sm text-gray-500 mb-1">Total Locations</div>
+          <div class="text-xl font-semibold text-gray-900"><%= @presenter.total_locations_count %></div>
+        </div>
+        
+        <!-- Producer Ratio -->
+        <div class="bg-gray-50 rounded-lg p-4">
+          <div class="text-sm text-gray-500 mb-1">Producer Ratio</div>
+          <div class="text-xl font-semibold text-gray-900"><%= number_to_percentage(@presenter.overall_producer_ratio, precision: 1) %></div>
+          <div class="text-xs text-gray-500"><%= @presenter.total_producers_count %> producers</div>
+        </div>
+        
+        <!-- Total Production -->
+        <div class="bg-gray-50 rounded-lg p-4">
+          <div class="text-sm text-gray-500 mb-1">Total Production</div>
+          <div class="text-xl font-semibold text-gray-900"><%= number_to_human(@presenter.total_weight, precision: 2, units: { unit: "g", thousand: "kg" }) %></div>
+        </div>
+        
+        <!-- Average per Tree -->
+        <div class="bg-gray-50 rounded-lg p-4">
+          <div class="text-sm text-gray-500 mb-1">Avg per Location</div>
+          <div class="text-xl font-semibold text-gray-900"><%= number_to_human(@presenter.production_per_tree, precision: 2, units: { unit: "g", thousand: "kg" }) %></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow" data-controller="sort">
+    <div class="p-4">
+      <!-- Sort Controls -->
+      <div class="flex flex-wrap items-center justify-between mb-4 gap-2">
+
+        <!-- Hidden form for state preservation -->
+        <form class="hidden">
+          <!-- Keep existing filters -->
+          <% @filter_params.each do |key, value| %>
+            <% if value.is_a?(Array) %>
+              <% value.each do |v| %>
+                <input type="hidden" name="<%= key %>[]" value="<%= v %>" />
+              <% end %>
+            <% else %>
+              <input type="hidden" name="<%= key %>" value="<%= value %>" />
+            <% end %>
+          <% end %>
+          
+          <!-- Sort fields -->
+          <input type="hidden" name="sort_field" value="<%= @sort_field %>" data-sort-target="field" />
+          <input type="hidden" name="sort_direction" value="<%= @sort_direction %>" data-sort-target="direction" />
+        </form>
+        
+        <span class="text-sm text-gray-700">Sort by:</span>
+        <div class="flex flex-wrap gap-2">
+          <% [
+            ['name', 'Name'],
+            ['planted_at', 'Planting Date'],
+            ['locations_count', 'Locations'],
+            ['replacement_ratio', 'Replacements'],
+            ['findings_count', 'Findings'],
+            ['total_weight', 'Total Weight'],
+            ['average_weight', 'Avg Weight'],
+            ['producers_ratio', 'Producers %'],
+            ['production_per_planting', 'Prod/Planting'],
+            ['production_per_producer', 'Prod/Producer']
+          ].each do |field, label| %>
+            <button type="button" 
+                    data-sort-target="sortButton"
+                    data-action="sort#sort"
+                    data-sort-field="<%= field %>" 
+                    data-current-direction="<%= @sort_field == field ? @sort_direction : 'none' %>"
+                    class="text-sm font-medium rounded-lg px-3 py-2 inline-flex items-center <%= @sort_field == field ? 'bg-gray-200' : 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-100' %>">
+              <%= label %>
+              <svg class="w-4 h-4 ml-1.5 <%= @sort_field == field ? '' : 'text-gray-400' %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<%= @sort_field == field && @sort_direction == 'desc' ? 'M19 9l-7 7-7-7' : 'M5 15l7-7 7 7' %>"></path>
+              </svg>
+            </button>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- All Parcel Cards -->
+      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3" data-sort-target="orchardTab">
+        <% @all_parcel_stats = @parcel_stats.values.flatten.compact %>
+        <% @all_parcel_stats.each do |stats| %>
+          <%= render partial: "topology/parcels/parcel_card", locals: { stats: stats } %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+

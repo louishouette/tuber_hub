@@ -1,0 +1,42 @@
+<!-- Plantings Subsection -->
+<div class="space-y-4">
+  <h3 class="text-lg font-medium text-gray-900 border-b pb-2">Plantings</h3>
+  <div class="space-y-3">
+    <% 
+      # Use the already calculated values from the stats hash
+      total_locations = @stats[:total_locations].to_i
+      
+      # Get values for original plantings
+      original_plantings = @stats[:original_plantings_count].to_i
+      original_plantings_ratio = total_locations > 0 ? (original_plantings.to_f / total_locations * 100).round : 0
+      
+      # Get values for total replacements
+      total_replacements = @stats[:total_replacements_count].to_i
+      total_replacements_ratio = total_locations > 0 ? (total_replacements.to_f / total_locations * 100).round : 0
+      
+      # Get values for actual replacements
+      actual_replacements = @stats[:actual_replacements_count].to_i
+      actual_replacements_ratio = total_locations > 0 ? (actual_replacements.to_f / total_locations * 100).round : 0
+    %>
+    <div>
+      <div class="text-sm text-gray-700 font-medium mb-1">Original Plantings</div>
+      <div class="text-sm text-gray-600"><%= number_with_delimiter(original_plantings, delimiter: " ") %> (<%= original_plantings_ratio %>% of locations)</div>
+    </div>
+    <div>
+      <div class="text-sm text-gray-700 font-medium mb-1">Total Replacements</div>
+      <div class="text-sm text-gray-600"><%= number_with_delimiter(total_replacements, delimiter: " ") %> (<%= total_replacements_ratio %>% of locations)</div>
+    </div>
+    <div>
+      <div class="text-sm text-gray-700 font-medium mb-1">Actual Replacements</div>
+      <div class="text-sm text-gray-600"><%= number_with_delimiter(actual_replacements, delimiter: " ") %> (<%= actual_replacements_ratio %>% of locations)</div>
+    </div>
+    <div>
+      <div class="text-sm text-gray-700 font-medium mb-1">Inoculation</div>
+      <% if @stats[:inoculation].present? %>
+        <div class="text-sm text-gray-600"><%= @stats[:inoculation].name %></div>
+      <% else %>
+        <div class="text-sm text-gray-600">Not specified</div>
+      <% end %>
+    </div>
+  </div>
+</div>

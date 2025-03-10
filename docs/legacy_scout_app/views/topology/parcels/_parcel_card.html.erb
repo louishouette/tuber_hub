@@ -1,0 +1,191 @@
+<% if stats[:parcel].present? %>
+  <% cache [stats[:parcel], stats[:parcel].updated_at] do %>
+  <% 
+    # Extract values for data attributes to enable client-side sorting
+    current_season = stats[:current_season] || {}
+    producers_count = current_season[:producers_count].to_i
+    total_locations = stats[:total_locations].to_i
+    total_weight = current_season[:total_weight].to_f
+    findings_count = current_season[:findings_count].to_i
+    planting_count = stats[:planting_count].to_i || 1
+    replacement_count = stats[:replacement_count].to_i
+    replacement_ratio = total_locations.positive? ? (replacement_count.to_f / total_locations) : 0
+    producers_ratio = total_locations.positive? ? (producers_count.to_f / total_locations) : 0
+    average_weight = total_locations.positive? ? (total_weight / total_locations) : 0
+    per_producer = producers_count.positive? ? (total_weight / producers_count) : 0
+    per_planting = planting_count.positive? ? (total_weight / planting_count) : 0
+  %>
+  <div class="relative md:p-6 p-4 bg-white border border-gray-200 rounded-lg shadow overflow-hidden parcel-card"
+      data-parcel-id="<%= stats[:parcel].id %>"
+      data-planted-at="<%= stats[:parcel].planted_at.to_s if stats[:parcel].planted_at.present? %>"
+      data-spring-age="<%= stats[:spring_age] %>"
+      data-locations-count="<%= total_locations %>"
+      data-findings-count="<%= findings_count %>"
+      data-total-weight="<%= total_weight %>"
+      data-average-weight="<%= average_weight %>"
+      data-producers-ratio="<%= producers_ratio %>"
+      data-replacement-ratio="<%= replacement_ratio %>"
+      data-production-per-planting="<%= per_planting %>"
+      data-production-per-producer="<%= per_producer %>">
+
+    <!-- Parcel Header -->
+    <div class="flex justify-between items-start mb-4">
+      <h3 class="text-lg font-semibold text-gray-900">
+        <%= stats[:parcel].name %>
+      </h3>
+      <div class="flex flex-col items-end">
+        <div class="flex items-center space-x-2 relative">
+          <span class="px-2 py-1 bg-gray-100 text-xs font-medium rounded-full text-gray-700">
+            <%= stats[:spring_age] %> springs
+          </span>
+          <% if stats[:parcel].planted_at.present? %>
+            <span class="text-xs text-gray-500">
+              Planted: <%= stats[:parcel].planted_at.strftime("%b %Y") %>
+            </span>
+          <% end %>
+          <%= link_to "View more", topology_parcel_path(stats[:parcel]), data: { turbo: false }, class: "relative z-40 ml-2 text-xs font-medium rounded-lg px-2 py-1 text-white bg-blue-600 hover:bg-blue-700 shadow-sm inline-block" %>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Species & Location Info -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+      <div>
+        <div class="text-sm font-medium text-gray-700 mb-2">Parcel Details</div>
+        <div class="space-y-3">
+          <div>
+            <div class="text-sm text-gray-500">Locations</div>
+            <div class="text-base font-medium text-gray-900"><%= stats[:total_locations] %></div>
+          </div>
+          
+          <div>
+            <div class="text-sm text-gray-500">Replacements</div>
+            <div class="text-base font-medium flex items-center">
+              <span class="text-gray-900"><%= stats[:replacement_count] %></span>
+              <span class="text-xs text-gray-500 ml-1">(<%= number_to_percentage(stats[:replacement_ratio] * 100, precision: 1) %>)</span>
+            </div>
+          </div>
+          
+          <div>
+            <div class="text-sm text-gray-500">Inoculation</div>
+            <div class="text-base font-medium text-gray-900">
+              <%= stats[:inoculation]&.name || "None" %>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div>
+        <div class="text-sm font-medium text-gray-700 mb-2">Species</div>
+        <div class="flex flex-wrap gap-2">
+          <% stats[:species_distribution].each do |species| %>
+            <% species_record = Species.find_by(name: species[:name]) %>
+            <% color_code = species_record&.color_code || "#6c757d" %>
+            <% 
+              # Calculate brightness (simple formula: higher value = brighter color)
+              # Convert hex to RGB first
+              r = color_code[1..2].to_i(16)
+              g = color_code[3..4].to_i(16)
+              b = color_code[5..6].to_i(16)
+              brightness = (r * 299 + g * 587 + b * 114) / 1000
+              
+              # Use darker text for bright colors
+              text_color = brightness > 150 ? "#333333" : color_code
+            %>
+            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium" style="background-color: <%= color_code %>25; color: <%= text_color %>">
+              <%= species[:name] %> (<%= species[:percentage] %>%)
+            </span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Current Season Stats -->
+    <div class="border-t border-gray-200 pt-4">
+      <div class="mb-3">
+        <div class="text-sm font-medium text-gray-900">Current Season Performance</div>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <!-- Producers -->
+        <div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-500">Producers</span>
+            <%= render partial: "topology/parcels/trend_indicator", locals: { 
+              change: stats[:changes][:producer_ratio]
+            } %>
+          </div>
+          <div class="text-base font-medium flex items-center">
+            <span class="text-gray-900"><%= stats[:current_season][:producers_count] %></span>
+            <span class="text-xs text-gray-500 ml-1">(<%= number_to_percentage(stats[:current_season][:producer_ratio] * 100, precision: 0) %>)</span>
+          </div>
+        </div>
+        
+        <!-- Findings Count -->
+        <div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-500">Findings</span>
+            <%= render partial: "topology/parcels/trend_indicator", locals: { 
+              change: stats[:changes][:findings_count]
+            } %>
+          </div>
+          <div class="text-base font-medium text-gray-900">
+            <%= stats[:current_season][:findings_count] %>
+          </div>
+        </div>
+        
+        <!-- Total Weight -->
+        <div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-500">Total Weight</span>
+            <%= render partial: "topology/parcels/trend_indicator", locals: { 
+              change: stats[:changes][:total_weight]
+            } %>
+          </div>
+          <div class="text-base font-medium text-gray-900">
+            <%= number_to_human(stats[:current_season][:total_weight], precision: 2, units: { unit: "g", thousand: "kg" }) %>
+          </div>
+        </div>
+        
+        <!-- Average Weight -->
+        <div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-500">Avg Weight</span>
+            <%= render partial: "topology/parcels/trend_indicator", locals: { 
+              change: stats[:changes][:average_weight]
+            } %>
+          </div>
+          <div class="text-base font-medium text-gray-900">
+            <%= number_to_human(stats[:current_season][:average_weight], precision: 2, units: { unit: "g", thousand: "kg" }) %>
+          </div>
+        </div>
+        
+        <!-- Production per Planting -->
+        <div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-500">g/Planting</span>
+            <%= render partial: "topology/parcels/trend_indicator", locals: { 
+              change: stats[:changes][:production_per_planting]
+            } %>
+          </div>
+          <div class="text-base font-medium text-gray-900">
+            <%= number_to_human(stats[:current_season][:production_per_planting], precision: 2, units: { unit: "g", thousand: "kg" }) %>
+          </div>
+        </div>
+
+        <!-- Production per Producing Planting -->
+        <div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-500">g/Producers</span>
+            <%= render partial: "topology/parcels/trend_indicator", locals: { 
+              change: stats[:changes][:g_per_producing]
+            } %>
+          </div>
+          <div class="text-base font-medium text-gray-900">
+            <%= number_to_human(stats[:current_season][:g_per_producing], precision: 2, units: { unit: "g", thousand: "kg" }) %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% end %>
+<% end %>

@@ -1,0 +1,73 @@
+<tr id="<%= dom_id intake %>" class="bg-white border-b hover:bg-gray-50">
+  <td class="px-6 py-4">
+    <%= l intake.intake_at.to_date, format: :long %>
+  </td>
+  <td class="px-6 py-4">
+    <%= intake.raw_number %>
+  </td>
+  <td class="px-6 py-4 text-right">
+    <%= number_with_precision intake.raw_weight, precision: 0 %> g
+  </td>
+  <td class="px-6 py-4 text-right">
+    <% if intake.net_weight.present? %>
+      <%= number_with_precision intake.net_weight, precision: 0 %> g
+    <% else %>
+      -
+    <% end %>
+  </td>
+  <td class="px-6 py-4 text-right">
+    <% if intake.edible_weight.present? %>
+      <%= number_with_precision intake.edible_weight, precision: 0 %> g
+    <% else %>
+      -
+    <% end %>
+  </td>
+  <td class="px-6 py-4 text-right">
+    <% if intake.non_edible_weight.present? %>
+      <%= number_with_precision intake.non_edible_weight, precision: 0 %> g
+    <% else %>
+      -
+    <% end %>
+  </td>
+  <td class="px-6 py-4">
+    <div class="flex justify-end items-center space-x-1">
+      <%= link_to intake_path(intake),
+          class: "inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-gray-700 rounded-lg hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300",
+          data: { tooltip_target: "view-tooltip-#{intake.id}" } do %>
+        <i class="fas fa-eye text-lg"></i>
+        <span class="ml-2">View</span>
+      <% end %>
+      <div id="view-tooltip-<%= intake.id %>" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip">
+        View details
+        <div class="tooltip-arrow" data-popper-arrow></div>
+      </div>
+
+      <%= link_to edit_intake_path(intake),
+          class: "inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300",
+          data: { tooltip_target: "edit-tooltip-#{intake.id}" } do %>
+        <i class="fas fa-edit text-lg"></i>
+        <span class="ml-2">Edit</span>
+      <% end %>
+      <div id="edit-tooltip-<%= intake.id %>" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip">
+        Edit intake
+        <div class="tooltip-arrow" data-popper-arrow></div>
+      </div>
+
+      <%= button_to intake_path(intake),
+          method: :delete,
+          form: { 
+            data: { turbo_confirm: 'Are you sure you want to delete this intake?' },
+            class: "inline"
+          },
+          class: "inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300",
+          data: { tooltip_target: "delete-tooltip-#{intake.id}" } do %>
+        <i class="fas fa-trash-alt text-lg"></i>
+        <span class="ml-2">Delete</span>
+      <% end %>
+      <div id="delete-tooltip-<%= intake.id %>" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip">
+        Delete intake
+        <div class="tooltip-arrow" data-popper-arrow></div>
+      </div>
+    </div>
+  </td>
+</tr>

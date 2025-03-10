@@ -1,10 +1,22 @@
 # Tuber Ecosystem of apps
 FBH Invest is a farming company dedicated to the production of black truffles in the Loire Valley. It distributes its production under the brand "Truffière de Cément".
 
-## Tuber FARM
-https://www.fbhinvest.fr
+## Redirecting all domains
+All available domains will redirect to the main one : https://www.truffiere-de-cement.fr
+
+## Tuber SHOP
+https://www.truffiere-de-cement.fr
+The brand website will serve :
+- a homepage with a CTA for gathering leads 
+- a /shop section for selling truffles
+- the following public sections : /blog, /news, /about, /contact and /job
+- a /club section for private stories and private figures
+- a discrete 'connect' link to the ERP (if already connected, don't display 'connect' but 'Tuber HUB')
+
+## Tuber HUB
+https://hub.truffiere-de-cement.fr
 The internal ERP tool to manage ressources and operations and to create reports. 
-Its data is made available to other apps throught its versioned API at api.fbhinvest.fr/v2
+Its data is made available to other apps throught its versioned API at api.truffiere-de-cement.fr/v2
 - core : the namespace to manage the main elements
   - farm
   - season
@@ -31,19 +43,11 @@ Its data is made available to other apps throught its versioned API at api.fbhin
   - role
   - permission
 
-## Tuber SHOP
-https://www.truffiere-de-cement.fr
-The brand website will serve :
-- a homepage with a CTA for gathering leads 
-- a /shop section for selling truffles
-- the following public sections : /blog, /news, /about, /contact and /job
-- a /club section for private stories and private figures
-
 ## Tuber MARKETPLACE
-https://marketplace.fbhinvest.fr
+https://marketplace.truffiere-de-cement.fr
 A reserved access to the commercial partners where they can find everything about the week prices, their past orders, invoices, track their order and see their allocated quantities. It's their endpoint for business relation.
 
 ## Tuber SCOUT
-http://scout.fbhinvest.fr
+http://scout.truffiere-de-cement.fr
 The mobile website, a responsive frontend to a simple surveying on-field system, to report on truffle findings.
-An link to the iOS and Android app version of Tuber SCOUT will be available at : http://scout.fbhinvest.fr/app
+An link to the iOS and Android app version of Tuber SCOUT will be available at : http://scout.truffiere-de-cement.fr/app

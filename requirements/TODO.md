@@ -1,4 +1,7 @@
-FEAT: displaying different layouts
+# FEAT: setup kamal
+- security find-internet-password -a 'lmmh' -l 'Docker Credentials' -w for retrieving docker credentials
+
+# FEAT: displaying different layouts
 - the landing page should be the root of the whole application
 - we need to add a few pages with placeholders freely accessible :
   - /shop

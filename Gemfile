@@ -35,6 +35,32 @@ gem "kamal", require: false
 # Add HTTP asset caching/compression and X-Sendfile acceleration to Puma [https://github.com/basecamp/thruster/]
 gem "thruster", require: false
 
+group :development, :test do
+  # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
+  gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
+
+  # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
+  gem "brakeman", require: false
+
+  # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
+  gem "rubocop-rails-omakase", require: false
+end
+
+group :development do
+  # Use console on exceptions pages [https://github.com/rails/web-console]
+  gem "web-console"
+
+  # https://github.com/drwl/annotaterb
+  gem "annotaterb"
+
+  # https://github.com/voormedia/rails-erd
+  gem "rails-erd"
+
+  # https://github.com/BetterErrors/better_errors
+  # gem 'better_errors'
+  # gem 'binding_of_caller'
+end
+
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 1.2"
 
@@ -68,28 +94,5 @@ gem "pundit"
 # https://github.com/weppos/breadcrumbs_on_rails
 # gem "breadcrumbs_on_rails"
 
-group :development, :test do
-  # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
-  gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
-
-  # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
-  gem "brakeman", require: false
-
-  # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
-  gem "rubocop-rails-omakase", require: false
-end
-
-group :development do
-  # Use console on exceptions pages [https://github.com/rails/web-console]
-  gem "web-console"
-
-  # https://github.com/drwl/annotaterb
-  gem "annotaterb"
-
-  # https://github.com/voormedia/rails-erd
-  gem "rails-erd"
-
-  # https://github.com/BetterErrors/better_errors
-  # gem 'better_errors'
-  # gem 'binding_of_caller'
-end
+# https://github.com/Rails-Designer/rails_icons
+gem "rails_icons", "~> 1.2"

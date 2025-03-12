@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Tuber HUB - Truffiu00e8re de Cu00e9ment" %></title>
+    <title><%= content_for(:title) || "Tuber HUB" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -26,11 +26,14 @@
 
   <body class="bg-gray-50">
     <div class="hub-layout">
-      <!-- Hub-specific navbar could go here -->
-      <div class="container mx-auto px-4 py-8">
-        <%= yield %>
+      <div class="antialiased bg-gray-50 dark:bg-gray-900">
+        <%= render "layouts/hub/shared/navbar" %>
+        <%= render "layouts/hub/shared/sidebar" %>
+
+        <main class="p-4 md:ml-64 h-auto pt-20">
+          <%= yield %>
+        </main>
       </div>
-      <!-- Hub-specific footer could go here -->
     </div>
   </body>
 </html>

@@ -1,33 +1,27 @@
 class UserPolicy < ApplicationPolicy
   def index?
-    user.admin?
+    false # Restrict access since role concept is removed
   end
 
   def show?
-    user.admin? || user.moderator? || record == user
+    record == user # Users can only see their own profile
   end
 
   def create?
-    user.admin?
+    false # Restrict access since role concept is removed
   end
 
   def update?
-    user.admin? || record == user
+    record == user # Users can only update their own profile
   end
 
   def destroy?
-    user.admin? && record != user
+    false # Restrict access since role concept is removed
   end
 
   class Scope < Scope
     def resolve
-      if user.admin?
-        scope.all
-      elsif user.moderator?
-        scope.where.not(role: 'admin')
-      else
-        scope.where(id: user.id)
-      end
+      scope.where(id: user.id) # Users can only access their own records
     end
   end
 end

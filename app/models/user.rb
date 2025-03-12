@@ -1,25 +1,29 @@
+# == Schema Information
+#
+# Table name: users
+#
+#  id              :bigint           not null, primary key
+#  email_address   :string           not null
+#  first_name      :string
+#  last_name       :string
+#  password_digest :string           not null
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#
+# Indexes
+#
+#  index_users_on_email_address  (email_address) UNIQUE
+#
 class User < ApplicationRecord
   has_secure_password
   has_many :sessions, dependent: :destroy
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
+  normalizes :first_name, :last_name, with: ->(value) { value.to_s.strip.presence }
 
-  # Role definitions
-  ROLES = %w[admin moderator user].freeze
+  validates :first_name, :last_name, presence: true, on: :update
 
-  # Validations
-  validates :role, inclusion: { in: ROLES }
-
-  # Role methods
-  def admin?
-    role == 'admin'
-  end
-
-  def moderator?
-    role == 'moderator'
-  end
-
-  def user?
-    role == 'user'
+  def full_name
+    [ first_name, last_name ].compact_blank.join(" ")
   end
 end

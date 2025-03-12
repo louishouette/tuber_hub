@@ -10,10 +10,13 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  # Public namespace routes
-  namespace :public do
-    get "/", to: "home#index"
-  end
+  # Clean URLs for public pages (no namespace in URL but controllers are in public/ namespace)
+  get "/shop", to: "public/shop#index", as: :shop
+  get "/blog", to: "public/blog#index", as: :blog
+  get "/news", to: "public/news#index", as: :news
+  get "/about", to: "public/about#index", as: :about
+  get "/contact", to: "public/contact#index", as: :contact
+  get "/jobs", to: "public/job#index", as: :job
 
   # Marketplace namespace routes
   namespace :marketplace do

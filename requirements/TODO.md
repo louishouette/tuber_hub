@@ -2,15 +2,14 @@
 - security find-internet-password -a 'lmmh' -l 'Docker Credentials' -w for retrieving docker credentials
 
 # FEAT: displaying different layouts
-- the landing page should be the root of the whole application
-- we need to add a few pages with placeholders freely accessible :
+- we need to add a few pages with placeholder content freely accessible :
   - /shop
   - /blog
   - /news
   - /about
   - /contact
   - /job
-- the followings are accessible only after loging in :
+- the following pages will be accessible only after loging in :
   - /club
   - Tuber HUB : https://hub.truffiere-de-cement.fr
   - Marketplace : https://marketplace.truffiere-de-cement.fr

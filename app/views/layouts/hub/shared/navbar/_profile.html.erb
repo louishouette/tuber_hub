@@ -6,11 +6,9 @@
   data-dropdown-toggle="dropdown"
 >
   <span class="sr-only">Open user menu</span>
-  <img
-    class="w-8 h-8 rounded-full"
-    src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/michael-gough.png"
-    alt="user photo"
-  />
+  <div class="flex items-center justify-center w-8 h-8 rounded-full bg-primary-600 text-white">
+    <%= user_initials(Current.user&.full_name) %>
+  </div>
 </button>
 <!-- Dropdown menu -->
 <div
@@ -20,11 +18,11 @@
   <div class="py-3 px-4">
     <span
       class="block text-sm font-semibold text-gray-900 dark:text-white"
-      >Neil Sims</span
+      ><%= Current.user&.full_name %></span
     >
     <span
       class="block text-sm text-gray-900 truncate dark:text-white"
-      >name@flowbite.com</span
+      ><%= Current.user&.email_address %></span
     >
   </div>
   <ul
@@ -38,13 +36,6 @@
         >My profile</a
       >
     </li>
-    <li>
-      <a
-        href="#"
-        class="block py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-400 dark:hover:text-white"
-        >Account settings</
-      >
-    </li>
   </ul>
   <ul
     class="py-1 text-gray-700 dark:text-gray-300"
@@ -52,40 +43,8 @@
   >
     <li>
       <a
-        href="#"
-        class="flex items-center py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-        ><%= icon "heart", library: "lucide", variant: "outline", class: "mr-2 w-5 h-5 text-gray-400" %>
-        My likes</a
-      >
-    </li>
-    <li>
-      <a
-        href="#"
-        class="flex items-center py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-        ><%= icon "folders", library: "lucide", variant: "outline", class: "mr-2 w-5 h-5 text-gray-400" %>
-        Collections</a
-      >
-    </li>
-    <li>
-      <a
-        href="#"
-        class="flex justify-between items-center py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-      >
-        <span class="flex items-center">
-          <%= icon "flame", library: "lucide", variant: "outline", class: "mr-2 w-5 h-5 text-primary-600 dark:text-primary-500" %>
-          Pro version
-        </span>
-        <%= icon "chevron-right", library: "lucide", variant: "outline", class: "w-5 h-5 text-gray-400" %>
-      </a>
-    </li>
-  </ul>
-  <ul
-    class="py-1 text-gray-700 dark:text-gray-300"
-    aria-labelledby="dropdown"
-  >
-    <li>
-      <a
-        href="#"
+        href="<%= logout_path %>"
+        data-turbo-method="delete"
         class="block py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
         >Sign out</a
       >

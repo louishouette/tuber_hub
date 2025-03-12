@@ -1,0 +1,74 @@
+<!-- 🌿 Navbar -->
+<nav class="bg-white shadow-md py-4 px-6 flex justify-between items-center w-full overflow-visible">
+  <!-- Logo -->
+  <a href="/" class="flex items-center">
+    <%= image_tag "legacy-logos/tdc.png", alt: "Truffière de Cément Logo", class: "h-[4.6rem]" %>
+  </a>
+
+  <!-- Centered Title -->
+  <h1 class="text-4xl font-medium text-[#1C3835] absolute left-1/2 transform -translate-x-1/2">Truffière de Cément</h1>
+
+  <!-- Navigation Links -->
+  <div class="hidden md:flex space-x-6 text-[#1C3835]">
+    <a href="/shop" class="hover:underline px-3 py-2 text-base font-medium">Shop</a>
+    <a href="/blog" class="hover:underline px-3 py-2 text-base font-medium">Blog</a>
+    <a href="/news" class="hover:underline px-3 py-2 text-base font-medium">News</a>
+    <a href="/about" class="hover:underline px-3 py-2 text-base font-medium">About</a>
+    <a href="/contact" class="hover:underline px-3 py-2 text-base font-medium">Contact</a>
+    <a href="/jobs" class="hover:underline px-3 py-2 text-base font-medium">Jobs</a>
+    
+    <!-- Private Access Dropdown -->
+    <div class="relative">
+      <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" class="text-gray-500 hover:text-gray-900 hover:bg-gray-100 px-3 py-2 rounded-lg text-base font-medium flex items-center" type="button">
+        Private access
+        <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+        </svg>
+      </button>
+      <!-- Dropdown menu -->
+      <div id="dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
+        <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefaultButton">
+          <li><a href="/marketplace" class="block px-4 py-2 hover:bg-gray-100">Marketplace</a></li>
+          <li><a href="/club" class="block px-4 py-2 hover:bg-gray-100">Club</a></li>
+          <li><a href="/hub" class="block px-4 py-2 hover:bg-gray-100">Tuber HUB</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Menu Button -->
+  <button data-collapse-toggle="mobile-menu" type="button" class="md:hidden inline-flex items-center p-2 text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500">
+    <span class="sr-only">Open main menu</span>
+    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+    </svg>
+  </button>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="hidden md:hidden bg-white w-full px-6 py-3" id="mobile-menu">
+  <ul class="space-y-2">
+    <li><a href="/shop" class="block px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 rounded-lg">Shop</a></li>
+    <li><a href="/blog" class="block px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 rounded-lg">Blog</a></li>
+    <li><a href="/news" class="block px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 rounded-lg">News</a></li>
+    <li><a href="/about" class="block px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 rounded-lg">About</a></li>
+    <li><a href="/contact" class="block px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 rounded-lg">Contact</a></li>
+    <li><a href="/jobs" class="block px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 rounded-lg">Jobs</a></li>
+    <li>
+      <button id="mobileDropdownButton" data-dropdown-toggle="mobileDropdown" class="w-full text-left block px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-100 rounded-lg flex items-center justify-between" type="button">
+        Private access
+        <svg class="w-2.5 h-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+        </svg>
+      </button>
+      <!-- Mobile Dropdown menu -->
+      <div id="mobileDropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
+        <ul class="py-2 text-sm text-gray-700" aria-labelledby="mobileDropdownButton">
+          <li><a href="/marketplace" class="block px-4 py-2 hover:bg-gray-100">Marketplace</a></li>
+          <li><a href="/club" class="block px-4 py-2 hover:bg-gray-100">Club</a></li>
+          <li><a href="/hub" class="block px-4 py-2 hover:bg-gray-100">Tuber HUB</a></li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+</div>

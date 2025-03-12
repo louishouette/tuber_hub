@@ -1,0 +1,32 @@
+/* Custom Fonts for landing page */
+@font-face {
+  font-family: 'Dashiell Fine';
+  src: url(asset-path('dashiellfine-medium.woff')) format('woff'),
+       url(asset-path('dashiellfine-medium.ttf')) format('truetype'),
+       url(asset-path('dashiellfine-medium.otf')) format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Dashiell Fine';
+  src: url(asset-path('dashiellfine-bold.woff')) format('woff'),
+       url(asset-path('dashiellfine-bold.ttf')) format('truetype'),
+       url(asset-path('dashiellfine-bold.otf')) format('opentype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+body { 
+  font-family: 'Dashiell Fine', serif; 
+  background-color: #ffffff; 
+  color: #1C3835; 
+}
+
+h1, h2, h3 { 
+  font-family: 'Dashiell Fine', serif; 
+}
+
+.highlight { 
+  border-bottom: 2px solid #F5E3BB; 
+}

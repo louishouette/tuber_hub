@@ -1,0 +1,13 @@
+<!-- 🌿 Footer -->
+<footer class="bg-white text-center py-6">
+  <p class="text-sm text-[#1C3835]">© <%= Time.zone.now.year %> Truffière de Cément - Tous droits réservés.</p>
+  <div class="flex justify-center space-x-4 mt-2">
+    <a href="#" class="text-sm text-[#1C3835] hover:underline">Mentions légales</a>
+    <a href="#" class="text-sm text-[#1C3835] hover:underline">Politique de confidentialité</a>
+    <a href="#" class="text-sm text-[#1C3835] hover:underline">Conditions générales</a>
+    <a href="#" class="text-sm text-[#1C3835] hover:underline">Cookies</a>
+    <% if authenticated? %>
+      <span class="text-sm text-[#1C3835]">Connecté en tant que <%= Current.user.email_address %></span>
+    <% end %>
+  </div>
+</footer>

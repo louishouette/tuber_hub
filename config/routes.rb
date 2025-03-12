@@ -1,6 +1,8 @@
 Rails.application.routes.draw do
   # Authentication routes
-  resource :session
+  get "/login", to: "sessions#new", as: :login
+  post "/login", to: "sessions#create", as: :session
+  delete "/logout", to: "sessions#destroy", as: :logout
   resources :passwords, param: :token
 
   # Health check - Can be used by load balancers and uptime monitors

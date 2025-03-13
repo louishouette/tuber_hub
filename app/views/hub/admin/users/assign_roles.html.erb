@@ -1,0 +1,93 @@
+<div class="p-4">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Assign Roles to <%= @user.full_name %></h1>
+    <div class="space-x-2">
+      <%= link_to 'Show User', hub_admin_user_path(@user), class: 'text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline' %>
+      <%= link_to 'Back to Users', hub_admin_users_path, class: 'text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline' %>
+    </div>
+  </div>
+
+  <% if notice.present? %>
+    <div id="notice" class="flex p-4 mb-4 text-sm text-green-800 border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-800" role="alert">
+      <svg class="flex-shrink-0 inline w-5 h-5 mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+      </svg>
+      <span class="sr-only">Info</span>
+      <div>
+        <%= notice %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="max-w-3xl mx-auto bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+    <p class="mb-4 text-gray-700 dark:text-gray-300">Select the roles you want to assign to <%= @user.full_name %>.</p>
+
+    <%= form_with(url: assign_roles_hub_admin_user_path(@user), method: :post, class: "space-y-6") do |form| %>
+      <div class="space-y-4">
+        <label class="flex items-center mb-4">
+          <input type="checkbox" id="toggle_all" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+          <span class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Toggle All</span>
+        </label>
+
+        <% @roles.each do |role| %>
+          <div class="flex items-center p-3 border border-gray-200 rounded-lg dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+            <div class="flex items-center h-5">
+              <%= check_box_tag 'role_ids[]', role.id, @assigned_role_ids.include?(role.id), 
+                  id: "role_#{role.id}",
+                  class: "w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" %>
+            </div>
+            <div class="ml-3 text-sm">
+              <label for="role_<%= role.id %>" class="font-medium text-gray-900 dark:text-gray-300"><%= role.name %></label>
+              <% if role.description.present? %>
+                <p class="text-gray-500 dark:text-gray-400"><%= role.description %></p>
+              <% end %>
+              <div class="mt-1">
+                <span class="text-xs text-blue-700 dark:text-blue-500"><%= pluralize(role.permissions.count, 'permission') %></span>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <div>
+        <label for="expires_at" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Expiration Date (Optional)</label>
+        <%= form.datetime_field :expires_at, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" %>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Leave blank for no expiration.</p>
+      </div>
+
+      <div class="flex justify-end">
+        <%= form.submit 'Update Roles', class: 'text-sm font-medium text-white bg-[#1C3835] hover:bg-[#152A27] focus:ring-4 focus:outline-none focus:ring-green-300 rounded-lg px-4 py-2.5' %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const toggleAllCheckbox = document.getElementById('toggle_all');
+    const roleCheckboxes = document.querySelectorAll('input[name="role_ids[]"]');
+    
+    toggleAllCheckbox.addEventListener('change', function() {
+      const isChecked = this.checked;
+      roleCheckboxes.forEach(checkbox => {
+        checkbox.checked = isChecked;
+      });
+    });
+    
+    // Update toggle all checkbox state based on other checkboxes
+    function updateToggleAllState() {
+      const allChecked = Array.from(roleCheckboxes).every(cb => cb.checked);
+      const noneChecked = Array.from(roleCheckboxes).every(cb => !cb.checked);
+      
+      toggleAllCheckbox.checked = allChecked;
+      toggleAllCheckbox.indeterminate = !allChecked && !noneChecked;
+    }
+    
+    roleCheckboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', updateToggleAllState);
+    });
+    
+    // Initial state
+    updateToggleAllState();
+  });
+</script>

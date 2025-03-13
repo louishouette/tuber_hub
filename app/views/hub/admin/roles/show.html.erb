@@ -1,0 +1,96 @@
+<div class="p-4">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Role Details</h1>
+    <div class="space-x-2">
+      <%= link_to 'Edit', edit_hub_admin_role_path(@role), class: 'text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline' %>
+      <%= link_to 'Assign Permissions', assign_permissions_hub_admin_role_path(@role), class: 'text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline' %>
+      <%= link_to 'Back to Roles', hub_admin_roles_path, class: 'text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline' %>
+    </div>
+  </div>
+
+  <% if notice.present? %>
+    <div id="notice" class="flex p-4 mb-4 text-sm text-green-800 border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-800" role="alert">
+      <svg class="flex-shrink-0 inline w-5 h-5 mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+      </svg>
+      <span class="sr-only">Info</span>
+      <div>
+        <%= notice %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="max-w-2xl mx-auto bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="col-span-1">
+        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Name</dt>
+        <dd class="mt-1 text-base text-gray-900 dark:text-white"><%= @role.name %></dd>
+      </div>
+
+      <div class="col-span-2">
+        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Description</dt>
+        <dd class="mt-1 text-base text-gray-900 dark:text-white"><%= @role.description %></dd>
+      </div>
+
+      <div class="col-span-1">
+        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Created At</dt>
+        <dd class="mt-1 text-base text-gray-900 dark:text-white"><%= @role.created_at.strftime("%B %d, %Y %H:%M") %></dd>
+      </div>
+
+      <div class="col-span-1">
+        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Updated At</dt>
+        <dd class="mt-1 text-base text-gray-900 dark:text-white"><%= @role.updated_at.strftime("%B %d, %Y %H:%M") %></dd>
+      </div>
+    </dl>
+
+    <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Users with this Role</h3>
+      <% if @role.users.any? %>
+        <ul class="list-disc pl-5 space-y-2 text-gray-900 dark:text-white">
+          <% @role.users.each do |user| %>
+            <li>
+              <%= link_to user.email_address, hub_admin_user_path(user), class: 'text-blue-600 dark:text-blue-500 hover:underline' %>
+              <span class="text-sm text-gray-500 dark:text-gray-400"><%= user.full_name %></span>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="text-gray-500 dark:text-gray-400">No users have been assigned this role yet.</p>
+      <% end %>
+    </div>
+
+    <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Permissions</h3>
+        <%= link_to 'Manage Permissions', assign_permissions_hub_admin_role_path(@role), class: 'text-sm font-medium text-white bg-[#1C3835] hover:bg-[#152A27] focus:ring-4 focus:outline-none focus:ring-green-300 rounded-lg px-4 py-2.5' %>
+      </div>
+      
+      <% if @role.permissions.any? %>
+        <div class="overflow-x-auto relative">
+          <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+              <tr>
+                <th scope="col" class="px-4 py-3">Namespace</th>
+                <th scope="col" class="px-4 py-3">Controller</th>
+                <th scope="col" class="px-4 py-3">Action</th>
+                <th scope="col" class="px-4 py-3">Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @role.permissions.order(:namespace, :controller, :action).each do |permission| %>
+                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                  <td class="px-4 py-2"><%= permission.namespace %></td>
+                  <td class="px-4 py-2"><%= permission.controller %></td>
+                  <td class="px-4 py-2"><%= permission.action %></td>
+                  <td class="px-4 py-2"><%= permission.description %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="text-gray-500 dark:text-gray-400">No permissions have been assigned to this role yet.</p>
+      <% end %>
+    </div>
+  </div>
+</div>

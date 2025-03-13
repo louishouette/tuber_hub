@@ -15,8 +15,8 @@
 #
 # Foreign Keys
 #
-#  fk_rails_...  (user_id => users.id)
+#  fk_rails_...  (user_id => hub_admin_users.id)
 #
 class Session < ApplicationRecord
-  belongs_to :user
+  belongs_to :user, class_name: 'Hub::Admin::User'
 end

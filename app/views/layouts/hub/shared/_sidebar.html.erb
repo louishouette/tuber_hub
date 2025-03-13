@@ -162,6 +162,37 @@
     <ul
       class="pt-5 mt-5 space-y-2 border-t border-gray-200 dark:border-gray-700"
     >
+      <% if Current.user&.admin? %>
+      <li>
+        <button
+          type="button"
+          class="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+          aria-controls="dropdown-admin"
+          data-collapse-toggle="dropdown-admin"
+        >
+          <%= icon "shield", library: "lucide", variant: "outline", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" %>
+          <span class="flex-1 ml-3 text-left whitespace-nowrap">Admin</span>
+          <%= icon "chevron-down", library: "lucide", variant: "outline", class: "w-6 h-6" %>
+        </button>
+        <ul id="dropdown-admin" class="hidden py-2 space-y-2">
+          <li>
+            <%= link_to hub_admin_users_path, class: "flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" do %>
+              <span>Users</span>
+            <% end %>
+          </li>
+          <li>
+            <%= link_to hub_admin_roles_path, class: "flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" do %>
+              <span>Roles</span>
+            <% end %>
+          </li>
+          <li>
+            <%= link_to hub_admin_permissions_path, class: "flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" do %>
+              <span>Permissions</span>
+            <% end %>
+          </li>
+        </ul>
+      </li>
+      <% end %>
       <li>
         <a
           href="#"

@@ -1,0 +1,128 @@
+<%= form_with(model: [:hub, :admin, permission], class: "space-y-4") do |form| %>
+  <% if permission.errors.any? %>
+    <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+      <h2 class="font-bold"><%= pluralize(permission.errors.count, "error") %> prohibited this permission from being saved:</h2>
+      <ul class="mt-1.5 list-disc list-inside">
+        <% permission.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :namespace, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+    <%= form.select :namespace, 
+                   options_for_select([["", ""]] + @available_namespaces.map { |ns| [ns.present? ? ns : "(root)", ns] }, permission.namespace),
+                   {},
+                   class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500",
+                   id: "namespace_select" %>
+  </div>
+
+  <div>
+    <%= form.label :controller, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+    <div id="controller_container">
+      <% if permission.namespace.present? && @available_controllers[permission.namespace].present? %>
+        <%= form.select :controller, 
+                       options_for_select([["", ""]] + @available_controllers[permission.namespace].map { |c| [c, c] }, permission.controller),
+                       {},
+                       class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" %>
+      <% else %>
+        <%= form.text_field :controller, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" %>
+      <% end %>
+    </div>
+  </div>
+
+  <div>
+    <%= form.label :action, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+    <%= form.select :action, 
+                   options_for_select([["", ""]] + @standard_actions.map { |a| [a, a] }, permission.action),
+                   { include_blank: "Custom action..." },
+                   class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500",
+                   id: "action_select" %>
+    
+    <div id="custom_action" class="hidden mt-2">
+      <%= form.text_field :custom_action, 
+                        value: (!@standard_actions.include?(permission.action) && permission.action.present?) ? permission.action : "",
+                        placeholder: "Enter custom action",
+                        class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" %>
+    </div>
+  </div>
+
+  <div>
+    <%= form.label :description, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+    <%= form.text_area :description, rows: 3, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" %>
+  </div>
+
+  <div class="flex justify-end">
+    <%= form.submit class: "text-sm font-medium text-white bg-[#1C3835] hover:bg-[#152A27] focus:ring-4 focus:outline-none focus:ring-green-300 rounded-lg px-4 py-2.5" %>
+  </div>
+<% end %>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Handle namespace change to update controllers
+    const namespaceSelect = document.getElementById('namespace_select');
+    const controllerContainer = document.getElementById('controller_container');
+    const actionSelect = document.getElementById('action_select');
+    const customActionDiv = document.getElementById('custom_action');
+    const customActionField = document.querySelector('#custom_action input');
+    
+    // Initialize custom action field visibility
+    if (actionSelect.value === '') {
+      customActionDiv.classList.remove('hidden');
+    }
+    
+    // Handle namespace change
+    if (namespaceSelect) {
+      namespaceSelect.addEventListener('change', function() {
+        const namespace = this.value;
+        
+        // Fetch controllers for the selected namespace
+        fetch(`/hub/admin/permissions/controllers_for_namespace?namespace=${encodeURIComponent(namespace)}`)
+          .then(response => response.json())
+          .then(data => {
+            let html = '';
+            if (data.controllers && data.controllers.length > 0) {
+              html = `<select name="hub_admin_permission[controller]" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">`;
+              html += `<option value=""></option>`;
+              data.controllers.forEach(controller => {
+                html += `<option value="${controller}">${controller}</option>`;
+              });
+              html += `</select>`;
+            } else {
+              html = `<input type="text" name="hub_admin_permission[controller]" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">`;
+            }
+            controllerContainer.innerHTML = html;
+          })
+          .catch(error => {
+            console.error('Error fetching controllers:', error);
+            controllerContainer.innerHTML = `<input type="text" name="hub_admin_permission[controller]" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">`;
+          });
+      });
+    }
+    
+    // Handle action selection
+    if (actionSelect) {
+      actionSelect.addEventListener('change', function() {
+        if (this.value === '') {
+          customActionDiv.classList.remove('hidden');
+        } else {
+          customActionDiv.classList.add('hidden');
+          customActionField.value = '';
+        }
+      });
+    }
+    
+    // Form submission handling for custom action
+    const form = document.querySelector('form');
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        if (actionSelect.value === '' && customActionField.value.trim() !== '') {
+          // Use the custom action value
+          actionSelect.value = customActionField.value.trim();
+        }
+      });
+    }
+  });
+</script>

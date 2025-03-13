@@ -32,6 +32,115 @@ Rails.application.routes.draw do
 
   # Hub namespace routes
   namespace :hub do
+    namespace :admin do
+      # User management
+      resources :users do
+        member do
+          post 'assign_roles'
+        end
+      end
+      
+      # Role and permission management
+      resources :roles do
+        member do
+          post 'assign_permissions'
+        end
+      end
+      resources :permissions do
+        collection do
+          post 'generate_permissions'
+          get 'controllers_for_namespace'
+        end
+      end
+      
+      # Assignment management
+      resources :role_assignments, only: [:index, :new, :create, :destroy]
+      resources :permission_assignments, only: [:index, :new, :create, :destroy]
+    end
+    
+    # Core namespace for main elements
+    namespace :core do
+      resources :farms
+      resources :seasons
+      resources :productions
+    end
+    
+    # Cultivation namespace and sub-namespaces
+    namespace :cultivation do
+      resources :irrigations
+      resources :fertilizations
+      resources :treatments
+      resources :plantings
+      resources :findings
+      resources :tilings
+      resources :mowings
+      resources :prunnings
+      
+      namespace :irrigation do
+        resources :sectors
+        resources :admissions
+        resources :tertiaries
+        resources :primaries
+        resources :secondaries
+        resources :dispensers
+      end
+      
+      namespace :fertilization do
+        resources :formulas
+        resources :tools
+      end
+      
+      namespace :treatment do
+        resources :families
+        resources :tools
+        resources :formulas
+      end
+      
+      namespace :planting do
+        resources :orchards
+        resources :parcels
+        resources :rows
+        resources :locations
+        resources :species
+        resources :nurseries
+        resources :inoculations
+      end
+      
+      namespace :harvest do
+        resources :runs
+        resources :dogs
+        resources :sectors
+      end
+      
+      namespace :tiling do
+        resources :tools
+      end
+      
+      namespace :mowing do
+        resources :tools
+      end
+      
+      namespace :prunning do
+        resources :architectures
+        resources :pruners
+      end
+    end
+    
+    # Measure namespace and sub-namespaces
+    namespace :measure do
+      resources :observations
+      
+      namespace :observation do
+        resources :types
+      end
+      
+      resources :soil_analyses
+      resources :soil_resistivities
+      resources :soil_moistures
+      resources :meteorologicals
+      resources :plant_electrophysiologies
+      resources :multispectrals
+    end
     get "/", to: "home#index"
   end
 

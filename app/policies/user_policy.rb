@@ -1,4 +1,5 @@
 class UserPolicy < ApplicationPolicy
+  # Policy for Hub::Admin::User
   def index?
     false # Restrict access since role concept is removed
   end

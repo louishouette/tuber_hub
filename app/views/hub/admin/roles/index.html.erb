@@ -38,6 +38,7 @@
               <%= link_to 'Show', hub_admin_role_path(role), class: 'font-medium text-blue-600 dark:text-blue-500 hover:underline' %>
               <%= link_to 'Edit', edit_hub_admin_role_path(role), class: 'font-medium text-blue-600 dark:text-blue-500 hover:underline' %>
               <%= link_to 'Assign Permissions', assign_permissions_hub_admin_role_path(role), class: 'font-medium text-blue-600 dark:text-blue-500 hover:underline' %>
+              <%= link_to 'View Users', users_hub_admin_role_path(role), class: 'font-medium text-blue-600 dark:text-blue-500 hover:underline' %>
               <%= button_to 'Delete', hub_admin_role_path(role), method: :delete, class: 'font-medium text-red-600 dark:text-red-500 hover:underline',
                   form: { data: { turbo_confirm: 'Are you sure you want to delete this role?' } } %>
             </td>

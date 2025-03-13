@@ -13,6 +13,7 @@
 #
 # Indexes
 #
+#  idx_permissions_lookup                 (namespace,controller,action,status)
 #  index_hub_admin_permissions_on_status  (status)
 #
 module Hub

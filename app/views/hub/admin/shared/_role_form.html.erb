@@ -1,4 +1,11 @@
-<%= form_with(model: [:hub, :admin, role], class: "space-y-4") do |form| %>
+<% # Debug form parameter names %>
+<% if role.new_record? %>
+  <div class="mb-4 p-2 bg-gray-100 dark:bg-gray-700 rounded">
+    <small class="text-xs text-gray-600 dark:text-gray-300">Debug: form params will be sent with key: <%= role.model_name.param_key %></small>
+  </div>
+<% end %>
+
+<%= form_with(model: role, url: role.new_record? ? hub_admin_roles_path : hub_admin_role_path(role), class: "space-y-4", scope: :hub_admin_role) do |form| %>
   <% if role.errors.any? %>
     <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
       <h2 class="font-bold"><%= pluralize(role.errors.count, "error") %> prohibited this role from being saved:</h2>

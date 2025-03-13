@@ -57,20 +57,40 @@ module Hub
         # Admin can do everything
         return true if admin?
         
-        # Check if user has role with permission for this action
-        roles.joins(permission_assignments: :permission)
-             .where(hub_admin_permission_assignments: { expires_at: nil })
-             .or(
-               roles.joins(permission_assignments: :permission)
-                    .where('hub_admin_permission_assignments.expires_at > ?', Time.zone.now)
-             )
-             .exists?(
-               hub_admin_permissions: {
-                 action: action.to_s,
-                 namespace: namespace.to_s,
-                 controller: controller.to_s
-               }
-             )
+        # Return false if user has no roles
+        return false if roles.empty?
+        
+        # Cache the permission check for better performance
+        permission_key = "user_#{id}_permission_#{namespace}:#{controller}:#{action}"
+        Rails.cache.fetch(permission_key, expires_in: 1.hour) do
+          # Check if user has role with permission for this action
+          # Account for both unlimited and non-expired permissions
+          roles.joins(permission_assignments: :permission)
+            .where(
+              hub_admin_permissions: {
+                namespace: namespace.to_s,
+                controller: controller.to_s,
+                action: action.to_s,
+                status: 'active'
+              }
+            )
+            .where(
+              hub_admin_permission_assignments: { expires_at: nil }
+            )
+            .or(
+              roles.joins(permission_assignments: :permission)
+                .where(
+                  hub_admin_permissions: {
+                    namespace: namespace.to_s,
+                    controller: controller.to_s,
+                    action: action.to_s,
+                    status: 'active'
+                  }
+                )
+                .where('hub_admin_permission_assignments.expires_at > ?', Time.zone.now)
+            )
+            .exists?
+        end
       end
       
       # Check if user account is active

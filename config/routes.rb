@@ -37,25 +37,24 @@ Rails.application.routes.draw do
       resources :users do
         member do
           post 'assign_roles'
+          patch 'toggle_active'  # For blocking/unblocking users
+        end
+        collection do
+          get 'roles/:role_id', to: 'users#by_role', as: :by_role
         end
       end
       
-      # Role and permission management
+      # Role management
       resources :roles do
         member do
+          get 'users', to: 'roles#users', as: :users
+          get 'assign_permissions'
           post 'assign_permissions'
         end
       end
-      resources :permissions do
-        collection do
-          post 'generate_permissions'
-          get 'controllers_for_namespace'
-        end
-      end
       
-      # Assignment management
-      resources :role_assignments, only: [:index, :new, :create, :destroy]
-      resources :permission_assignments, only: [:index, :new, :create, :destroy]
+      # Permission management
+      resources :permissions, only: [:index, :show]
     end
     
     # Core namespace for main elements

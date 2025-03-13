@@ -22,15 +22,15 @@ module Hub
       validates :name, presence: true, uniqueness: { case_sensitive: false }
       
       # Scopes
-      scope :active, -> { where("expires_at IS NULL OR expires_at > ?", Time.zone.now) }
+      scope :ordered, -> { order(:name) }
       
       # Methods
-      def expired?
-        expires_at.present? && expires_at <= Time.zone.now
+      def active?
+        true  # Roles are always active unless explicitly deleted
       end
       
-      def active?
-        !expired?
+      def to_s
+        name
       end
     end
   end

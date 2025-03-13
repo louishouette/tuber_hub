@@ -1,22 +1,35 @@
 module Hub
   module Admin
     class UsersController < BaseController
-      before_action :set_user, only: [:show, :edit, :update, :destroy, :assign_roles]
+      before_action :set_user, only: [:show, :edit, :update, :destroy, :assign_roles, :toggle_active]
       
       def index
-        @users = Hub::Admin::User.all.order(:email_address)
+        @users = policy_scope(User)
+          .order(:last_name, :first_name, :email_address)
+          .includes(:roles)
         @roles = Hub::Admin::Role.all.order(:name)
       end
 
+      # Filter users by role
+      def by_role
+        authorize User, :by_role?
+        @role = Role.find(params[:role_id])
+        @users = @role.users.order(:last_name, :first_name, :email_address)
+        render :index
+      end
+
       def show
+        authorize @user
       end
 
       def new
-        @user = Hub::Admin::User.new
+        @user = User.new
+        authorize @user
       end
 
       def create
-        @user = Hub::Admin::User.new(user_params)
+        @user = User.new(user_params)
+        authorize @user
         
         if @user.save
           redirect_to hub_admin_users_path, notice: 'User was successfully created.'
@@ -26,15 +39,19 @@ module Hub
       end
 
       def edit
+        authorize @user
       end
 
       def update
-        if params[:user][:password].blank?
-          params[:user].delete(:password)
-          params[:user].delete(:password_confirmation)
+        authorize @user
+        
+        # Handle password update
+        updated_params = user_params
+        if updated_params[:password].blank?
+          updated_params = updated_params.except(:password, :password_confirmation)
         end
         
-        if @user.update(user_params)
+        if @user.update(updated_params)
           redirect_to hub_admin_users_path, notice: 'User was successfully updated.'
         else
           render :edit, status: :unprocessable_entity
@@ -42,6 +59,8 @@ module Hub
       end
 
       def destroy
+        authorize @user
+        
         if @user.destroy
           redirect_to hub_admin_users_path, notice: 'User was successfully deleted.'
         else
@@ -49,12 +68,28 @@ module Hub
         end
       end
       
+      # Toggle user active status
+      def toggle_active
+        authorize @user, :toggle_active?
+        
+        new_status = !@user.active?
+        if @user.update(active: new_status)
+          status_message = new_status ? 'activated' : 'deactivated'
+          redirect_to hub_admin_user_path(@user), notice: "User #{@user.full_name} has been #{status_message}."
+        else
+          redirect_to hub_admin_user_path(@user), alert: 'Could not change user status.'
+        end
+      end
+      
       # Special action to manage roles for a user
       def assign_roles
-        role_ids = params[:role_ids] || []
+        authorize @user, :assign_roles?
         
-        # Handle the role assignments
-        if params[:commit].present?
+        if request.post?
+          user_params = params.expect(user: [:role_ids, :expires_at])
+          role_ids = user_params[:user][:role_ids] || []
+          expires_at = user_params[:user][:expires_at].presence
+          
           # Remove roles that were unchecked
           @user.role_assignments.where.not(role_id: role_ids).each do |assignment|
             assignment.revoke!(Current.user)
@@ -66,7 +101,7 @@ module Hub
               @user.role_assignments.create!(
                 role_id: role_id,
                 granted_by: Current.user,
-                expires_at: params[:expires_at].presence
+                expires_at: expires_at
               )
             end
           end
@@ -74,7 +109,7 @@ module Hub
           redirect_to hub_admin_user_path(@user), notice: 'Roles updated successfully'
         else
           # Just display the form
-          @roles = Hub::Admin::Role.all.order(:name)
+          @roles = Role.all.order(:name)
           @assigned_role_ids = @user.roles.pluck(:id)
           render :assign_roles
         end

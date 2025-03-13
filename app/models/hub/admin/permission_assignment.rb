@@ -13,6 +13,8 @@
 #
 # Indexes
 #
+#  idx_permission_assignments_lookup                        (role_id,permission_id)
+#  index_hub_admin_permission_assignments_on_expires_at     (expires_at)
 #  index_hub_admin_permission_assignments_on_granted_by_id  (granted_by_id)
 #  index_hub_admin_permission_assignments_on_permission_id  (permission_id)
 #  index_hub_admin_permission_assignments_on_revoked_by_id  (revoked_by_id)

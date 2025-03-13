@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_13_104754) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_13_164500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -22,9 +22,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_13_104754) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "revoked_by_id"
+    t.index ["expires_at"], name: "index_hub_admin_permission_assignments_on_expires_at"
     t.index ["granted_by_id"], name: "index_hub_admin_permission_assignments_on_granted_by_id"
     t.index ["permission_id"], name: "index_hub_admin_permission_assignments_on_permission_id"
     t.index ["revoked_by_id"], name: "index_hub_admin_permission_assignments_on_revoked_by_id"
+    t.index ["role_id", "permission_id"], name: "idx_permission_assignments_lookup"
     t.index ["role_id"], name: "index_hub_admin_permission_assignments_on_role_id"
   end
 
@@ -36,6 +38,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_13_104754) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "status"
+    t.index ["namespace", "controller", "action", "status"], name: "idx_permissions_lookup"
     t.index ["status"], name: "index_hub_admin_permissions_on_status"
   end
 

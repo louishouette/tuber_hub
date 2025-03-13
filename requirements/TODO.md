@@ -7,7 +7,5 @@
   - Tuber HUB : https://hub.truffiere-de-cement.fr
   - Marketplace : https://marketplace.truffiere-de-cement.fr
 
-# FEAT: CRUD for users
-1. create an admin namespace inside the HUB namespace
-2. create a users controller inside the admin namespace
-3. create users CRUD views inside the admin namespace
+# FEAT: authorization
+- refine the authorization process

@@ -1,0 +1,44 @@
+<%# Main permissions list display %>
+<% if permissions_by_namespace.any? %>
+  <div class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+    <% permissions_by_namespace.each do |namespace, controllers| %>
+      <div class="mb-8">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
+          <%= namespace.present? ? namespace.humanize : 'Global' %>
+        </h2>
+        
+        <div class="pl-4 mt-4">
+          <% controllers.each do |controller, permissions| %>
+            <div class="mb-6">
+              <h3 class="text-md font-medium text-gray-800 dark:text-gray-200 mb-3">
+                <strong>Controller: <%= controller.titleize %></strong>
+              </h3>
+              
+              <div class="overflow-x-auto relative">
+                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                  <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                      <th scope="col" class="px-4 py-3 w-1/4">Action</th>
+                      <th scope="col" class="px-4 py-3 w-1/6">Status</th>
+                      <th scope="col" class="px-4 py-3 w-1/2">Roles</th>
+                      <th scope="col" class="px-4 py-3 w-1/12">Details</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% permissions.each do |permission| %>
+                      <%= render 'hub/admin/shared/permissions/permission_table_row', permission: permission %>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400">
+    <span class="font-medium">No permissions found!</span> Use the filters above to change your search or click 'Refresh Permissions' to scan controllers.
+  </div>
+<% end %>

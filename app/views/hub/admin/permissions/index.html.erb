@@ -1,19 +1,23 @@
 <div class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
   <div class="flex justify-between items-center mb-6">
     <h1 class="text-2xl font-bold text-gray-900 dark:text-white">System Permissions</h1>
-    <div>
-      <%= link_to 'Back to Roles', hub_admin_roles_path, class: 'text-sm py-2.5 px-5 text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-green-300 rounded-lg text-center font-medium dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-green-800' %>
-    </div>
+    <%= render 'hub/admin/shared/page_actions', 
+        refresh_path: hub_admin_refresh_admin_permissions_path,
+        back_path: hub_admin_roles_path, 
+        back_text: 'Back to Roles' %>
   </div>
   
-  <div class="mb-4">
-    <p class="text-sm text-gray-700 dark:text-gray-300">
+  <div class="mb-6">
+    <p class="text-sm text-gray-700 dark:text-gray-300 mb-3">
       Permissions define what actions users can perform in the system. They are automatically discovered from controller actions.
       Assign permissions to roles to control user access.
     </p>
+    
+    <!-- Filtering UI -->
+    <%= render 'hub/admin/shared/permissions/permissions_filter' %>
   </div>
 
-  <div class="mt-6">
+  <div class="mt-6" id="permissions_container">
     <% if @permissions_by_namespace.any? %>
       <div class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
         <% @permissions_by_namespace.each do |namespace, controllers| %>
@@ -26,24 +30,31 @@
               <% controllers.each do |controller, permissions| %>
                 <div class="mb-6">
                   <h3 class="text-md font-medium text-gray-800 dark:text-gray-200 mb-3">
-                    <%= controller.humanize %>
+                    <strong>Controller: <%= controller.titleize %></strong>
                   </h3>
                   
                   <div class="overflow-x-auto relative">
                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                       <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
-                          <th scope="col" class="px-4 py-3">Action</th>
-                          <th scope="col" class="px-4 py-3">Status</th>
-                          <th scope="col" class="px-4 py-3">Roles</th>
-                          <th scope="col" class="px-4 py-3">Details</th>
+                          <th scope="col" class="px-4 py-3 w-1/4">Action</th>
+                          <th scope="col" class="px-4 py-3 w-1/6">Status</th>
+                          <th scope="col" class="px-4 py-3 w-1/2">Roles</th>
+                          <th scope="col" class="px-4 py-3 w-1/12">Details</th>
                         </tr>
                       </thead>
                       <tbody>
                         <% permissions.each do |permission| %>
-                          <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                          <% 
+                          # Determine if this is a Pundit-compatible action
+                          is_pundit_action = PermissionService.pundit_controllable_actions(include_all: true).include?(permission.action)
+                        %>
+                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-4 py-2 font-medium text-gray-900 dark:text-white">
                               <%= permission.action.humanize %>
+                              <% if is_pundit_action %>
+                                <span class="ml-2 bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-green-900 dark:text-green-300" title="This action can be controlled through a Pundit policy method">Pundit</span>
+                              <% end %>
                             </td>
                             <td class="px-4 py-2">
                               <% if permission.status == 'active' %>
@@ -91,7 +102,10 @@
     <% else %>
       <div class="text-center py-10">
         <p class="text-gray-500 dark:text-gray-400">No permissions found in the system.</p>
-        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Run <code>rails permissions:discover</code> to discover permissions from controllers.</p>
+        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          Click the <span class="font-semibold">Refresh Permissions</span> button to run <code>rails permissions:discover</code>. <br>
+          This will discover permissions from controllers.
+        </p>
       </div>
     <% end %>
   </div>

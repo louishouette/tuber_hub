@@ -1,0 +1,16 @@
+<%# Page action buttons that appear in the header %>
+<div class="flex items-center space-x-3">
+  <% if defined?(refresh_path) && refresh_path.present? %>
+    <div class="inline-flex">
+      <%= button_to refresh_path, class: 'inline-block', data: { turbo_frame: '_top' } do %>
+        <span class="text-sm py-2.5 px-5 text-white bg-[#1C3835] hover:bg-[#152A27] focus:ring-4 focus:outline-none focus:ring-green-300 rounded-lg text-center font-medium dark:bg-[#1C3835] dark:hover:bg-[#152A27] dark:focus:ring-green-800">Refresh Permissions</span>
+      <% end %>
+    </div>
+  <% end %>
+  
+  <% if defined?(back_path) && back_path.present? %>
+    <div class="inline-flex">
+      <%= link_to back_text || 'Back', back_path, class: 'text-sm py-2.5 px-5 text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-green-300 rounded-lg text-center font-medium dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-green-800' %>
+    </div>
+  <% end %>
+</div>

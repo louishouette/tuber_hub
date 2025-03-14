@@ -1,0 +1,49 @@
+<%# Single permission table row %>
+<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+  <td class="px-4 py-4">
+    <div class="font-medium text-gray-900 dark:text-white">
+      <%= permission.action.titleize %>
+    </div>
+    <div class="text-xs text-gray-500 dark:text-gray-400">
+      <%= permission.description.presence || PermissionService.action_description(permission.action) %>
+    </div>
+  </td>
+  <td class="px-4 py-4">
+    <% if permission.active? %>
+      <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-md dark:bg-green-900 dark:text-green-300">
+        Active
+      </span>
+    <% elsif permission.legacy? %>
+      <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded-md dark:bg-gray-700 dark:text-gray-300">
+        Legacy
+      </span>
+    <% else %>
+      <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-md dark:bg-yellow-900 dark:text-yellow-300">
+        <%= permission.status.titleize %>
+      </span>
+    <% end %>
+  </td>
+  <td class="px-4 py-4">
+    <% if permission.roles.any? %>
+      <div class="flex flex-wrap gap-1.5">
+        <% permission.roles.first(5).each do |role| %>
+          <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-md dark:bg-blue-900 dark:text-blue-300">
+            <%= role.name %>
+          </span>
+        <% end %>
+        <% if permission.roles.count > 5 %>
+          <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded-md dark:bg-gray-700 dark:text-gray-300">
+            +<%= permission.roles.count - 5 %> more
+          </span>
+        <% end %>
+      </div>
+    <% else %>
+      <span class="text-gray-400 dark:text-gray-500">No roles assigned</span>
+    <% end %>
+  </td>
+  <td class="px-4 py-4 text-right">
+    <%= link_to hub_admin_permission_path(permission), class: "text-sm text-blue-600 dark:text-blue-500 hover:underline" do %>
+      <i class="fas fa-eye"></i>
+    <% end %>
+  </td>
+</tr>

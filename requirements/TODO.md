@@ -11,7 +11,6 @@
 - refine the authorization process
 - log user activity
 
-
 # FEAT: permissions
 Tuber HUB is the internal ERP tool to manage ressources and operations and to create reports.
 For now it is quite empty, but we need to add the following namespaces, which will all reside under the hub namespace.

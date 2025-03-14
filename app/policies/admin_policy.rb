@@ -60,6 +60,11 @@ class AdminPolicy < ApplicationPolicy
   def assign_permissions?
     user&.admin?
   end
+  
+  # Method to authorize refreshing permissions
+  def refresh?
+    user&.admin?
+  end
 
   class Scope < Scope
     def resolve

@@ -1,9 +1,9 @@
 <div class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
   <div class="flex items-center justify-between mb-6">
     <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Permission Details</h1>
-    <div class="space-x-2">
-      <%= link_to 'Back to Permissions', hub_admin_permissions_path, class: 'text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline' %>
-    </div>
+    <%= render 'hub/admin/shared/page_actions', 
+        back_path: hub_admin_permissions_path, 
+        back_text: 'Back to Permissions' %>
   </div>
 
   <% if notice.present? %>
@@ -77,25 +77,24 @@
               <tr>
                 <th scope="col" class="px-4 py-3">Role</th>
                 <th scope="col" class="px-4 py-3">Description</th>
+                <th scope="col" class="px-4 py-3">Users</th>
                 <th scope="col" class="px-4 py-3">Expires</th>
                 <th scope="col" class="px-4 py-3">Actions</th>
               </tr>
             </thead>
             <tbody>
               <% @assigned_roles.each do |role| %>
-                <% assignment = role.permission_assignments.find_by(permission: @permission) %>
                 <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                  <td class="px-4 py-2 font-medium text-gray-900 dark:text-white"><%= role.name %></td>
+                  <td class="px-4 py-2 font-medium text-gray-900 dark:text-white">
+                    <%= link_to role.name, hub_admin_role_path(role), class: "text-blue-600 dark:text-blue-500 hover:underline" %>
+                  </td>
                   <td class="px-4 py-2"><%= role.description %></td>
+                  <td class="px-4 py-2"><%= role.users.count %> users</td>
                   <td class="px-4 py-2">
-                    <% if assignment && assignment.expires_at %>
-                      <%= assignment.expires_at.strftime("%B %d, %Y") %>
-                    <% else %>
-                      <span class="text-gray-400 dark:text-gray-500">Never</span>
-                    <% end %>
+                    <span class="text-gray-400 dark:text-gray-500">Never</span>
                   </td>
                   <td class="px-4 py-2">
-                    <%= link_to 'View Role', hub_admin_role_path(role), class: 'text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline' %>
+                    <%= link_to 'View Role', hub_admin_role_path(role), class: 'text-sm py-1.5 px-3 text-white bg-[#1C3835] hover:bg-[#152A27] focus:ring-4 focus:outline-none focus:ring-green-300 rounded-lg text-center font-medium dark:bg-[#1C3835] dark:hover:bg-[#152A27] dark:focus:ring-green-800' %>
                   </td>
                 </tr>
               <% end %>
@@ -107,8 +106,51 @@
       <% end %>
     </div>
     
-    <div class="mt-6 flex justify-end">
-      <%= link_to 'Back to Permissions', hub_admin_permissions_path, class: 'text-sm py-2.5 px-5 text-white bg-[#1C3835] hover:bg-[#152A27] focus:ring-4 focus:outline-none focus:ring-green-300 rounded-lg text-center font-medium dark:bg-[#1C3835] dark:hover:bg-[#152A27] dark:focus:ring-green-800' %>
+    <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Users with this Permission</h3>
+      <% if @assigned_users&.any? %>
+        <div class="overflow-x-auto relative">
+          <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+              <tr>
+                <th scope="col" class="px-4 py-3">User</th>
+                <th scope="col" class="px-4 py-3">Email</th>
+                <th scope="col" class="px-4 py-3">Roles</th>
+                <th scope="col" class="px-4 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @assigned_users.each do |user| %>
+                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                  <td class="px-4 py-2 font-medium text-gray-900 dark:text-white"><%= user.name %></td>
+                  <td class="px-4 py-2"><%= user.email %></td>
+                  <td class="px-4 py-2">
+                    <div class="flex flex-wrap gap-1">
+                      <% user.roles.order(:name).limit(3).each do |role| %>
+                        <span class="px-2 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-300">
+                          <%= role.name %>
+                        </span>
+                      <% end %>
+                      <% if user.roles.count > 3 %>
+                        <span class="px-2 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-300">
+                          +<%= user.roles.count - 3 %> more
+                        </span>
+                      <% end %>
+                    </div>
+                  </td>
+                  <td class="px-4 py-2">
+                    <%= link_to 'View User', '#', class: 'text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline' %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="text-gray-500 dark:text-gray-400">No users have this permission.</p>
+      <% end %>
     </div>
+    
+
   </div>
 </div>

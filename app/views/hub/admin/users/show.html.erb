@@ -3,7 +3,6 @@
     <h1 class="text-2xl font-bold text-gray-900 dark:text-white">User Profile</h1>
     <div class="space-x-2">
       <%= link_to 'Edit', edit_hub_admin_user_path(@user), class: 'text-white bg-[#1C3835] hover:bg-[#152A27] font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none' %>
-      <%= link_to 'Assign Roles', assign_roles_hub_admin_user_path(@user), class: 'text-white bg-[#1C3835] hover:bg-[#152A27] font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none' %>
       <% if policy(@user).toggle_active? %>
         <%= button_to toggle_active_hub_admin_user_path(@user), method: :patch, class: 'text-white bg-[#1C3835] hover:bg-[#152A27] font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none' do %>
           <%= @user.active? ? 'Deactivate User' : 'Activate User' %>
@@ -136,6 +135,86 @@
           </dd>
         </div>
       </dl>
+    </div>
+    <!-- Role Assignment Section -->
+    <div class="mt-8 bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+      <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Assigned Roles</h2>
+      
+      <% if policy(@user).assign_roles? %>
+        <%= form_with(url: assign_roles_hub_admin_user_path(@user), method: :post, class: "space-y-6") do |form| %>
+          <div class="space-y-4">
+            <label class="flex items-center mb-4">
+              <input type="checkbox" id="toggle_all" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+              <span class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Toggle All</span>
+            </label>
+
+            <% Hub::Admin::Role.all.order(:name).each do |role| %>
+              <div class="flex items-center p-3 border border-gray-200 rounded-lg dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                <div class="flex items-center h-5">
+                  <%= check_box_tag 'user[role_ids][]', role.id, @user.roles.include?(role), 
+                      id: "role_#{role.id}",
+                      class: "w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" 
+                  %>
+                </div>
+                <div class="ml-3 text-sm">
+                  <label for="role_<%= role.id %>" class="font-medium text-gray-900 dark:text-gray-300"><%= role.name %></label>
+                  <p class="text-xs text-gray-500 dark:text-gray-400"><%= role.description %></p>
+                </div>
+              </div>
+            <% end %>
+          </div>
+
+          <div class="mt-6">
+            <%= form.submit 'Update Roles', class: "text-sm py-2.5 px-5 text-white bg-[#1C3835] hover:bg-[#152A27] focus:ring-4 focus:outline-none focus:ring-green-300 rounded-lg text-center font-medium dark:bg-[#1C3835] dark:hover:bg-[#152A27] dark:focus:ring-green-800" %>
+          </div>
+        <% end %>
+        
+        <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            const toggleAllCheckbox = document.getElementById('toggle_all');
+            const roleCheckboxes = document.querySelectorAll('input[name="user[role_ids][]"]');
+            
+            toggleAllCheckbox.addEventListener('change', function() {
+              const isChecked = this.checked;
+              roleCheckboxes.forEach(checkbox => {
+                checkbox.checked = isChecked;
+              });
+            });
+            
+            // Update toggle_all when individual checkboxes change
+            roleCheckboxes.forEach(checkbox => {
+              checkbox.addEventListener('change', function() {
+                const allChecked = [...roleCheckboxes].every(cb => cb.checked);
+                const anyChecked = [...roleCheckboxes].some(cb => cb.checked);
+                
+                toggleAllCheckbox.checked = allChecked;
+                toggleAllCheckbox.indeterminate = anyChecked && !allChecked;
+              });
+            });
+            
+            // Initial state
+            const allCheckedInitially = [...roleCheckboxes].every(cb => cb.checked);
+            const anyCheckedInitially = [...roleCheckboxes].some(cb => cb.checked);
+            
+            toggleAllCheckbox.checked = allCheckedInitially;
+            toggleAllCheckbox.indeterminate = anyCheckedInitially && !allCheckedInitially;
+          });
+        </script>
+      <% else %>
+        <div class="p-4 bg-gray-50 rounded-lg dark:bg-gray-700">
+          <% if @user.roles.any? %>
+            <ul class="space-y-2">
+              <% @user.roles.order(:name).each do |role| %>
+                <li class="text-gray-900 dark:text-white">
+                  <span class="font-medium"><%= role.name %></span>: <%= role.description %>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <p class="text-gray-700 dark:text-gray-400">No roles assigned to this user.</p>
+          <% end %>
+        </div>
+      <% end %>
     </div>
   </div>
 </div>

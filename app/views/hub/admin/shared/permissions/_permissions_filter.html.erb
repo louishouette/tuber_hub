@@ -1,0 +1,31 @@
+<%# Filter form for permissions %>
+<%= form_with(url: hub_admin_permissions_path, method: :get, class: "bg-gray-50 dark:bg-gray-700 p-4 rounded-lg", data: { turbo_frame: "_top" }) do |form| %>
+  <div class="flex flex-col md:flex-row gap-4 items-end">
+    <div class="flex-1">
+      <%= form.label :namespace, 'Namespace', class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+      <%= form.select :namespace, 
+        options_for_select([['All Namespaces', '']] + @available_namespaces.map { |n| [n.humanize, n] }, @filter_namespace),
+        {}, 
+        { class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-700 focus:border-green-700 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-green-700 dark:focus:border-green-700" } 
+      %>
+    </div>
+    
+    <div class="flex-1">
+      <%= form.label :type, 'Permission Type', class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+      <%= form.select :type, 
+        options_for_select([
+          ['All Types', 'all'],
+          ['CRUD Operations', 'crud'],
+          ['Custom Operations', 'custom'],
+          ['Pundit Compatible', 'pundit'],
+        ], @filter_type),
+        {}, 
+        { class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-700 focus:border-green-700 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-green-700 dark:focus:border-green-700" } 
+      %>
+    </div>
+    
+    <div class="self-end">
+      <%= form.submit 'Apply Filters', class: "text-sm py-2.5 px-5 text-white bg-[#1C3835] hover:bg-[#152A27] focus:ring-4 focus:outline-none focus:ring-green-300 rounded-lg text-center font-medium dark:bg-[#1C3835] dark:hover:bg-[#152A27] dark:focus:ring-green-800" %>
+    </div>
+  </div>
+<% end %>

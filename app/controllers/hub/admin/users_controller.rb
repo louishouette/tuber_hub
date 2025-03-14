@@ -90,34 +90,30 @@ module Hub
       def assign_roles
         authorize @user, :assign_roles?
         
-        if request.post?
-          user_params = params.require(:user).permit(:expires_at, role_ids: [])
-          role_ids = user_params[:role_ids] || []
-          expires_at = user_params[:expires_at].presence
-          
-          # Remove roles that were unchecked
-          @user.role_assignments.where.not(role_id: role_ids).each do |assignment|
-            assignment.revoke!(Current.user)
-          end
-          
-          # Add new roles
-          role_ids.each do |role_id|
-            unless @user.role_assignments.exists?(role_id: role_id)
-              @user.role_assignments.create!(
-                role_id: role_id,
-                granted_by: Current.user,
-                expires_at: expires_at
-              )
-            end
-          end
-          
-          redirect_to hub_admin_user_path(@user), notice: 'Roles updated successfully'
-        else
-          # Just display the form
-          @roles = Role.all.order(:name)
-          @assigned_role_ids = @user.roles.pluck(:id)
-          render :assign_roles
+        # Redirect to show page if accessed via GET (since assignment is now embedded)
+        redirect_to hub_admin_user_path(@user) and return unless request.post?
+        
+        user_params = params.require(:user).permit(:expires_at, role_ids: [])
+        role_ids = user_params[:role_ids] || []
+        expires_at = user_params[:expires_at].presence
+        
+        # Remove roles that were unchecked
+        @user.role_assignments.where.not(role_id: role_ids).each do |assignment|
+          assignment.revoke!(Current.user)
         end
+        
+        # Add new roles
+        role_ids.each do |role_id|
+          unless @user.role_assignments.exists?(role_id: role_id)
+            @user.role_assignments.create!(
+              role_id: role_id,
+              granted_by: Current.user,
+              expires_at: expires_at
+            )
+          end
+        end
+        
+        redirect_to hub_admin_user_path(@user), notice: 'Roles updated successfully'
       end
       
       private

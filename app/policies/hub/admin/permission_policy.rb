@@ -11,6 +11,10 @@ module Hub
         user.admin? || permission_check
       end
       
+      def refresh?
+        user.admin? # Only admins can refresh permissions
+      end
+      
       class Scope < Scope
         def resolve
           if user.admin?

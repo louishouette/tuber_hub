@@ -2,9 +2,8 @@
   <div class="flex items-center justify-between mb-6">
     <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Role Details</h1>
     <div class="space-x-2">
-      <%= link_to 'Edit', edit_hub_admin_role_path(@role), class: 'text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline' %>
-      <%= link_to 'Assign Permissions', assign_permissions_hub_admin_role_path(@role), class: 'text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline' %>
-      <%= link_to 'Back to Roles', hub_admin_roles_path, class: 'text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline' %>
+      <%= link_to 'Edit', edit_hub_admin_role_path(@role), class: 'text-white bg-[#1C3835] hover:bg-[#152A27] font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none' %>
+      <%= link_to 'Back to Roles', hub_admin_roles_path, class: 'text-gray-700 hover:text-gray-900 font-medium text-sm' %>
     </div>
   </div>
 
@@ -60,12 +59,97 @@
     </div>
 
     <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-      <div class="flex justify-between items-center mb-3">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Permissions</h3>
-        <%= link_to 'Manage Permissions', assign_permissions_hub_admin_role_path(@role), class: 'text-sm font-medium text-white bg-[#1C3835] hover:bg-[#152A27] focus:ring-4 focus:outline-none focus:ring-green-300 rounded-lg px-4 py-2.5' %>
-      </div>
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Permissions</h3>
       
-      <% if @role.permissions.any? %>
+      <% if policy(@role).assign_permissions? %>
+        <%= form_with(url: assign_permissions_hub_admin_role_path(@role), method: :post) do |form| %>
+          <!-- Permissions section with namespace filtering -->
+          <div data-controller="namespace-filter">
+            <!-- Namespace filtering -->
+            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mb-6">
+              <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                  <label for="namespace-filter" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Filter by Namespace</label>
+                  <select id="namespace-filter" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-700 focus:border-green-700 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-green-700 dark:focus:border-green-700" data-namespace-filter-target="select" data-action="change->namespace-filter#filter">
+                    <option value="all">All Namespaces</option>
+                    <% Hub::Admin::Permission.available_namespaces.each do |namespace| %>
+                      <option value="<%= namespace %>"><%= namespace.humanize %></option>
+                    <% end %>
+                  </select>
+                </div>
+              </div>
+            </div>
+          
+          <!-- Permissions List -->
+          <div id="permissions-container" class="space-y-6">
+            <% 
+              # Get only Pundit-compatible actions
+              pundit_actions = PermissionService.pundit_controllable_actions(include_all: true)
+              
+              # Filter permissions list - only Pundit-compatible and exclude system controllers/actions
+              system_controllers = %w[application sessions passwords]
+              system_actions = %w[authorize_namespace namespace_scope allowed_to? user_is_admin?]
+              
+              permissions = Hub::Admin::Permission.where(status: 'active')
+                .where(action: pundit_actions)
+                .where.not(controller: system_controllers)
+                .where.not(action: system_actions)
+                .order(:namespace, :controller, :action)
+              
+              # Group permissions by namespace and controller for easier navigation
+              permissions_by_namespace = permissions.group_by(&:namespace).transform_values do |perms|
+                perms.group_by(&:controller)
+              end
+              
+              assigned_permission_ids = @role.permissions.pluck(:id)
+            %>
+            
+            <% permissions_by_namespace.each do |namespace, controllers| %>
+              <div class="permission-namespace" data-namespace-filter-target="container" data-namespace="<%= namespace %>">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2 mb-4">
+                  <%= namespace.present? ? namespace.humanize : 'Global' %>
+                </h3>
+                
+                <div class="pl-4 space-y-6">
+                  <% controllers.each do |controller, controller_permissions| %>
+                    <div class="mb-6">
+                      <h4 class="text-md font-medium text-gray-800 dark:text-gray-200 mb-3">
+                        <%= controller.titleize %>
+                      </h4>
+                      
+                      <div class="space-y-2 pl-4">
+                        <% controller_permissions.each do |permission| %>
+                          <div class="permission-item flex items-center p-2 border border-gray-200 rounded-lg dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <div class="flex items-center h-5">
+                              <%= check_box_tag 'role[permission_ids][]', permission.id, assigned_permission_ids.include?(permission.id), 
+                                  id: "permission_#{permission.id}",
+                                  class: "w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" 
+                              %>
+                            </div>
+                            <div class="ml-3 text-sm">
+                              <label for="permission_<%= permission.id %>" class="font-medium text-gray-900 dark:text-gray-300">
+                                <%= permission.action.humanize %>
+                                <span class="ml-2 bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-green-900 dark:text-green-300" title="This action can be controlled through a Pundit policy method">Pundit</span>
+                              </label>
+                            </div>
+                          </div>
+                        <% end %>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+          </div> <!-- end of namespace-filter controller -->
+          
+          <div class="mt-8">
+            <%= form.submit 'Update Permissions', class: "text-sm py-2.5 px-5 text-white bg-[#1C3835] hover:bg-[#152A27] focus:ring-4 focus:outline-none focus:ring-green-300 rounded-lg text-center font-medium dark:bg-[#1C3835] dark:hover:bg-[#152A27] dark:focus:ring-green-800" %>
+          </div>
+        <% end %>
+        
+
+      <% else %>
         <div class="overflow-x-auto relative">
           <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
             <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -88,8 +172,10 @@
             </tbody>
           </table>
         </div>
-      <% else %>
-        <p class="text-gray-500 dark:text-gray-400">No permissions have been assigned to this role yet.</p>
+        
+        <% if @role.permissions.empty? %>
+          <p class="text-gray-500 dark:text-gray-400 mt-4">No permissions have been assigned to this role yet.</p>
+        <% end %>
       <% end %>
     </div>
   </div>

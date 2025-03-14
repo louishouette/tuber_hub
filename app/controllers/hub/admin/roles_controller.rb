@@ -62,11 +62,15 @@ module Hub
       def assign_permissions
         authorize @role, :assign_permissions?
         
-        if request.post?
-          role_params = params.require(:role).permit(:expires_at, permission_ids: [])
-          permission_ids = role_params[:permission_ids] || []
-          expires_at = role_params[:expires_at].presence
-          
+        # Redirect to show page if accessed via GET (since assignment is now embedded)
+        redirect_to hub_admin_role_path(@role) and return unless request.post?
+        
+        role_params = params.require(:role).permit(:expires_at, permission_ids: [])
+        permission_ids = role_params[:permission_ids] || []
+        expires_at = role_params[:expires_at].presence
+        
+        # Wrap in a transaction to ensure all or nothing completes
+        ActiveRecord::Base.transaction do
           # Remove permissions that were unchecked
           @role.permission_assignments.where.not(permission_id: permission_ids).each do |assignment|
             assignment.revoke!(Current.user)
@@ -82,20 +86,9 @@ module Hub
               )
             end
           end
-          
-          redirect_to hub_admin_role_path(@role), notice: 'Permissions updated successfully'
-        else
-          # Just display the form
-          @permissions = Hub::Admin::Permission.where(status: 'active')
-            .order(:namespace, :controller, :action)
-            
-          # Group permissions by namespace and controller for easier navigation
-          @permissions_by_namespace = @permissions.group_by(&:namespace).transform_values do |perms|
-            perms.group_by(&:controller)
-          end
-            
-          @assigned_permission_ids = @role.permissions.pluck(:id)
         end
+        
+        redirect_to hub_admin_role_path(@role), notice: 'Permissions updated successfully'
       end
       
       

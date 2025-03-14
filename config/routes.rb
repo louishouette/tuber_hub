@@ -55,7 +55,8 @@ Rails.application.routes.draw do
       end
       
       # Permission management
-      resources :permissions, only: [:index, :show]
+      resources :permissions, only: [:index, :show] 
+      post 'permissions/refresh', to: 'permissions#refresh', as: 'refresh_admin_permissions'
     end
     
     # Core namespace for main elements

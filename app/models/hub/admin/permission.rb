@@ -51,6 +51,18 @@ module Hub
       def full_identifier
         "#{namespace}/#{controller}##{action}"
       end
+      
+      # Get all available namespaces from the database, ensuring core namespaces are always included
+      def self.available_namespaces
+        # Core application namespaces to always include
+        core_namespaces = %w[hub hub/admin club marketplace public]
+        
+        # Get existing namespaces from the database
+        db_namespaces = distinct.pluck(:namespace).compact
+        
+        # Combine and ensure uniqueness
+        (core_namespaces + db_namespaces).uniq.sort
+      end
 
       # Mark permission as legacy
       def mark_as_legacy!

@@ -63,9 +63,9 @@ module Hub
         authorize @role, :assign_permissions?
         
         if request.post?
-          role_params = params.expect(role: [:permission_ids, :expires_at])
-          permission_ids = role_params[:role][:permission_ids] || []
-          expires_at = role_params[:role][:expires_at].presence
+          role_params = params.require(:role).permit(:expires_at, permission_ids: [])
+          permission_ids = role_params[:permission_ids] || []
+          expires_at = role_params[:expires_at].presence
           
           # Remove permissions that were unchecked
           @role.permission_assignments.where.not(permission_id: permission_ids).each do |assignment|
@@ -105,7 +105,7 @@ module Hub
         @role = Hub::Admin::Role.find(params[:id])
       end
       
-      # For now, revert to params.require until we can debug the params.expect issue
+      # Strong parameters for role model
       def role_params
         params.require(:hub_admin_role).permit(:name, :description)
       end

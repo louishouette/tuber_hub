@@ -40,18 +40,23 @@ module Hub
 
       def edit
         authorize @user
+        # Add a hidden debug field to help troubleshoot
+        @debug_info = {
+          model_name: @user.model_name.param_key,
+          class_name: @user.class.name
+        }
       end
 
       def update
         authorize @user
         
         # Handle password update
-        updated_params = user_params
-        if updated_params[:password].blank?
-          updated_params = updated_params.except(:password, :password_confirmation)
+        user_update_params = user_params
+        if user_update_params[:password].blank?
+          user_update_params = user_update_params.except(:password, :password_confirmation)
         end
         
-        if @user.update(updated_params)
+        if @user.update(user_update_params)
           redirect_to hub_admin_users_path, notice: 'User was successfully updated.'
         else
           render :edit, status: :unprocessable_entity
@@ -86,9 +91,9 @@ module Hub
         authorize @user, :assign_roles?
         
         if request.post?
-          user_params = params.expect(user: [:role_ids, :expires_at])
-          role_ids = user_params[:user][:role_ids] || []
-          expires_at = user_params[:user][:expires_at].presence
+          user_params = params.require(:user).permit(:expires_at, role_ids: [])
+          role_ids = user_params[:role_ids] || []
+          expires_at = user_params[:expires_at].presence
           
           # Remove roles that were unchecked
           @user.role_assignments.where.not(role_id: role_ids).each do |assignment|
@@ -122,10 +127,14 @@ module Hub
       end
       
       def user_params
-        params.expect(:user).permit(
+        params.require(:user).permit(
           :email_address, 
           :first_name, 
           :last_name, 
+          :phone_number,
+          :job_title,
+          :notes,
+          :active,
           :password, 
           :password_confirmation
         )

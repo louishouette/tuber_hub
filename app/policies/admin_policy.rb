@@ -39,10 +39,25 @@ class AdminPolicy < ApplicationPolicy
     user&.admin?
   end
 
+  # Method to authorize viewing users for a role
+  def users?
+    user&.admin?
+  end
+
   # Legacy method for backward compatibility
   # @deprecated Use standard Pundit action methods instead (index?, show?, etc.)
   def access?
     Rails.logger.warn "[DEPRECATION] AdminPolicy#access? is deprecated. Use standard Pundit methods instead."
+    user&.admin?
+  end
+  
+  # Method to authorize assigning roles to users
+  def assign_roles?
+    user&.admin?
+  end
+  
+  # Method to authorize assigning permissions to roles
+  def assign_permissions?
     user&.admin?
   end
 

@@ -2,15 +2,20 @@
 #
 # Table name: hub_admin_users
 #
-#  id              :bigint           not null, primary key
-#  active          :boolean          default(TRUE), not null
-#  email_address   :string           not null
-#  first_name      :string
-#  last_name       :string
-#  last_sign_in_at :datetime
-#  password_digest :string           not null
-#  created_at      :datetime         not null
-#  updated_at      :datetime         not null
+#  id                 :bigint           not null, primary key
+#  active             :boolean          default(TRUE), not null
+#  current_sign_in_ip :string
+#  email_address      :string           not null
+#  first_name         :string
+#  job_title          :string
+#  last_name          :string
+#  last_sign_in_at    :datetime
+#  notes              :text
+#  password_digest    :string           not null
+#  phone_number       :string
+#  sign_in_count      :integer
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
 #
 # Indexes
 #
@@ -33,7 +38,8 @@ module Hub
       has_many :granted_permission_assignments, class_name: 'PermissionAssignment', foreign_key: 'granted_by_id'
 
       normalizes :email_address, with: ->(e) { e.strip.downcase }
-      normalizes :first_name, :last_name, with: ->(value) { value.to_s.strip.presence }
+      normalizes :first_name, :last_name, :job_title, with: ->(value) { value.to_s.strip.presence }
+      normalizes :phone_number, with: ->(value) { value.to_s.strip.gsub(/\D/, '').presence }
 
       validates :first_name, :last_name, presence: true, on: :update
 

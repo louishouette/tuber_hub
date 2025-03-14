@@ -36,6 +36,7 @@ Rails.application.routes.draw do
       # User management
       resources :users do
         member do
+          get 'assign_roles'
           post 'assign_roles'
           patch 'toggle_active'  # For blocking/unblocking users
         end

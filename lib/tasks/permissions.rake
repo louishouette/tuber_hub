@@ -17,4 +17,26 @@ namespace :permissions do
     puts "  #{active_count} active permissions"
     puts "  #{legacy_count} legacy permissions marked"
   end
+  
+  desc "Remove legacy permissions from the database"
+  task remove_legacy: :environment do
+    puts "Removing legacy permissions..."
+    
+    # Count legacy permissions before removal
+    legacy_count_before = Hub::Admin::Permission.where(status: 'legacy').count
+    
+    if legacy_count_before.zero?
+      puts "No legacy permissions found to remove."
+    else
+      # Remove all legacy permissions
+      Hub::Admin::Permission.where(status: 'legacy').destroy_all
+      
+      # Count remaining permissions for verification
+      remaining_count = Hub::Admin::Permission.count
+      
+      puts "\nLegacy permissions removal completed:"
+      puts "  #{legacy_count_before} legacy permissions removed"
+      puts "  #{remaining_count} permissions remaining in the system"
+    end
+  end
 end

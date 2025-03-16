@@ -1,3 +1,7 @@
+# TODO
+- build a notification system
+- log user activity
+
 # FEAT: setup kamal
 - security find-internet-password -a 'lmmh' -l 'Docker Credentials' -w for retrieving docker credentials
 
@@ -6,11 +10,6 @@
   - /club
   - Tuber HUB : https://hub.truffiere-de-cement.fr
   - Marketplace : https://marketplace.truffiere-de-cement.fr
-
-# FEAT: authorization
-- refine the authorization process
-- log user activity
-- add a task in @lib/tasks/permissions.rake to remove legacy permissions
 
 # FEAT: permissions
 Tuber HUB is the internal ERP tool to manage ressources and operations and to create reports.

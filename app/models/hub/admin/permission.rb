@@ -52,16 +52,25 @@ module Hub
         "#{namespace}/#{controller}##{action}"
       end
       
-      # Get all available namespaces from the database, ensuring core namespaces are always included
+      # Get all available namespaces from both the application routes and the database
+      # This ensures we include both configured and dynamically discovered namespaces
+      # @return [Array<String>] sorted list of all available namespaces
       def self.available_namespaces
-        # Core application namespaces to always include
-        core_namespaces = %w[hub hub/admin club marketplace public]
-        
-        # Get existing namespaces from the database
-        db_namespaces = distinct.pluck(:namespace).compact
-        
-        # Combine and ensure uniqueness
-        (core_namespaces + db_namespaces).uniq.sort
+        # Use Solid Cache to improve performance
+        Rails.cache.fetch('hub_admin_permission:available_namespaces', expires_in: 1.hour) do
+          # Get namespaces from the PermissionService (dynamically discovered)
+          app_namespaces = if defined?(PermissionService)
+                            PermissionService.main_namespaces
+                          else
+                            []
+                          end
+          
+          # Get existing namespaces from the database
+          db_namespaces = distinct.pluck(:namespace).compact
+          
+          # Combine and ensure uniqueness
+          (app_namespaces + db_namespaces).uniq.sort
+        end
       end
 
       # Mark permission as legacy

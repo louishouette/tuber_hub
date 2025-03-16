@@ -10,6 +10,7 @@
 # FEAT: authorization
 - refine the authorization process
 - log user activity
+- add a task in @lib/tasks/permissions.rake to remove legacy permissions
 
 # FEAT: permissions
 Tuber HUB is the internal ERP tool to manage ressources and operations and to create reports.

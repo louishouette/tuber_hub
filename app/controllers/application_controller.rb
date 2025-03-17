@@ -8,7 +8,7 @@ class ApplicationController < ActionController::Base
 
   # Ensure authorization is applied to all actions except specified ones
   after_action :verify_authorized, except: [:index], unless: :skip_authorization?
-  after_action :verify_policy_scoped, only: [:index], unless: :skip_policy_scope?
+  after_action :verify_policy_scoped, only: [:index], unless: :skip_policy_scope_check?
 
   # Globally rescue from Pundit::NotAuthorizedError
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
@@ -54,9 +54,15 @@ class ApplicationController < ActionController::Base
   
   # Check if this is an authentication controller
   def is_authentication_controller?
+    self.class.name == 'SessionsController' ||
     controller_path == 'sessions' ||
     controller_path == 'passwords' ||
     controller_path == 'registrations'
+  end
+  
+  # Checks if we should skip policy scope checking
+  def skip_policy_scope_check?
+    skip_policy_scope? || !action_name.in?(['index'])
   end
   
   # Check if we're using Devise controllers

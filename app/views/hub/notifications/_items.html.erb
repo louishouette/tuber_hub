@@ -1,0 +1,7 @@
+<% if notifications.empty? %>
+  <%= render "hub/notifications/empty_state" %>
+<% else %>
+  <% notifications.each do |notification| %>
+    <%= render "hub/notifications/notification_item", notification: notification %>
+  <% end %>
+<% end %>

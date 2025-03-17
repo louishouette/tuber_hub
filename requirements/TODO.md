@@ -2,6 +2,10 @@
 - build a notification system
 - log user activity
 
+# FIX
+- move app/services/permission_service.rb to hub/admin
+- move app/controllers/concerns/authentication.rb to hub/admin
+
 # FEAT: setup kamal
 - security find-internet-password -a 'lmmh' -l 'Docker Credentials' -w for retrieving docker credentials
 

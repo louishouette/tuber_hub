@@ -1,0 +1,21 @@
+<div class="notification-item flex py-3 px-4 border-b border-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 dark:border-gray-600" 
+     data-notification-id="<%= notification.id %>">
+  <div class="flex-shrink-0">
+    <div class="w-9 h-9 rounded-full flex items-center justify-center <%= notification_css_class(notification.notification_type) %>">
+      <%= notification_icon(notification.notification_type) %>
+    </div>
+  </div>
+  <div class="pl-3 w-full">
+    <div class="text-gray-500 font-normal text-sm mb-1.5 dark:text-gray-400">
+      <%= notification.message %>
+    </div>
+    <div class="text-xs font-medium text-primary-600 dark:text-primary-500">
+      <%= time_ago(notification.created_at) %>
+    </div>
+  </div>
+  <button class="dismiss-notification text-gray-400 hover:text-gray-600 ml-2" 
+          data-notification-id="<%= notification.id %>"
+          data-action="click->notifications#dismiss">
+    <%= icon "x", library: "lucide", variant: "outline", class: "w-4 h-4" %>
+  </button>
+</div>

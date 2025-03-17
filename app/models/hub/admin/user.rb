@@ -29,6 +29,9 @@ module Hub
       has_secure_password
       has_many :sessions, dependent: :destroy
       
+      # Notifications association
+      has_many :notifications, class_name: 'Hub::Notification', foreign_key: 'user_id', dependent: :destroy
+      
       # Role associations
       has_many :role_assignments, dependent: :destroy
       has_many :roles, through: :role_assignments
@@ -102,6 +105,20 @@ module Hub
       # Check if user account is active
       def active?
         active
+      end
+      
+      # Authenticate a user with email and password - follows Rails 8 pattern
+      # @param params [ActionController::Parameters] params containing email_address and password
+      # @return [Hub::Admin::User, nil] the authenticated user or nil if authentication failed
+      def self.authenticate_by(params)
+        # Use normalized email_address (auto-downcased and stripped by normalizes)
+        user = find_by(email_address: params[:email_address])
+        
+        # Only authenticate active users
+        return nil unless user&.active?
+        
+        # Verify password using has_secure_password's authenticate method
+        user.authenticate(params[:password]) ? user : nil
       end
     end
   end

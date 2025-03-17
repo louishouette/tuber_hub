@@ -1,7 +1,7 @@
 class CreateHubNotifications < ActiveRecord::Migration[8.0]
   def change
     create_table :hub_notifications do |t|
-      t.references :user, null: false, foreign_key: true
+      t.references :user, null: false, foreign_key: { to_table: :hub_admin_users }
       t.text :message
       t.string :notification_type
       t.datetime :read_at

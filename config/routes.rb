@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  # Action Cable routes
+  mount ActionCable.server => "/cable"
+
   # Authentication routes
   get "/login", to: "sessions#new", as: :login
   post "/login", to: "sessions#create", as: :session
@@ -32,12 +35,16 @@ Rails.application.routes.draw do
 
   # Hub namespace routes
   namespace :hub do
+    # Debug routes - only for development
+    post 'debug/test_notification'
+
     # Notification routes
     resources :notifications, only: [:index, :create] do
       collection do
         get :unread
         get :count
         get :items
+        get :empty_state
         post :mark_all_as_read
       end
       member do

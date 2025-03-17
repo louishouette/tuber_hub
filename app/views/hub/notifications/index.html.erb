@@ -75,7 +75,7 @@
   <% end %>
   
   <!-- Notifications List -->
-  <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+  <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden" data-controller="notification-list">
     <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
       <h2 class="text-xl font-semibold text-gray-900 dark:text-white">All Notifications</h2>
       
@@ -86,8 +86,8 @@
       <% end %>
     </div>
     
-    <div id="notifications-container">
-      <%= render partial: "hub/notifications/items", locals: { notifications: @notifications } %>
+    <div id="notifications-container" data-notification-list-target="container">
+      <%= render partial: "hub/notifications/items", locals: { notifications: @notifications } %> 
     </div>
   </div>
 </div>

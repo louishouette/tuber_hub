@@ -9,8 +9,8 @@ module Hub
     # All notification operations are scoped to the current user
     # Skip authorization checks for the index and related notification actions
     # since we're handling authorization through the policy_scope
-    skip_after_action :verify_authorized, only: [:index, :items, :unread, :count, :read, :dismiss, :displayed, :toast, :mark_all_as_read]
-    skip_after_action :verify_policy_scoped, only: [:items, :unread]
+    skip_after_action :verify_authorized, only: [:index, :items, :unread, :count, :read, :dismiss, :displayed, :toast, :mark_all_as_read, :empty_state]
+    skip_after_action :verify_policy_scoped, only: [:items, :unread, :empty_state]
     
     before_action :set_notification, only: [:read, :dismiss, :displayed, :toast]
     
@@ -98,6 +98,12 @@ module Hub
         format.html { redirect_to hub_notifications_path, notice: 'All notifications marked as read.' }
         format.json { head :no_content }
       end
+    end
+    
+    # GET /hub/notifications/empty_state
+    # Returns the empty state partial for when there are no notifications
+    def empty_state
+      render partial: "hub/notifications/empty_state", layout: false
     end
     
     private

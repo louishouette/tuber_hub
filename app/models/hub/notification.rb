@@ -37,6 +37,7 @@ class Hub::Notification < ApplicationRecord
   scope :undismissed, -> { where(dismissed_at: nil) }
   scope :recent, -> { order(created_at: :desc) }
   scope :not_displayed, -> { where(displayed_at: nil) }
+  scope :for_user, ->(user_id) { where(user_id: user_id) }
   
   # Scopes by type
   scope :info, -> { where(notification_type: 'info') }

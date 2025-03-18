@@ -1,10 +1,13 @@
 # TODO
-- build a notification system
 - log user activity
 
 # FIX
+- remove all .DS_Store from the app
+
+# FIX : refactor the folder hierarchy :
 - move app/services/permission_service.rb to hub/admin
 - move app/controllers/concerns/authentication.rb to hub/admin
+- detect the other required movements
 
 # FEAT: setup kamal
 - security find-internet-password -a 'lmmh' -l 'Docker Credentials' -w for retrieving docker credentials
@@ -16,6 +19,12 @@
   - Marketplace : https://marketplace.truffiere-de-cement.fr
 
 # FEAT: permissions
+- add the ability to assign a role to a user
+
+# FIX : notifications
+- the notification count isn't displaying correctly
+
+## Namespaces
 Tuber HUB is the internal ERP tool to manage ressources and operations and to create reports.
 For now it is quite empty, but we need to add the following namespaces, which will all reside under the hub namespace.
 

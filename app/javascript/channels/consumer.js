@@ -3,4 +3,15 @@
 
 import { createConsumer } from "@rails/actioncable"
 
-export default createConsumer()
+let consumerInstance = null;
+
+try {
+  // Create a consumer and connect to /cable endpoint
+  console.log('Creating Action Cable consumer...');
+  consumerInstance = createConsumer('/cable');
+  console.log('Action Cable consumer created successfully:', consumerInstance);
+} catch (error) {
+  console.error('Failed to create Action Cable consumer:', error);
+}
+
+export default consumerInstance;

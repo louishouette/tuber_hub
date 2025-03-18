@@ -32,6 +32,14 @@ module Hub
         authorize @user
         
         if @user.save
+          # Send notification to the user who performed the action
+          Hub::NotificationService.notify(
+            user: Current.user,
+            message: "User #{@user.full_name} was successfully created",
+            notification_type: 'success',
+            metadata: { user_id: @user.id }
+          )
+          
           redirect_to hub_admin_users_path, notice: 'User was successfully created.'
         else
           render :new, status: :unprocessable_entity
@@ -57,6 +65,14 @@ module Hub
         end
         
         if @user.update(user_update_params)
+          # Send notification to the user who performed the action
+          Hub::NotificationService.notify(
+            user: Current.user,
+            message: "User #{@user.full_name} was successfully updated",
+            notification_type: 'success',
+            metadata: { user_id: @user.id }
+          )
+          
           redirect_to hub_admin_users_path, notice: 'User was successfully updated.'
         else
           render :edit, status: :unprocessable_entity
@@ -67,8 +83,24 @@ module Hub
         authorize @user
         
         if @user.destroy
+          # Send notification to the user who performed the action
+          Hub::NotificationService.notify(
+            user: Current.user,
+            message: "User #{@user.full_name} was successfully deleted",
+            notification_type: 'success',
+            metadata: { user_id: @user.id }
+          )
+          
           redirect_to hub_admin_users_path, notice: 'User was successfully deleted.'
         else
+          # Send error notification
+          Hub::NotificationService.notify(
+            user: Current.user,
+            message: "Failed to delete user #{@user.full_name}",
+            notification_type: 'error',
+            metadata: { user_id: @user.id, error: "User has active sessions or assignments" }
+          )
+          
           redirect_to hub_admin_users_path, alert: 'Could not delete user because they have active sessions or assignments.'
         end
       end
@@ -80,8 +112,25 @@ module Hub
         new_status = !@user.active?
         if @user.update(active: new_status)
           status_message = new_status ? 'activated' : 'deactivated'
+          
+          # Send notification to the user who performed the action
+          Hub::NotificationService.notify(
+            user: Current.user,
+            message: "User #{@user.full_name} has been #{status_message}",
+            notification_type: 'success',
+            metadata: { user_id: @user.id, status: new_status ? 'active' : 'inactive' }
+          )
+          
           redirect_to hub_admin_user_path(@user), notice: "User #{@user.full_name} has been #{status_message}."
         else
+          # Send error notification
+          Hub::NotificationService.notify(
+            user: Current.user,
+            message: "Failed to change status for user #{@user.full_name}",
+            notification_type: 'error',
+            metadata: { user_id: @user.id }
+          )
+          
           redirect_to hub_admin_user_path(@user), alert: 'Could not change user status.'
         end
       end
@@ -97,6 +146,12 @@ module Hub
         role_ids = user_params[:role_ids] || []
         expires_at = user_params[:expires_at].presence
         
+        # Track role changes for notification
+        previous_role_ids = @user.role_ids.to_set
+        new_role_ids = role_ids.map(&:to_i).to_set
+        added_role_ids = new_role_ids - previous_role_ids
+        removed_role_ids = previous_role_ids - new_role_ids
+        
         # Remove roles that were unchecked
         @user.role_assignments.where.not(role_id: role_ids).each do |assignment|
           assignment.revoke!(Current.user)
@@ -111,6 +166,29 @@ module Hub
               expires_at: expires_at
             )
           end
+        end
+        
+        # Create notification with specific details about role changes
+        if added_role_ids.any? || removed_role_ids.any?
+          # Get role names for better notification readability
+          added_roles = Hub::Admin::Role.where(id: added_role_ids.to_a).pluck(:name).join(', ')
+          removed_roles = Hub::Admin::Role.where(id: removed_role_ids.to_a).pluck(:name).join(', ')
+          
+          changes = []
+          changes << "Added roles: #{added_roles}" if added_roles.present?
+          changes << "Removed roles: #{removed_roles}" if removed_roles.present?
+          
+          Hub::NotificationService.notify(
+            user: Current.user,
+            message: "Updated roles for user #{@user.full_name}",
+            notification_type: 'success',
+            metadata: {
+              user_id: @user.id,
+              added_role_ids: added_role_ids.to_a,
+              removed_role_ids: removed_role_ids.to_a,
+              changes: changes.join('; ')
+            }
+          )
         end
         
         redirect_to hub_admin_user_path(@user), notice: 'Roles updated successfully'

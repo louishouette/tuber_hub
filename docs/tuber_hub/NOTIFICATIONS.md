@@ -1,101 +1,87 @@
 # TuberHub Notification System
 
-This document explains how to use the notification system in TuberHub. The notification system provides real-time notifications to users using Rails 8's Solid Cable (Action Cable) for WebSockets.
+A real-time notification system using Rails 8's Solid Cable technology for WebSockets.
 
-## Overview
+## Key Components
 
-The notification system consists of several components:
+### Server-Side
 
-1. **`Hub::Notification` model**: Stores notification data in the database
-2. **`Hub::NotificationService`**: Service for creating and broadcasting notifications
-3. **`Hub::Notifiable` concern**: Mixin for controllers to simplify notification creation
-4. **`NotificationChannel`**: Action Cable channel for real-time notification delivery
-5. **Stimulus controllers**: Frontend components for handling notification display
+- **`Hub::Notification`**: Database model for notifications
+- **`Hub::NotificationService`**: Creates and broadcasts notifications
+- **`Hub::Notifiable`**: Controller mixin for easy notification creation
+- **`Hub::NotificationChannel`**: Action Cable channel for real-time delivery
 
-## Notification Types
+### Client-Side
 
-The system supports the following notification types:
+- **Utilities**: `notification_utils.js`, `event_bus.js`, `notification_types.js`
+- **Channel**: `notification_channel.js` (receives broadcasts)
+- **Controllers**: Stimulus controllers for UI components
+  - `notifications_controller.js`: Main container
+  - `notification_counter_controller.js`: Count badge
+  - `notification_list_controller.js`: List UI
+  - `toast_controller.js`: Toast notifications
 
-- `info`: General information (default)
-- `success`: Positive outcomes, confirmations
-- `warning`: Alerts that require attention but aren't critical
-- `error`: Critical issues that need immediate attention
+## Data Flow & Architecture
 
-Each type has a corresponding CSS class and icon for consistent styling.
+**Core Principles:**
+- **Unidirectional Flow**: Server broadcasts → Client receives → UI updates
+- **No Polling**: Only use Action Cable for real-time updates
+- **Event-Driven**: Components communicate via event bus
 
-## Creating Notifications
+**Notification Types:**
+- `info`: General information (blue)
+- `success`: Positive outcomes (green)
+- `warning`: Alerts requiring attention (yellow)
+- `error`: Critical issues (red)
 
-### Using NotificationService Directly
+## Usage
+
+### Creating Notifications
 
 ```ruby
-# Create a notification for a specific user
+# Basic notification
 Hub::NotificationService.notify(
-  user: current_user,
+  user: Current.user,
   message: "Your file has been processed",
-  notification_type: :success,  # Optional, defaults to :info
-  metadata: {                   # Optional, for storing additional data
-    resource_type: "Document",
-    resource_id: document.id
-  },
-  url: document_path(document)  # Optional, URL to redirect when clicked
+  notification_type: :success  # :info, :success, :warning, :error
 )
 
-# Create notifications for multiple users
-users = Hub::Admin::User.where(role: "manager")
+# With additional options
+Hub::NotificationService.notify(
+  user: Current.user,
+  message: "Document updated",
+  notification_type: :info,
+  metadata: { resource_id: doc.id },
+  url: document_path(doc)
+)
+
+# For multiple users
 Hub::NotificationService.notify_all(
-  users: users,
-  message: "Team meeting starts in 15 minutes",
-  notification_type: :info
+  users: User.admins,
+  message: "System maintenance complete"
 )
 
-# Create a notification and broadcast it immediately
-# This is useful for real-time notifications
+# Broadcast immediately (real-time)
 Hub::NotificationService.notify_and_broadcast(
-  user: current_user,
-  message: "New message received",
-  notification_type: :info
+  user: Current.user,
+  message: "New message received"
 )
 ```
 
-### Using the Notifiable Concern
-
-The `Hub::Notifiable` concern provides helper methods for controllers. Include it in your controller:
+### In Controllers (using Notifiable concern)
 
 ```ruby
 class DocumentsController < ApplicationController
   include Hub::Notifiable
   
   def create
-    @document = Document.new(document_params)
-    
-    if @document.save
-      # Creates a flash notice and a notification with the same message
-      notify :success, "Document was successfully created"
-      redirect_to @document
-    else
-      render :new
-    end
+    # Creates notification and flash message
+    notify :success, "Document was created"
   end
   
   def update
-    if @document.update(document_params)
-      # Only creates a notification, no flash message
-      notification :info, "Document was updated", url: document_path(@document)
-      redirect_to @document
-    else
-      render :edit
-    end
-  end
-  
-  def destroy
-    @document.destroy
-    # Creates a notification with additional metadata
-    notification :warning, "Document was deleted", metadata: { 
-      resource_type: "Document", 
-      resource_id: @document.id, 
-      name: @document.name 
-    }
-    redirect_to documents_path
+    # Notification only, no flash
+    notification :info, "Document was updated"
   end
 end
 ```
@@ -137,16 +123,41 @@ The notification system uses Flowbite and Tailwind CSS for styling. The appearan
 
 ## Working with the JavaScript API
 
+### Event System Architecture
+
+The notification system uses a centralized event bus to avoid circular dependencies and ensure proper event flow. All components should communicate through this bus rather than directly with each other.
+
+### Key Events
+
 The notification system provides several custom events that you can listen for in your JavaScript code:
 
 - `notification:received` - Fired when a new notification is received via WebSockets
 - `notification:toast` - Fired when a toast notification should be displayed
+- `notification:count-changed` - Fired when the notification count changes
+- `notification:dismiss` - Fired when a notification is dismissed
+
+### Event Handling Best Practices
+
+1. **Prevent Event Loops**: When handling an event that might cause state changes, be careful not to trigger the same event again
+2. **Use Data in Events**: Pass all necessary data in the event detail to avoid additional AJAX requests
+3. **Separate UI Updates from Data Operations**: Keep DOM updates separate from data operations
 
 Example:
 
 ```javascript
-document.addEventListener('notification:received', (event) => {
-  console.log('New notification:', event.detail)
+// GOOD: Uses the event bus and prevents loops
+import notificationEventBus from "utilities/event_bus"
+
+notificationEventBus.on('notification:count-changed', (data) => {
+  // Just update the UI with the data provided in the event
+  // No additional AJAX requests or event emissions
+  this.updateBadge(data.count)
+})
+
+// BAD: Creates potential event loops
+document.addEventListener('notification:count-changed', () => {
+  // This will cause another AJAX request and potentially another event
+  this.updateCount() 
 })
 ```
 
@@ -165,11 +176,32 @@ The notification system exposes the following API endpoints:
 
 ## Best Practices
 
-1. Keep notification messages concise and clear
-2. Use appropriate notification types based on severity
-3. Only use real-time notifications for time-sensitive information
-4. Include relevant context in metadata for advanced use cases
-5. Consider user preferences (some users may want to disable certain notifications)
+1. **No Polling**: Never use polling or intervals when Action Cable is available
+2. **Single Source of Truth**: All real-time updates should come through Action Cable
+3. **Avoid Circular Events**: Be careful not to create event loops where events trigger handlers that emit the same events
+4. **Component Independence**: UI components should only depend on the event bus, not directly on each other
+5. **Keep notification messages concise and clear**
+6. **Use appropriate notification types based on severity**
+7. **Only use real-time notifications for time-sensitive information**
+8. **Include relevant context in metadata for advanced use cases**
+9. **Consider user preferences (some users may want to disable certain notifications)**
+
+## Design Principles
+
+- **Server Push Over Client Pull**: Always prefer Action Cable broadcasts over client-side polling
+- **Unidirectional Data Flow**: Data flows in one direction: Server → Action Cable → Event Bus → UI Components
+- **Separation of Concerns**: Logic separated into distinct modules
+- **DRY (Don't Repeat Yourself)**: Common functionality extracted to utilities
+- **Single Responsibility**: Each component has a clear purpose
+- **Event-driven Architecture**: Components communicate through events
+- **Responsive Design**: Mobile-first approach with responsive UI
+
+## Style Guidelines
+
+- Notification dropdown is responsive (fixed on mobile, absolute on desktop)
+- Toast notifications appear in the top-right corner by default
+- Smooth animations for all notification interactions
+- Consistent color coding based on notification type
 
 ## Example Integration with a Model
 
@@ -202,15 +234,33 @@ class Comment < ApplicationRecord
 end
 ```
 
-## Debugging
+## Troubleshooting
 
-To debug Action Cable connections, check the server logs or browser console. You can add additional logging in the `NotificationChannel` or Stimulus controllers as needed.
+### Common Issues
+- **Infinite AJAX Loops**: Check for circular event handling
+- **Missing Updates**: Verify Action Cable connections
+- **Nil User Errors**: Check Current.user access in channels
 
-## Customizing Behavior
+### Debugging
+1. Check browser console for connection status
+2. Verify channel subscription (`Hub::NotificationChannel`)
+3. Monitor server logs for broadcasts
+4. Check network tab for excessive requests
 
-The notification system is designed to be extensible. You can customize behavior by:
+## Recent Improvements
 
-1. Overriding methods in `Hub::NotificationService`
-2. Extending the `Hub::Notification` model with additional scopes
-3. Adding new notification types in `Hub::NotificationHelper`
-4. Customizing the JavaScript controllers for specific behaviors
+1. **Eliminated Polling** - Using pure Action Cable
+2. **Fixed Event Handling** - Unidirectional data flow
+3. **Enhanced Performance** - Solid Cache integration
+4. **Better Error Handling** - Graceful degradation
+
+See `/requirements/changelog/developping_notifications.md` for details.
+
+## Future Roadmap
+
+- Notification grouping and categorization
+- User notification preferences
+- Rich content support (images, formatting)
+- Engagement metrics and analytics
+- Cross-device synchronization
+- Expiration and archiving features

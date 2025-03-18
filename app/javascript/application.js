@@ -3,4 +3,8 @@ import "@hotwired/turbo-rails"
 import "controllers"
 import "flowbite"
 import "chartkick"
-import "Chart.bundle"import "channels"
+import "Chart.bundle"
+
+// Action Cable setup for real-time features
+import "@rails/actioncable"
+import "channels"

@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  # Action Cable routes
+  mount ActionCable.server => "/cable"
+
   # Authentication routes
   get "/login", to: "sessions#new", as: :login
   post "/login", to: "sessions#create", as: :session
@@ -38,6 +41,7 @@ Rails.application.routes.draw do
         get :unread
         get :count
         get :items
+        get :empty_state
         post :mark_all_as_read
       end
       member do

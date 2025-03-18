@@ -1,0 +1,57 @@
+/*********************************************
+ * Toast Notification System Styles
+ * TuberHub Application
+ *********************************************/
+
+/* ----------------------------------------
+ * Toast Component Base Styles
+ * ---------------------------------------- */
+.toast-notification {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s ease-in-out;
+  z-index: 9999; /* Ensure toasts are above everything */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-bottom: 0.75rem;
+}
+
+/* Toast Animation States */
+.toast-notification.show {
+  opacity: 1;
+  transform: translateY(0);
+  animation: toast-in 0.3s ease-out;
+}
+
+.toast-notification.hiding {
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: toast-out 0.3s ease-in;
+}
+
+/* ----------------------------------------
+ * Toast Container Styles
+ * ---------------------------------------- */
+#toast-container {
+  z-index: 9999;
+  width: auto;
+  max-width: 24rem;
+  pointer-events: none; /* Let clicks pass through the container */
+}
+
+/* Make toast elements clickable */
+#toast-container .toast-notification {
+  pointer-events: auto;
+}
+
+/* ----------------------------------------
+ * Toast Animations
+ * ---------------------------------------- */
+@keyframes toast-in {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes toast-out {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-20px); opacity: 0; }
+}

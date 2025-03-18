@@ -5,12 +5,12 @@
   </button>
   
   <!-- Dropdown menu -->
-  <div id="notification-dropdown" class="hidden absolute right-0 z-50 w-full max-w-sm bg-white divide-y divide-gray-100 rounded-lg shadow-xl dark:bg-gray-800 dark:divide-gray-700">
-    <div class="flex items-center justify-between p-4 text-gray-700 dark:text-white">
+  <div id="notification-dropdown" class="hidden fixed md:absolute right-0 top-full mt-2 z-50 w-full max-w-xs md:max-w-md bg-white divide-y divide-gray-100 rounded-lg shadow-xl dark:bg-gray-800 dark:divide-gray-700 transition-transform duration-300 origin-top-right">
+    <div class="flex items-center justify-between p-4 text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700">
       <h6 class="text-sm font-semibold">Notifications</h6>
       <a href="#" class="text-xs font-medium text-primary-600 hover:underline dark:text-primary-500" data-action="click->notifications#markAllAsRead">Mark all as read</a>
     </div>
-    <div data-notifications-target="container" class="max-h-96 overflow-y-auto">
+    <div data-notifications-target="container" class="max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800">
       <!-- Notification items will be loaded here -->
       <div class="py-4 px-4 text-center text-gray-500 dark:text-gray-400">
         <div class="flex flex-col items-center">
@@ -19,8 +19,8 @@
         </div>
       </div>
     </div>
-    <a href="<%= hub_notifications_path %>" class="block py-2 text-sm font-medium text-center text-gray-900 rounded-b-lg bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white">
-      <div class="inline-flex items-center">
+    <a href="<%= hub_notifications_path %>" class="block py-3 text-sm font-medium text-center text-gray-900 rounded-b-lg bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white border-t border-gray-200 dark:border-gray-700">
+      <div class="inline-flex items-center justify-center">
         <%= icon "list", library: "lucide", variant: "outline", class: "w-4 h-4 mr-2" %>
         <span>View all notifications</span>
       </div>

@@ -1,13 +1,14 @@
-# TODO
-- log user activity
-
 # FIX
-- remove all .DS_Store from the app
 
-# FIX : refactor the folder hierarchy :
-- move app/services/permission_service.rb to hub/admin
-- move app/controllers/concerns/authentication.rb to hub/admin
-- detect the other required movements
+# FEAT : notifications
+- remove all home made notifications and use https://github.com/excid3/noticed instead
+- rely on the legacy flash messages all accross the app for notifying about CRUD operations
+
+# FEAT: permissions
+- add the ability to assign a role to a user
+
+# FEAT: user activity logging
+- log user activity
 
 # FEAT: setup kamal
 - security find-internet-password -a 'lmmh' -l 'Docker Credentials' -w for retrieving docker credentials
@@ -17,12 +18,6 @@
   - /club
   - Tuber HUB : https://hub.truffiere-de-cement.fr
   - Marketplace : https://marketplace.truffiere-de-cement.fr
-
-# FEAT: permissions
-- add the ability to assign a role to a user
-
-# FIX : notifications
-- the notification count isn't displaying correctly
 
 ## Namespaces
 Tuber HUB is the internal ERP tool to manage ressources and operations and to create reports.

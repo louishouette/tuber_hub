@@ -14,12 +14,7 @@ pin "@rails/actioncable", to: "actioncable.esm.js"
 # Pin the channels through the index.js file
 pin "channels", to: "channels/index.js"
 
-# Pin specific channel files explicitly
-pin "channels/consumer", to: "channels/consumer.js"
-pin "channels/hub/notification_channel", to: "channels/hub/notification_channel.js"
-
-# Ensure proper channel connections for namespaced channels
-pin "consumer", to: "channels/consumer.js"
+# Action Cable pins were removed as part of notification system cleanup
 
 # Pin utility modules
 pin_all_from "app/javascript/utilities", under: "utilities"

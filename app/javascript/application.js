@@ -5,6 +5,4 @@ import "flowbite"
 import "chartkick"
 import "Chart.bundle"
 
-// Action Cable setup for real-time features
-import "@rails/actioncable"
-import "channels"
+// Action Cable setup removed as part of notification system cleanup

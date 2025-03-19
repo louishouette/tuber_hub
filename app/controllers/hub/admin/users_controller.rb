@@ -32,15 +32,7 @@ module Hub
         authorize @user
         
         if @user.save
-          # Send notification to the user who performed the action
-          Hub::NotificationService.notify(
-            user: Current.user,
-            message: "User #{@user.full_name} was successfully created",
-            notification_type: 'success',
-            metadata: { user_id: @user.id }
-          )
-          
-          redirect_to hub_admin_users_path, notice: 'User was successfully created.'
+          redirect_to hub_admin_users_path, notice: "User #{@user.full_name} was successfully created."
         else
           render :new, status: :unprocessable_entity
         end
@@ -65,15 +57,7 @@ module Hub
         end
         
         if @user.update(user_update_params)
-          # Send notification to the user who performed the action
-          Hub::NotificationService.notify(
-            user: Current.user,
-            message: "User #{@user.full_name} was successfully updated",
-            notification_type: 'success',
-            metadata: { user_id: @user.id }
-          )
-          
-          redirect_to hub_admin_users_path, notice: 'User was successfully updated.'
+          redirect_to hub_admin_users_path, notice: "User #{@user.full_name} was successfully updated."
         else
           render :edit, status: :unprocessable_entity
         end
@@ -83,25 +67,9 @@ module Hub
         authorize @user
         
         if @user.destroy
-          # Send notification to the user who performed the action
-          Hub::NotificationService.notify(
-            user: Current.user,
-            message: "User #{@user.full_name} was successfully deleted",
-            notification_type: 'success',
-            metadata: { user_id: @user.id }
-          )
-          
-          redirect_to hub_admin_users_path, notice: 'User was successfully deleted.'
+          redirect_to hub_admin_users_path, notice: "User #{@user.full_name} was successfully deleted."
         else
-          # Send error notification
-          Hub::NotificationService.notify(
-            user: Current.user,
-            message: "Failed to delete user #{@user.full_name}",
-            notification_type: 'error',
-            metadata: { user_id: @user.id, error: "User has active sessions or assignments" }
-          )
-          
-          redirect_to hub_admin_users_path, alert: 'Could not delete user because they have active sessions or assignments.'
+          redirect_to hub_admin_users_path, alert: "Could not delete user #{@user.full_name} because they have active sessions or assignments."
         end
       end
       
@@ -113,25 +81,9 @@ module Hub
         if @user.update(active: new_status)
           status_message = new_status ? 'activated' : 'deactivated'
           
-          # Send notification to the user who performed the action
-          Hub::NotificationService.notify(
-            user: Current.user,
-            message: "User #{@user.full_name} has been #{status_message}",
-            notification_type: 'success',
-            metadata: { user_id: @user.id, status: new_status ? 'active' : 'inactive' }
-          )
-          
           redirect_to hub_admin_user_path(@user), notice: "User #{@user.full_name} has been #{status_message}."
         else
-          # Send error notification
-          Hub::NotificationService.notify(
-            user: Current.user,
-            message: "Failed to change status for user #{@user.full_name}",
-            notification_type: 'error',
-            metadata: { user_id: @user.id }
-          )
-          
-          redirect_to hub_admin_user_path(@user), alert: 'Could not change user status.'
+          redirect_to hub_admin_user_path(@user), alert: "Could not change status for user #{@user.full_name}."
         end
       end
       
@@ -178,17 +130,7 @@ module Hub
           changes << "Added roles: #{added_roles}" if added_roles.present?
           changes << "Removed roles: #{removed_roles}" if removed_roles.present?
           
-          Hub::NotificationService.notify(
-            user: Current.user,
-            message: "Updated roles for user #{@user.full_name}",
-            notification_type: 'success',
-            metadata: {
-              user_id: @user.id,
-              added_role_ids: added_role_ids.to_a,
-              removed_role_ids: removed_role_ids.to_a,
-              changes: changes.join('; ')
-            }
-          )
+
         end
         
         redirect_to hub_admin_user_path(@user), notice: 'Roles updated successfully'

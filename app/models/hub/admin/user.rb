@@ -29,8 +29,7 @@ module Hub
       has_secure_password
       has_many :sessions, dependent: :destroy
       
-      # Notifications association
-      has_many :notifications, class_name: 'Hub::Notification', foreign_key: 'user_id', dependent: :destroy
+      # Notifications association removed
       
       # Role associations
       has_many :role_assignments, dependent: :destroy

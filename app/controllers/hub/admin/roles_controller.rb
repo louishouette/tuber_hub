@@ -23,15 +23,7 @@ module Hub
         authorize @role
         
         if @role.save
-          # Send notification to the user who performed the action
-          Hub::NotificationService.notify(
-            user: Current.user,
-            message: "Role '#{@role.name}' was successfully created",
-            notification_type: 'success',
-            metadata: { role_id: @role.id }
-          )
-          
-          redirect_to hub_admin_roles_path, notice: 'Role was successfully created.'
+          redirect_to hub_admin_roles_path, notice: "Role '#{@role.name}' was successfully created."
         else
           render :new, status: :unprocessable_entity
         end
@@ -44,15 +36,7 @@ module Hub
       def update
         authorize @role
         if @role.update(role_params)
-          # Send notification to the user who performed the action
-          Hub::NotificationService.notify(
-            user: Current.user,
-            message: "Role '#{@role.name}' was successfully updated",
-            notification_type: 'success',
-            metadata: { role_id: @role.id }
-          )
-          
-          redirect_to hub_admin_roles_path, notice: 'Role was successfully updated.'
+          redirect_to hub_admin_roles_path, notice: "Role '#{@role.name}' was successfully updated."
         else
           render :edit, status: :unprocessable_entity
         end
@@ -61,25 +45,9 @@ module Hub
       def destroy
         authorize @role
         if @role.destroy
-          # Send notification to the user who performed the action
-          Hub::NotificationService.notify(
-            user: Current.user,
-            message: "Role '#{@role.name}' was successfully deleted",
-            notification_type: 'success',
-            metadata: { role_id: @role.id }
-          )
-          
-          redirect_to hub_admin_roles_path, notice: 'Role was successfully deleted.'
+          redirect_to hub_admin_roles_path, notice: "Role '#{@role.name}' was successfully deleted."
         else
-          # Send error notification
-          Hub::NotificationService.notify(
-            user: Current.user,
-            message: "Failed to delete role '#{@role.name}'",
-            notification_type: 'error',
-            metadata: { role_id: @role.id, error: "Role is still in use" }
-          )
-          
-          redirect_to hub_admin_roles_path, alert: 'Could not delete role because it is still in use.'
+          redirect_to hub_admin_roles_path, alert: "Could not delete role '#{@role.name}' because it is still in use."
         end
       end
       
@@ -131,18 +99,6 @@ module Hub
           # Get permission details for better notification readability
           added_count = added_permission_ids.size
           removed_count = removed_permission_ids.size
-          
-          Hub::NotificationService.notify(
-            user: Current.user,
-            message: "Updated permissions for role '#{@role.name}'",
-            notification_type: 'success',
-            metadata: {
-              role_id: @role.id,
-              added_permission_count: added_count,
-              removed_permission_count: removed_count,
-              changes: "Added #{added_count} permissions; Removed #{removed_count} permissions"
-            }
-          )
         end
         
         redirect_to hub_admin_role_path(@role), notice: 'Permissions updated successfully'

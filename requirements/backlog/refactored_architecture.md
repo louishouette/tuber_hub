@@ -126,6 +126,66 @@ The Excel export functionality has been updated to use the modular service archi
 - Consistent file naming conventions
 - Support for multiple report types (standard, weekly_summary, and full_production)
 
+## Notification System Architecture
+
+The notification system has been refactored to use Rails 8's Solid Cable technology for real-time updates with a modern event-driven architecture:
+
+### Server-Side Components
+
+1. **Hub::Notification Model**
+   - Stores notification metadata with proper database indexes
+   - Tracks read/unread/dismissed states with explicit timestamps
+   - Supports rich content via metadata storage
+
+2. **Hub::NotificationService**
+   - Creates and broadcasts notifications to users
+   - Manages notification caching and state transitions
+   - Ensures consistent notification delivery across channels
+
+3. **Hub::NotificationChannel**
+   - Real-time Action Cable channel for websocket communication
+   - Implements commands for notification state management
+   - Provides preloading capabilities for faster UI rendering
+   - Ensures proper count synchronization
+
+### Client-Side Components
+
+1. **Event Bus Architecture**
+   - Centralized event dispatch mechanism
+   - Prevents circular event dependencies
+   - Decouples UI components from data sources
+
+2. **Stimulus Controllers**
+   - `notification_counter_controller.js`: Badge display logic
+   - `notification_list_controller.js`: Dropdown content management
+   - `toast_controller.js`: Toast notification display
+   - `notifications_controller.js`: Container coordination
+
+3. **Utility Modules**
+   - `notification_utils.js`: Shared utility functions
+   - `event_bus.js`: Event management
+   - Consistent error handling and data validation
+
+### Key Improvements
+
+1. **Real-Time Updates**
+   - Eliminated polling in favor of push notifications
+   - Proper badge display logic (hidden when count = 0)
+   - Preloaded notifications for better UX
+   - Server-side rendering for HTML content
+
+2. **Performance Optimizations**
+   - Solid Cache integration for counting queries
+   - Reduced network traffic with selective updates
+   - Proper cache invalidation on notification changes
+   - Batched DOM updates to prevent layout thrashing
+
+3. **Error Resilience**
+   - Graceful degradation with fallback mechanisms
+   - Comprehensive error handling
+   - Development logging for easy debugging
+   - Cross-browser compatibility
+
 ## Future Improvements
 
 Potential future improvements include:

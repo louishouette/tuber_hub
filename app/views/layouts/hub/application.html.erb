@@ -25,18 +25,17 @@
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
   </head>
 
-  <body class="bg-gray-50" <% if Rails.env.development? %>data-controller="debug-notification"<% end %>>
+  <body class="bg-gray-50">
     <div class="hub-layout">
       <div class="antialiased bg-gray-50 dark:bg-gray-900">
         <%= render "layouts/hub/shared/navbar" %>
         <%= render "layouts/hub/shared/sidebar" %>
 
         <main class="p-4 md:ml-64 min-h-screen pt-20">
+          <%= render "layouts/hub/shared/flash_messages" %>
+          <% consume_flash %>
           <%= yield %>
         </main>
-        
-        <!-- Toast notifications -->
-        <%= render "layouts/toast_container" %>
       </div>
     </div>
   </body>

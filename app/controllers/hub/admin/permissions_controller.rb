@@ -81,14 +81,6 @@ module Hub
             # Get the count of active permissions for notification
             permission_count = Hub::Admin::Permission.count
             
-            # Send notification
-            Hub::NotificationService.notify(
-              user: Current.user,
-              message: "Permissions refreshed successfully",
-              notification_type: 'success',
-              metadata: { permission_count: permission_count }
-            )
-            
             # Update the UI after successful refresh
             format.html { redirect_to hub_admin_permissions_path, notice: 'Permissions have been refreshed from controllers.' }
             format.turbo_stream do
@@ -147,13 +139,7 @@ module Hub
               redirect_to hub_admin_permissions_path, notice: "Successfully refreshed permissions. Found #{permission_count} system permissions."
             end
           else
-            # Send error notification
-            Hub::NotificationService.notify(
-              user: Current.user,
-              message: "Failed to refresh permissions",
-              notification_type: 'error'
-            )
-            
+
             format.html { redirect_to hub_admin_permissions_path, alert: 'Failed to refresh permissions.' }
             format.turbo_stream do
               flash.now[:alert] = 'Failed to refresh permissions.'

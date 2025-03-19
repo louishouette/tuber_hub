@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_16_223635) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_19_101538) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -80,24 +80,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_16_223635) do
     t.index ["email_address"], name: "index_hub_admin_users_on_email_address", unique: true
   end
 
-  create_table "hub_notifications", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.text "message"
-    t.string "notification_type"
-    t.datetime "read_at"
-    t.datetime "dismissed_at"
-    t.jsonb "metadata", default: {}
-    t.datetime "displayed_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "url"
-    t.index ["dismissed_at"], name: "index_hub_notifications_on_dismissed_at"
-    t.index ["displayed_at"], name: "index_hub_notifications_on_displayed_at"
-    t.index ["notification_type"], name: "index_hub_notifications_on_notification_type"
-    t.index ["read_at"], name: "index_hub_notifications_on_read_at"
-    t.index ["user_id"], name: "index_hub_notifications_on_user_id"
-  end
-
   create_table "sessions", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "ip_address"
@@ -115,6 +97,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_16_223635) do
   add_foreign_key "hub_admin_role_assignments", "hub_admin_users", column: "granted_by_id"
   add_foreign_key "hub_admin_role_assignments", "hub_admin_users", column: "revoked_by_id"
   add_foreign_key "hub_admin_role_assignments", "hub_admin_users", column: "user_id"
-  add_foreign_key "hub_notifications", "hub_admin_users", column: "user_id"
   add_foreign_key "sessions", "hub_admin_users", column: "user_id"
 end

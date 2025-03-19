@@ -35,22 +35,6 @@ Rails.application.routes.draw do
 
   # Hub namespace routes
   namespace :hub do
-    # Notification routes
-    resources :notifications, only: [:index, :create] do
-      collection do
-        get :unread
-        get :count
-        get :items
-        get :empty_state
-        post :mark_all_as_read
-      end
-      member do
-        get :toast
-        patch :read
-        patch :dismiss
-        patch :displayed
-      end
-    end
 
     namespace :admin do
       # User management

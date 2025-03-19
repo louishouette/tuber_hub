@@ -1,0 +1,43 @@
+<div class="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
+  <div class="w-full mb-1">
+    <div class="mb-4">
+      <nav class="flex mb-5" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-2">
+          <li class="inline-flex items-center">
+            <%= link_to hub_path, class: "inline-flex items-center text-gray-700 hover:text-primary-600 dark:text-gray-300 dark:hover:text-white" do %>
+              <%= icon "home", library: "lucide", variant: "outline", class: "w-5 h-5 mr-2.5" %>
+              Home
+            <% end %>
+          </li>
+          <li>
+            <div class="flex items-center">
+              <%= icon "chevron-right", library: "lucide", variant: "outline", class: "w-4 h-4 text-gray-400" %>
+              <%= link_to "Farms", hub_core_farms_path, class: "ml-1 text-gray-700 hover:text-primary-600 md:ml-2 dark:text-gray-300 dark:hover:text-white" %>
+            </div>
+          </li>
+          <li>
+            <div class="flex items-center">
+              <%= icon "chevron-right", library: "lucide", variant: "outline", class: "w-4 h-4 text-gray-400" %>
+              <%= link_to @farm.name, hub_core_farm_path(@farm), class: "ml-1 text-gray-700 hover:text-primary-600 md:ml-2 dark:text-gray-300 dark:hover:text-white" %>
+            </div>
+          </li>
+          <li>
+            <div class="flex items-center">
+              <%= icon "chevron-right", library: "lucide", variant: "outline", class: "w-4 h-4 text-gray-400" %>
+              <span class="ml-1 text-gray-400 md:ml-2 dark:text-gray-500">Edit</span>
+            </div>
+          </li>
+        </ol>
+      </nav>
+      <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">Edit <%= @farm.name %></h1>
+    </div>
+  </div>
+</div>
+
+<div class="py-4 px-4">
+  <div class="mx-auto max-w-2xl">
+    <div class="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 dark:bg-gray-800">
+      <%= render 'form', farm: @farm, url: hub_core_farm_path(@farm) %>
+    </div>
+  </div>
+</div>

@@ -1,8 +1,17 @@
 # FIX
 
-# FEAT : notifications
-- remove all home made notifications and use https://github.com/excid3/noticed instead
-- rely on the legacy flash messages all accross the app for notifying about CRUD operations
+# FEAT: User preferences
+- create a UserPreference model referencing the Hub::Admin::User, key (string), and value (text) plus timestamps.
+- In UserPreference, add belongs_to :user and validate presence of key; implement an update_value method with info and debug logging.
+- In the User model, add has_many :user_preferences, dependent: :destroy and a helper method to retrieve preferences with defaults.
+- Secure & Optimize: In the controllers, manage user preferences via strong parameters and add database indexing on user_id and key for performance.
+
+# FEAT: CRUD for farms
+- Implement farm membership management
+- Develop UserPreference model for user customizations including default farm
+
+# PROMPT: maintain a changelog
+- apply the requested changes maintaining a changelog in the adequate file in @requirements/changelogs using @requirements/changelogs/generic.md as a template. Refer to the app documentation in @docs/tuber_hub for contextual functionnalities (like authorization for example)
 
 # FEAT: permissions
 - add the ability to assign a role to a user
@@ -18,6 +27,12 @@
   - /club
   - Tuber HUB : https://hub.truffiere-de-cement.fr
   - Marketplace : https://marketplace.truffiere-de-cement.fr
+
+# FEAT : notifications
+- use https://github.com/excid3/noticed for handling notifications
+
+# IDEAS:
+- https://github.com/pay-rails/pay
 
 ## Namespaces
 Tuber HUB is the internal ERP tool to manage ressources and operations and to create reports.

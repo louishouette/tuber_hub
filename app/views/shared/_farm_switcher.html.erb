@@ -1,0 +1,78 @@
+<!-- Farm switcher dropdown menu -->
+<button id="farmDropdownButton" data-dropdown-toggle="farmDropdown" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5" type="button">
+  <div class="flex items-center">
+    <!-- Farm icon or logo -->
+    <div class="mr-2">
+      <% if current_farm&.logo&.attached? %>
+        <%= image_tag current_farm.logo.variant(resize_to_limit: [24, 24]), class: "w-6 h-6 rounded" %>
+      <% else %>
+        <%= icon "building-2", class: "w-6 h-6" %>
+      <% end %>
+    </div>
+    
+    <!-- Farm name -->
+    <span class="hidden md:inline-block font-medium max-w-[120px] truncate">
+      <%= current_farm&.name || "Select Farm" %>
+    </span>
+    
+    <!-- Dropdown icon -->
+    <%= icon "chevron-down", class: "w-4 h-4 ml-1" %>
+  </div>
+</button>
+
+<!-- Dropdown menu -->
+<div id="farmDropdown" class="hidden z-10 w-72 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
+  <div class="py-3 px-4">
+    <span class="block text-sm font-medium text-gray-900 truncate dark:text-white">Farm Selection</span>
+  </div>
+  
+  <ul class="py-2 text-sm text-gray-700 dark:text-gray-200 max-h-48 overflow-y-auto" aria-labelledby="farmDropdownButton">
+    <% if Current.user.farms.any? %>
+      <% Current.user.farms.each do |farm| %>
+        <li>
+          <% if current_farm == farm %>
+            <div class="flex items-center py-2 px-4 bg-gray-100 dark:bg-gray-600">
+              <% if farm&.logo&.attached? %>
+                <%= image_tag farm.logo.variant(resize_to_limit: [20, 20]), class: "w-5 h-5 mr-2 rounded" %>
+              <% else %>
+                <%= icon "building-2", class: "w-5 h-5 mr-2" %>
+              <% end %>
+              <span class="flex-1"><%= farm.name %></span>
+              <span class="inline-flex items-center justify-center px-2 py-0.5 ml-3 text-xs font-medium text-white bg-primary-700 rounded dark:bg-primary-600">
+                Current
+              </span>
+            </div>
+          <% else %>
+            <%= button_to set_current_farm_hub_core_farms_path(farm_id: farm.id), method: :post, class: "flex items-center w-full py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" do %>
+              <% if farm&.logo&.attached? %>
+                <%= image_tag farm.logo.variant(resize_to_limit: [20, 20]), class: "w-5 h-5 mr-2 rounded" %>
+              <% else %>
+                <%= icon "building-2", class: "w-5 h-5 mr-2" %>
+              <% end %>
+              <span class="flex-1"><%= farm.name %></span>
+              <!-- Default farm indicator will be added in future UserPreference implementation -->
+            <% end %>
+          <% end %>
+        </li>
+      <% end %>
+    <% else %>
+      <li class="py-2 px-4 text-gray-500 dark:text-gray-400">
+        No farms available
+      </li>
+    <% end %>
+  </ul>
+  
+  <div class="py-2">
+    <% if policy(Hub::Core::Farm).create? %>
+      <%= link_to new_hub_core_farm_path, class: "flex items-center py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white" do %>
+        <%= icon "plus", class: "w-4 h-4 mr-2" %>
+        <span>Add new farm</span>
+      <% end %>
+    <% end %>
+    
+    <%= link_to hub_core_farms_path, class: "flex items-center py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white" do %>
+      <%= icon "settings", class: "w-4 h-4 mr-2" %>
+      <span>Manage farms</span>
+    <% end %>
+  </div>
+</div>

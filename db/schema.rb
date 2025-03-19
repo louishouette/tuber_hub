@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_19_101538) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_19_142422) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -80,6 +80,29 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_19_101538) do
     t.index ["email_address"], name: "index_hub_admin_users_on_email_address", unique: true
   end
 
+  create_table "hub_core_farm_users", force: :cascade do |t|
+    t.bigint "farm_id", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["farm_id", "user_id"], name: "idx_farm_users_lookup", unique: true
+    t.index ["farm_id"], name: "index_hub_core_farm_users_on_farm_id"
+    t.index ["user_id"], name: "index_hub_core_farm_users_on_user_id"
+  end
+
+  create_table "hub_core_farms", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "handle", null: false
+    t.text "address"
+    t.text "description"
+    t.string "logo"
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["handle"], name: "index_hub_core_farms_on_handle", unique: true
+    t.index ["name"], name: "index_hub_core_farms_on_name"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "ip_address"
@@ -97,5 +120,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_19_101538) do
   add_foreign_key "hub_admin_role_assignments", "hub_admin_users", column: "granted_by_id"
   add_foreign_key "hub_admin_role_assignments", "hub_admin_users", column: "revoked_by_id"
   add_foreign_key "hub_admin_role_assignments", "hub_admin_users", column: "user_id"
+  add_foreign_key "hub_core_farm_users", "hub_admin_users", column: "user_id"
+  add_foreign_key "hub_core_farm_users", "hub_core_farms", column: "farm_id"
   add_foreign_key "sessions", "hub_admin_users", column: "user_id"
 end

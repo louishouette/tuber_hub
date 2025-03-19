@@ -1,0 +1,140 @@
+<div class="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
+  <div class="w-full mb-1">
+    <div class="mb-4">
+      <nav class="flex mb-5" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-2">
+          <li class="inline-flex items-center">
+            <%= link_to hub_path, class: "inline-flex items-center text-gray-700 hover:text-primary-600 dark:text-gray-300 dark:hover:text-white" do %>
+              <%= icon "home", library: "lucide", variant: "outline", class: "w-5 h-5 mr-2.5" %>
+              Home
+            <% end %>
+          </li>
+          <li>
+            <div class="flex items-center">
+              <%= icon "chevron-right", library: "lucide", variant: "outline", class: "w-4 h-4 text-gray-400" %>
+              <%= link_to "Farms", hub_core_farms_path, class: "ml-1 text-gray-700 hover:text-primary-600 md:ml-2 dark:text-gray-300 dark:hover:text-white" %>
+            </div>
+          </li>
+          <li>
+            <div class="flex items-center">
+              <%= icon "chevron-right", library: "lucide", variant: "outline", class: "w-4 h-4 text-gray-400" %>
+              <span class="ml-1 text-gray-400 md:ml-2 dark:text-gray-500"><%= @farm.name %></span>
+            </div>
+          </li>
+        </ol>
+      </nav>
+      <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white"><%= @farm.name %></h1>
+    </div>
+    <div class="sm:flex">
+      <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
+        <% if !Current.farm == @farm && policy(@farm).set_current_farm? %>
+          <%= button_to set_current_farm_hub_core_farms_path(farm_id: @farm.id), method: :post, class: "inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800" do %>
+            <%= icon "check-circle", library: "lucide", variant: "outline", class: "w-4 h-4 mr-2" %>
+            Switch to this farm
+          <% end %>
+        <% end %>
+        
+        <% if policy(@farm).edit? %>
+          <%= link_to edit_hub_core_farm_path(@farm), class: "inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800" do %>
+            <%= icon "edit", library: "lucide", variant: "outline", class: "w-4 h-4 mr-2" %>
+            Edit farm
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="flex flex-col p-4">
+  <div class="grid gap-4 xl:grid-cols-2 2xl:grid-cols-3">
+    <!-- Farm Details -->
+    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+      <div class="items-center sm:flex xl:block 2xl:flex sm:space-x-4 xl:space-x-0 2xl:space-x-4">
+        <div>
+          <% if @farm.logo.attached? %>
+            <div class="flex-shrink-0 mb-4 sm:mb-0 xl:mb-4 2xl:mb-0">
+              <%= image_tag @farm.logo.variant(resize_to_limit: [100, 100]), class: "w-28 h-28 rounded" %>
+            </div>
+          <% else %>
+            <div class="flex-shrink-0 mb-4 sm:mb-0 xl:mb-4 2xl:mb-0">
+              <div class="flex items-center justify-center w-28 h-28 bg-gray-100 rounded dark:bg-gray-700">
+                <%= icon "building", library: "lucide", variant: "outline", class: "w-14 h-14 text-gray-500 dark:text-gray-400" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        <div>
+          <h3 class="mb-1 text-xl font-bold text-gray-900 dark:text-white"><%= @farm.name %></h3>
+          <div class="mb-4 text-sm text-gray-500 dark:text-gray-400">
+            <p><strong>Handle:</strong> <%= @farm.handle %></p>
+          </div>
+          <% if @farm.active? %>
+            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-md dark:bg-green-900 dark:text-green-300">Active</span>
+          <% else %>
+            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-md dark:bg-red-900 dark:text-red-300">Inactive</span>
+          <% end %>
+        </div>
+      </div>
+      
+      <div class="mt-6 border-t border-gray-200 dark:border-gray-700">
+        <dl class="divide-y divide-gray-200 dark:divide-gray-700">
+          <% if @farm.address.present? %>
+            <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Address</dt>
+              <dd class="mt-1 text-sm sm:col-span-2 sm:mt-0 text-gray-900 dark:text-white"><%= simple_format(@farm.address) %></dd>
+            </div>
+          <% end %>
+          
+          <% if @farm.description.present? %>
+            <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Description</dt>
+              <dd class="mt-1 text-sm sm:col-span-2 sm:mt-0 text-gray-900 dark:text-white"><%= simple_format(@farm.description) %></dd>
+            </div>
+          <% end %>
+          
+          <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">
+            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Created</dt>
+            <dd class="mt-1 text-sm sm:col-span-2 sm:mt-0 text-gray-900 dark:text-white"><%= @farm.created_at.strftime('%B %d, %Y') %></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+    
+    <!-- Farm Users Card -->
+    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+      <h3 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">Farm Users</h3>
+      <div class="overflow-y-auto max-h-64">
+        <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+          <% @farm.users.each do |user| %>
+            <li class="py-3">
+              <div class="flex items-center space-x-4">
+                <div class="flex-shrink-0">
+                  <% if user.avatar.attached? %>
+                    <%= image_tag user.avatar.variant(resize_to_limit: [40, 40]), class: "w-10 h-10 rounded-full" %>
+                  <% else %>
+                    <div class="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600">
+                      <span class="font-medium text-gray-600 dark:text-gray-300"><%= user.initials %></span>
+                    </div>
+                  <% end %>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                    <%= user.full_name %>
+                  </p>
+                  <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                    <%= user.email_address %>
+                  </p>
+                </div>
+                <% if @farm.farm_users.where(user: user).first&.is_default? %>
+                  <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">Default</span>
+                <% end %>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+      
+      <!-- Additional features for farm management could be added here -->
+    </div>
+  </div>
+</div>

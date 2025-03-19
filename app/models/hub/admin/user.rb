@@ -38,6 +38,10 @@ module Hub
       # Permission grants associations - for tracking who granted permissions
       has_many :granted_role_assignments, class_name: 'RoleAssignment', foreign_key: 'granted_by_id'
       has_many :granted_permission_assignments, class_name: 'PermissionAssignment', foreign_key: 'granted_by_id'
+      
+      # Farm associations
+      has_many :farm_users, class_name: 'Hub::Core::FarmUser', dependent: :destroy
+      has_many :farms, through: :farm_users, class_name: 'Hub::Core::Farm'
 
       normalizes :email_address, with: ->(e) { e.strip.downcase }
       normalizes :first_name, :last_name, :job_title, with: ->(value) { value.to_s.strip.presence }
@@ -118,6 +122,15 @@ module Hub
         
         # Verify password using has_secure_password's authenticate method
         user.authenticate(params[:password]) ? user : nil
+      end
+      
+      # Farm related methods
+      
+      # Add user to a farm
+      def add_to_farm(farm)
+        return nil unless farm
+        farm_users.find_or_create_by(farm: farm)
+        farm
       end
     end
   end

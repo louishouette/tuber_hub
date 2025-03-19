@@ -65,7 +65,11 @@ Rails.application.routes.draw do
     
     # Core namespace for main elements
     namespace :core do
-      resources :farms
+      resources :farms do
+        collection do
+          post 'set_current_farm'
+        end
+      end
       resources :seasons
       resources :productions
     end

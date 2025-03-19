@@ -16,6 +16,11 @@
         <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Tuber HUB</span>
       </a>
       
+      <!-- Farm Switcher -->
+      <% if Current.user && Current.user.farms.any? %>
+        <%= render 'shared/farm_switcher' %>
+      <% end %>
+      
     </div>
     
     <div class="flex items-center lg:order-2">

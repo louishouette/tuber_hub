@@ -1,0 +1,51 @@
+<%= form_with(model: farm, url: url, class: "space-y-4") do |form| %>
+  <% if farm.errors.any? %>
+    <div class="bg-red-50 text-red-600 p-4 rounded-lg mb-4">
+      <h2 class="text-lg font-bold mb-2"><%= pluralize(farm.errors.count, "error") %> prohibited this farm from being saved:</h2>
+      <ul class="list-disc pl-5">
+        <% farm.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :name, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+    <%= form.text_field :name, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" %>
+  </div>
+
+  <div>
+    <%= form.label :handle, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+    <%= form.text_field :handle, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" %>
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">The handle will be used as a unique identifier for the farm. It will be automatically converted to lowercase and spaces will be replaced with hyphens.</p>
+  </div>
+
+  <div>
+    <%= form.label :address, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+    <%= form.text_area :address, rows: 3, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" %>
+  </div>
+
+  <div>
+    <%= form.label :description, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+    <%= form.text_area :description, rows: 5, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" %>
+  </div>
+
+  <div>
+    <%= form.label :logo, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+    <%= form.file_field :logo, class: "block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" %>
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px).</p>
+  </div>
+
+  <% if farm.persisted? %>
+    <div class="flex items-center">
+      <%= form.check_box :active, class: "w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" %>
+      <%= form.label :active, class: "ml-2 text-sm font-medium text-gray-900 dark:text-gray-300" %>
+    </div>
+  <% end %>
+
+  <div class="flex items-center justify-end space-x-4 pt-4">
+    <%= link_to "Cancel", farm.persisted? ? hub_core_farm_path(farm) : hub_core_farms_path, class: "text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-primary-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600" %>
+    <%= form.submit class: "text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800" %>
+  </div>
+<% end %>

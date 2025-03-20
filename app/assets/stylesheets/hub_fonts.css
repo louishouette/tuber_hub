@@ -1,0 +1,15 @@
+/* Custom font settings for Hub namespace */
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+html.hub-layout, .hub-layout body {
+  font-family: 'Source Sans Pro', sans-serif !important;
+}
+
+.hub-layout h1, 
+.hub-layout h2, 
+.hub-layout h3, 
+.hub-layout h4, 
+.hub-layout h5, 
+.hub-layout h6 {
+  font-family: 'Source Sans Pro', sans-serif !important;
+}

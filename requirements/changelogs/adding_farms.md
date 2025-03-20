@@ -46,5 +46,8 @@ Farm management is a core feature of TuberHub. This functionality allows users t
 - Fixed layout issues in farm views by implementing a proper controller inheritance hierarchy
 
 ### Next Steps
+- presentation map :
+  - index : use a card list 
+  - show : use @docs/flowbite/card_with_tabs.html
 - Implement farm membership management
 - Develop UserPreference model for user customizations including default farm

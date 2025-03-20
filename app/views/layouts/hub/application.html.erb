@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="hub-layout">
   <head>
     <title><%= content_for(:title) || "Tuber HUB" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -20,7 +20,7 @@
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag :app, :hub_fonts, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
   </head>

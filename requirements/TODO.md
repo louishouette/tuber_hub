@@ -1,4 +1,5 @@
 # FIX
+- fix the application layout font to use "Nunito Sans"
 
 # FEAT: User preferences
 - create a UserPreference model referencing the Hub::Admin::User, key (string), and value (text) plus timestamps.

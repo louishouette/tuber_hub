@@ -13,7 +13,9 @@ module Hub
       def authorize_admin_access
         # Use the action name to determine which policy method to call
         # This will call index?, show?, etc. based on the current controller action
-        authorize :admin, policy_class: AdminPolicy
+        # Handle search actions the same as index actions for policy checks
+        action_method = action_name == 'search' ? 'index' : action_name
+        authorize :admin, "#{action_method}?".to_sym, policy_class: AdminPolicy
       rescue Pundit::NotAuthorizedError
         flash[:alert] = "You must be an administrator to access this area"
         redirect_to hub_path, status: :forbidden

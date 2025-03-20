@@ -21,7 +21,7 @@ module CurrentFarm
   def fetch_current_farm
     # Try to find the farm from session
     if session[:current_farm_id].present?
-      farm = Hub::Core::Farm.find_by(id: session[:current_farm_id])
+      farm = Hub::Admin::Farm.find_by(id: session[:current_farm_id])
       return farm if farm && farm.active? && Current.user&.farms&.include?(farm)
     end
 

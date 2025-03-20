@@ -61,6 +61,11 @@ class AdminPolicy < ApplicationPolicy
     user&.admin?
   end
   
+  # Method to authorize searching for resources
+  def search?
+    user&.admin?
+  end
+  
   # Method to authorize refreshing permissions
   def refresh?
     user&.admin?

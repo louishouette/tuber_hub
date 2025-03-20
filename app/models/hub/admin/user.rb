@@ -40,8 +40,8 @@ module Hub
       has_many :granted_permission_assignments, class_name: 'PermissionAssignment', foreign_key: 'granted_by_id'
       
       # Farm associations
-      has_many :farm_users, class_name: 'Hub::Core::FarmUser', dependent: :destroy
-      has_many :farms, through: :farm_users, class_name: 'Hub::Core::Farm'
+      has_many :farm_users, dependent: :destroy
+      has_many :farms, through: :farm_users
 
       normalizes :email_address, with: ->(e) { e.strip.downcase }
       normalizes :first_name, :last_name, :job_title, with: ->(value) { value.to_s.strip.presence }

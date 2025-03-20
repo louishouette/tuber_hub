@@ -11,7 +11,7 @@
         <div
           class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none"
         >
-          <%= icon "search", library: "lucide", variant: "outline", class: "w-5 h-5 text-gray-500 dark:text-gray-400" %>
+          <%= icon "magnifying-glass", variant: "outline", class: "w-5 h-5 text-gray-500 dark:text-gray-400" %>
         </div>
         <input
           type="text"
@@ -29,7 +29,7 @@
           href="#"
           class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
         >
-          <%= icon "layout-dashboard", library: "lucide", variant: "outline", class: "w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
+          <%= icon "squares-2x2", variant: "outline", class: "w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
           <span class="ml-3">Overview</span>
         </a>
       </li>
@@ -40,11 +40,11 @@
           aria-controls="dropdown-pages"
           data-collapse-toggle="dropdown-pages"
         >
-          <%= icon "file-text", library: "lucide", variant: "outline", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" %>
+          <%= icon "document-text", variant: "outline", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" %>
           <span class="flex-1 ml-3 text-left whitespace-nowrap"
             >Pages</span
           >
-          <%= icon "chevron-down", library: "lucide", variant: "outline", class: "w-6 h-6" %>
+          <%= icon "chevron-down", variant: "outline", class: "w-6 h-6" %>
         </button>
         <ul id="dropdown-pages" class="hidden py-2 space-y-2">
           <li>
@@ -77,11 +77,11 @@
           aria-controls="dropdown-sales"
           data-collapse-toggle="dropdown-sales"
         >
-          <%= icon "banknote", library: "lucide", variant: "outline", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" %>
+          <%= icon "banknotes", variant: "outline", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" %>
           <span class="flex-1 ml-3 text-left whitespace-nowrap"
             >Sales</span
           >
-          <%= icon "chevron-down", library: "lucide", variant: "outline", class: "w-6 h-6" %>
+          <%= icon "chevron-down", variant: "outline", class: "w-6 h-6" %>
         </button>
         <ul id="dropdown-sales" class="hidden py-2 space-y-2">
           <li>
@@ -112,7 +112,7 @@
           href="#"
           class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
         >
-          <%= icon "message-square", library: "lucide", variant: "outline", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
+          <%= icon "chat-bubble-left", variant: "outline", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
           <span class="flex-1 ml-3 whitespace-nowrap">Messages</span>
           <span
             class="inline-flex justify-center items-center w-5 h-5 text-xs font-semibold rounded-full text-primary-800 bg-primary-100 dark:bg-primary-200 dark:text-primary-800"
@@ -128,11 +128,11 @@
           aria-controls="dropdown-authentication"
           data-collapse-toggle="dropdown-authentication"
         >
-          <%= icon "key", library: "lucide", variant: "outline", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" %>
+          <%= icon "key", variant: "outline", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" %>
           <span class="flex-1 ml-3 text-left whitespace-nowrap"
             >Authentication</span
           >
-          <%= icon "chevron-down", library: "lucide", variant: "outline", class: "w-6 h-6" %>
+          <%= icon "chevron-down", variant: "outline", class: "w-6 h-6" %>
         </button>
         <ul id="dropdown-authentication" class="hidden py-2 space-y-2">
           <li>
@@ -170,9 +170,9 @@
           aria-controls="dropdown-admin"
           data-collapse-toggle="dropdown-admin"
         >
-          <%= icon "shield", library: "lucide", variant: "outline", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" %>
+          <%= icon "shield-check", variant: "outline", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" %>
           <span class="flex-1 ml-3 text-left whitespace-nowrap">Admin</span>
-          <%= icon "chevron-down", library: "lucide", variant: "outline", class: "w-6 h-6" %>
+          <%= icon "chevron-down", variant: "outline", class: "w-6 h-6" %>
         </button>
         <ul id="dropdown-admin" class="hidden py-2 space-y-2">
           <li>
@@ -190,6 +190,12 @@
               <span>Permissions</span>
             <% end %>
           </li>
+          <li>
+            <%= link_to hub_admin_farms_path, class: "flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" do %>
+              <%= icon "building-office", class: "w-5 h-5 mr-2 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" %>
+              <span>Farms</span>
+            <% end %>
+          </li>
         </ul>
       </li>
       <% end %>
@@ -198,7 +204,7 @@
           href="#"
           class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
         >
-          <%= icon "file-text", library: "lucide", variant: "outline", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
+          <%= icon "document-text", variant: "outline", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
           <span class="ml-3">Docs</span>
         </a>
       </li>
@@ -207,7 +213,7 @@
           href="#"
           class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
         >
-          <%= icon "component", library: "lucide", variant: "outline", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
+          <%= icon "puzzle-piece", variant: "outline", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
           <span class="ml-3">Components</span>
         </a>
       </li>
@@ -216,7 +222,7 @@
           href="#"
           class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
         >
-          <%= icon "circle-help", library: "lucide", variant: "outline", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
+          <%= icon "question-mark-circle", variant: "outline", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
           <span class="ml-3">Help</span>
         </a>
       </li>
@@ -229,14 +235,14 @@
       href="#"
       class="inline-flex justify-center p-2 text-gray-500 rounded cursor-pointer dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600"
     >
-      <%= icon "user", library: "lucide", variant: "outline", class: "w-6 h-6" %>
+      <%= icon "user", variant: "outline", class: "w-6 h-6" %>
     </a>
     <a
       href="#"
       data-tooltip-target="tooltip-settings"
       class="inline-flex justify-center p-2 text-gray-500 rounded cursor-pointer dark:text-gray-400 dark:hover:text-white hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-600"
     >
-      <%= icon "settings", library: "lucide", variant: "outline", class: "w-6 h-6" %>
+      <%= icon "cog", variant: "outline", class: "w-6 h-6" %>
     </a>
     <div
       id="tooltip-settings"

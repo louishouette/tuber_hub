@@ -1,18 +1,12 @@
-# FIX
-- fix the application layout font to use "Nunito Sans"
+# FIX: 
+- redirect /hub/admin to /hub/admin/dashboard and build a quick dashboard for the admin dashboard
 
 # FEAT: User preferences
 - create a UserPreference model referencing the Hub::Admin::User, key (string), and value (text) plus timestamps.
 - In UserPreference, add belongs_to :user (Hub::Admin::User) and validate presence of key; implement an update_value method with info and debug logging.
 - In the User model, add has_many :user_preferences, dependent: :destroy and a helper method to retrieve preferences with defaults.
 - In the controllers, manage user preferences via strong parameters and add database indexing on the user id and key for performance.
-
-# FEAT: CRUD for farms
-- Implement farm membership management
-- Develop UserPreference model for user customizations including default farm
-
-# PROMPT: maintain a changelog
-- apply the requested changes maintaining a changelog in the adequate file in @requirements/changelogs using @requirements/changelogs/generic.md as a template. Refer to the app documentation in @docs/tuber_hub for contextual functionnalities (like authorization for example)
+- Leverage UserPreference model for user customizations including default farm
 
 # FEAT: permissions
 - add the ability to assign a role to a user
@@ -20,8 +14,10 @@
 # FEAT: user activity logging
 - log user activity
 
-# FEAT: setup kamal
-- security find-internet-password -a 'lmmh' -l 'Docker Credentials' -w for retrieving docker credentials
+# FEAT: prepare for production
+- Setup Kamal : security find-internet-password -a 'lmmh' -l 'Docker Credentials' -w for retrieving docker credentials
+- Configure Active Storage : config/storage.yml 
+- Configure Action Mailer 
 
 # FEAT: displaying different layouts
 - the following pages will be accessible only after loging in :
@@ -35,12 +31,19 @@
 # IDEAS:
 - https://github.com/pay-rails/pay
 
+# PROMPT: maintain a changelog
+- apply the requested changes maintaining a changelog in the adequate file in @requirements/changelogs using @requirements/changelogs/generic.md as a template. Refer to the app documentation in @docs/tuber_hub for contextual functionnalities (like authorization for example)
+
 ## Namespaces
 Tuber HUB is the internal ERP tool to manage ressources and operations and to create reports.
 For now it is quite empty, but we need to add the following namespaces, which will all reside under the hub namespace.
 
-- core : the namespace to manage the main elements
-  - farm : MVC
+- admin : the namespace to manage the admin elements
+  - users : MVC
+  - farms : MVC
+  - roles : MVC
+  - permissions : MVC
+- core : the namespace to manage the main elements  
   - season : MVC
   - production : MVC
 - cultivation : the namespace to manage the cultivation elements

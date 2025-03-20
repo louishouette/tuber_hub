@@ -44,9 +44,3 @@
 12. Do not precompile the assets in dev
 13. The dev server (bin/dev) is always running, don't offer to start new ones
 14. You can reset the cache with `rails runner 'Rails.cache.clear' && rm -rf tmp/cache` but do not do it unless absolutely necessary
-
-## FLOWBITE UI STYLING RULES
-1. Use flowbite for designing the apps components : see the docs for flowbite in docs/flowbite
-2. Responsive Design:
-  a. Always use mobile-first approach (smaller screen styles as default)
-  b. Add responsive variants (sm:, md:, lg:) only when needed to adapt for larger screens

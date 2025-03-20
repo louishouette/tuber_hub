@@ -1,5 +1,4 @@
 import { Controller } from "@hotwired/stimulus"
-import { EventEmitter } from "../utilities/event_emitter"
 
 // Farm switcher controller - Business logic
 export default class extends Controller {
@@ -9,13 +8,43 @@ export default class extends Controller {
     makeDefault: Boolean
   }
 
+  // Event handlers registry
+  #listeners = {}
+
   connect() {
-    this.emitter = new EventEmitter()
-    this.emitter.on("farmSelected", this.handleFarmSelected.bind(this))
+    // Initialize event handling
+    this.#on("farmSelected", this.handleFarmSelected.bind(this))
   }
 
   disconnect() {
-    this.emitter.off("farmSelected")
+    // Clean up event listeners
+    this.#off("farmSelected")
+  }
+  
+  // Simple event emitter implementation
+  #on(event, callback) {
+    if (!this.#listeners[event]) {
+      this.#listeners[event] = []
+    }
+    this.#listeners[event].push(callback)
+  }
+  
+  #off(event, callback) {
+    if (!this.#listeners[event]) return
+    
+    if (callback) {
+      this.#listeners[event] = this.#listeners[event].filter(cb => cb !== callback)
+    } else {
+      delete this.#listeners[event]
+    }
+  }
+  
+  #emit(event, data) {
+    if (!this.#listeners[event]) return
+    
+    this.#listeners[event].forEach(callback => {
+      callback(data)
+    })
   }
 
   // Handle farm selection and prepare data for submission
@@ -41,6 +70,6 @@ export default class extends Controller {
     this.makeDefaultValue = isChecked
     
     // Emit event for the view controller
-    this.emitter.emit("makeDefaultToggled", { isChecked })
+    this.#emit("makeDefaultToggled", { isChecked })
   }
 }

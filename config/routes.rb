@@ -61,6 +61,19 @@ Rails.application.routes.draw do
       # Permission management
       resources :permissions, only: [:index, :show] 
       post 'permissions/refresh', to: 'permissions#refresh', as: 'refresh_admin_permissions'
+      
+      # Farm management
+      resources :farms do
+        collection do
+          post 'set_current_farm'
+        end
+        resources :users, only: [:create, :destroy], controller: 'farm_users' do
+          collection do
+            get 'search'
+            post 'add_selected'
+          end
+        end
+      end
     end
     
     # Core namespace for main elements
@@ -69,6 +82,7 @@ Rails.application.routes.draw do
         collection do
           post 'set_current_farm'
         end
+        resources :users, only: [:create, :destroy], controller: 'farm_users'
       end
       resources :seasons
       resources :productions

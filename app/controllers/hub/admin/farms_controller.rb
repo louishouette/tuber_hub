@@ -1,6 +1,7 @@
 module Hub
-  module Core
+  module Admin
     class FarmsController < BaseController
+      skip_before_action :authorize_admin_access, only: [:set_current_farm]
       before_action :set_farm, only: [:show, :edit, :update, :destroy]
       
       def index
@@ -27,7 +28,7 @@ module Hub
           session[:current_farm_id] = @farm.id
           
           # Redirect with success message
-          redirect_to hub_core_farm_path(@farm), notice: 'Farm was successfully created.'
+          redirect_to hub_admin_farm_path(@farm), notice: 'Farm was successfully created.'
         else
           render :new, status: :unprocessable_entity
         end
@@ -38,7 +39,7 @@ module Hub
 
       def update
         if @farm.update(farm_params)
-          redirect_to hub_core_farm_path(@farm), notice: 'Farm was successfully updated.'
+          redirect_to hub_admin_farm_path(@farm), notice: 'Farm was successfully updated.'
         else
           render :edit, status: :unprocessable_entity
         end
@@ -46,7 +47,7 @@ module Hub
 
       def destroy
         @farm.destroy
-        redirect_to hub_core_farms_path, notice: 'Farm was successfully deleted.'
+        redirect_to hub_admin_farms_path, notice: 'Farm was successfully deleted.'
       end
       
       # Sets the current farm for the user session

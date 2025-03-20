@@ -18,8 +18,10 @@
 #  index_hub_core_farms_on_name    (name)
 #
 module Hub
-  module Core
+  module Admin
     class Farm < ApplicationRecord
+      self.table_name = 'hub_admin_farms'
+      
       # Associations
       has_many :farm_users, dependent: :destroy
       has_many :users, through: :farm_users, class_name: 'Hub::Admin::User'

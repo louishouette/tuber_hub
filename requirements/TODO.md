@@ -2,9 +2,9 @@
 
 # FEAT: User preferences
 - create a UserPreference model referencing the Hub::Admin::User, key (string), and value (text) plus timestamps.
-- In UserPreference, add belongs_to :user and validate presence of key; implement an update_value method with info and debug logging.
+- In UserPreference, add belongs_to :user (Hub::Admin::User) and validate presence of key; implement an update_value method with info and debug logging.
 - In the User model, add has_many :user_preferences, dependent: :destroy and a helper method to retrieve preferences with defaults.
-- Secure & Optimize: In the controllers, manage user preferences via strong parameters and add database indexing on user_id and key for performance.
+- In the controllers, manage user preferences via strong parameters and add database indexing on the user id and key for performance.
 
 # FEAT: CRUD for farms
 - Implement farm membership management

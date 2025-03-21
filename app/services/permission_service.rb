@@ -57,15 +57,28 @@ class PermissionService
   
   # Checks if a user has a specific permission based on their roles
   # Fast-paths for admin users and unauthenticated access
-  # @param user [User] the user to check permissions for
+  # This is the central method for all permission checks in the application.
+  # @param user [Hub::Admin::User, nil] the user to check permissions for
   # @param namespace [String] controller namespace
   # @param controller [String] controller name
   # @param action [String] action name
+  # @param use_preloaded [Boolean] whether to use preloaded permissions if available
   # @return [Boolean] whether the user has permission
-  def self.user_has_permission?(user, namespace, controller, action)
+  def self.user_has_permission?(user, namespace, controller, action, use_preloaded: false)
     # Fast path for admin users and nil users
     return true if user&.admin? # Admin users can do everything
     return false unless user    # No user, no permissions
+    
+    # Format parameters consistently
+    namespace = namespace.to_s
+    controller = controller.to_s
+    action = action.to_s
+    
+    # Try to use preloaded permissions if requested and available
+    if use_preloaded && user.instance_variable_defined?(:@preloaded_permissions)
+      permission_key = "#{namespace}:#{controller}:#{action}"
+      return user.instance_variable_get(:@preloaded_permissions).include?(permission_key)
+    end
     
     # Generate a unique cache key for this permission check
     cache_key = "user_#{user.id}_permission_#{namespace}:#{controller}:#{action}"
@@ -76,17 +89,58 @@ class PermissionService
       return false if role_ids.empty?
       
       # Query whether any of the user's roles have this permission
-      # and ensure the permission hasn't expired
-      permission_exists = Hub::Admin::Permission
+      # Account for both unlimited and non-expired permissions
+      Hub::Admin::Permission
         .joins(:permission_assignments)
-        .where(namespace: namespace, controller: controller, action: action, status: 'active')
+        .where(status: 'active')
+        .where(namespace: namespace, controller: controller, action: action)
         .where(hub_admin_permission_assignments: { role_id: role_ids })
-        .where(hub_admin_permission_assignments: { expires_at: [nil, Time.zone.now..] })
+        .where(
+          'hub_admin_permission_assignments.expires_at IS NULL OR ' 
+          'hub_admin_permission_assignments.expires_at > ?', 
+          Time.zone.now
+        )
         .exists?
-        
-      # Return boolean result for caching
-      permission_exists
     end
+  end
+  
+  # Preloads all permissions for a user to avoid N+1 queries
+  # @param user [Hub::Admin::User] the user to preload permissions for
+  # @param namespaces [Array<String>] optional array of namespaces to limit preloading
+  # @return [Array<String>] array of permission strings in format "namespace:controller:action"
+  def self.preload_user_permissions(user, namespaces: nil)
+    return [] unless user && !user.admin?
+    
+    # Get user's role IDs
+    role_ids = user.roles.pluck(:id)
+    return [] if role_ids.empty?
+    
+    # Build the query for the user's permissions, optimized with proper indices
+    permissions_query = Hub::Admin::Permission
+      .select(:namespace, :controller, :action)
+      .distinct
+      .joins(:permission_assignments)
+      .where(status: 'active')
+      .where(hub_admin_permission_assignments: { role_id: role_ids })
+      .where(
+        'hub_admin_permission_assignments.expires_at IS NULL OR ' 
+        'hub_admin_permission_assignments.expires_at > ?', 
+        Time.zone.now
+      )
+    
+    # Add namespace filter if specified
+    permissions_query = permissions_query.where(namespace: namespaces) if namespaces.present?
+    
+    # Execute query and format results as permission strings
+    permission_strings = permissions_query.map do |p|
+      "#{p.namespace}:#{p.controller}:#{p.action}"
+    end
+    
+    # Store on user instance for later use
+    user.instance_variable_set(:@preloaded_permissions, permission_strings)
+    
+    # Return the permission strings
+    permission_strings
   end
   
   #===========================================================================
@@ -99,9 +153,8 @@ class PermissionService
     # Run the permissions discovery
     permission_count = discover_permissions
     
-    # Clear all permission-related caches
-    Rails.cache.delete('grouped_permissions')
-    Rails.cache.delete_matched("user_*_permission_*")
+    # Clear all permission-related caches systematically
+    clear_all_permission_caches
     
     # Log successful refresh
     Rails.logger.info("Permission refresh completed: #{permission_count} active permissions")
@@ -110,6 +163,39 @@ class PermissionService
     # Log failure with detailed error information
     Rails.logger.error("Permission refresh failed: #{e.message}\n#{e.backtrace.join('\n')}")
     false
+  end
+  
+  # Clears all permission-related caches
+  # @return [void]
+  def self.clear_all_permission_caches
+    # Clear the general permissions cache
+    Rails.cache.delete('grouped_permissions')
+    
+    # Clear all user permission caches
+    Rails.cache.delete_matched("user_*_permission_*")
+  end
+  
+  # Clears permission caches for a specific user
+  # @param user [Hub::Admin::User] the user whose caches to clear
+  # @return [void]
+  def self.clear_user_permission_caches(user)
+    return unless user&.id
+    
+    # Clear all permissions for this specific user
+    Rails.cache.delete_matched("user_#{user.id}_permission_*")
+  end
+  
+  # Clears permission caches for a specific permission
+  # @param namespace [String] namespace of the permission
+  # @param controller [String] controller of the permission
+  # @param action [String] action of the permission
+  # @return [void]
+  def self.clear_permission_caches(namespace, controller, action)
+    # Create a pattern to match any user's cache for this permission
+    cache_pattern = "user_*_permission_#{namespace}:#{controller}:#{action}"
+    
+    # Delete all matching caches
+    Rails.cache.delete_matched(cache_pattern)
   end
 
   # Discovers all controller actions and creates permissions records

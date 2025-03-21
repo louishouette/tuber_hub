@@ -134,7 +134,13 @@ For performance reasons, permission checks are cached:
 - Permission groups are cached for 15 minutes
 - Available namespaces are cached for 1 hour
 
-The cache is automatically invalidated when permissions are refreshed.
+The cache is managed through specialized methods in the `PermissionService`:
+
+- `clear_all_permission_caches`: Invalidates all permission-related caches
+- `clear_user_permission_caches(user)`: Clears cache for a specific user
+- `clear_permission_caches(namespace, controller, action)`: Clears cache for a specific permission
+
+These methods are called automatically when permissions are updated, roles are changed, or user-role assignments are modified.
 
 ## Best Practices
 
@@ -173,6 +179,18 @@ Rails.cache.fetch("user_#{user.id}_permission_#{namespace}:#{controller}:#{actio
   # Permission check logic
 end
 ```
+
+To avoid N+1 queries when checking multiple permissions for a user, the system supports permission preloading:
+
+```ruby
+# Preload all permissions for a user
+PermissionService.preload_user_permissions(user)
+
+# Check permissions using preloaded data (faster)
+PermissionService.user_has_permission?(user, namespace, controller, action, use_preloaded: true)
+```
+
+This approach significantly reduces database queries in pages that perform multiple permission checks.
 
 ## Troubleshooting
 

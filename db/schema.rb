@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_21_090853) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_21_105725) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -79,6 +79,21 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_21_090853) do
     t.index ["revoked_by_id"], name: "index_hub_admin_permission_assignments_on_revoked_by_id"
     t.index ["role_id", "permission_id"], name: "idx_permission_assignments_lookup"
     t.index ["role_id"], name: "index_hub_admin_permission_assignments_on_role_id"
+  end
+
+  create_table "hub_admin_permission_audits", force: :cascade do |t|
+    t.string "namespace", null: false
+    t.string "controller", null: false
+    t.string "action", null: false
+    t.string "change_type", null: false
+    t.jsonb "previous_state"
+    t.bigint "permission_id"
+    t.bigint "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["namespace", "controller", "action"], name: "idx_on_namespace_controller_action_a3a4846087"
+    t.index ["permission_id"], name: "index_hub_admin_permission_audits_on_permission_id"
+    t.index ["user_id"], name: "index_hub_admin_permission_audits_on_user_id"
   end
 
   create_table "hub_admin_permissions", force: :cascade do |t|
@@ -152,6 +167,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_21_090853) do
   add_foreign_key "hub_admin_permission_assignments", "hub_admin_roles", column: "role_id"
   add_foreign_key "hub_admin_permission_assignments", "hub_admin_users", column: "granted_by_id"
   add_foreign_key "hub_admin_permission_assignments", "hub_admin_users", column: "revoked_by_id"
+  add_foreign_key "hub_admin_permission_audits", "hub_admin_permissions", column: "permission_id"
+  add_foreign_key "hub_admin_permission_audits", "hub_admin_users", column: "user_id"
   add_foreign_key "hub_admin_role_assignments", "hub_admin_farms", column: "farm_id"
   add_foreign_key "hub_admin_role_assignments", "hub_admin_roles", column: "role_id"
   add_foreign_key "hub_admin_role_assignments", "hub_admin_users", column: "granted_by_id"

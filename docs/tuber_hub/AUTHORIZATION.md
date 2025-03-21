@@ -302,6 +302,59 @@ PermissionService.user_has_permission?(user, namespace, controller, action, farm
 
 This approach significantly reduces database queries in pages that perform multiple permission checks.
 
+## Permission Auditing
+
+The system includes a comprehensive audit trail for tracking changes to permissions:
+
+### Audit Records
+
+All permission changes are automatically logged in the `hub_admin_permission_audits` table, tracking:
+
+- What permission changed (namespace/controller/action)
+- What type of change occurred (created, updated, archived, restored, deleted)
+- Who made the change (user or system)
+- When the change occurred
+- Previous state (for updates)
+
+### Audit Types
+
+The system tracks these types of changes:
+
+- **created**: When a new permission is discovered
+- **updated**: When an existing permission is modified
+- **archived**: When a permission is marked as no longer in use
+- **restored**: When an archived permission is made active again
+- **deleted**: When a permission is permanently removed
+
+### Querying Audit History
+
+To retrieve permission history:
+
+```ruby
+# Get history for a specific permission
+AuthorizationService.permission_history(permission)
+
+# Get history for a namespace
+AuthorizationService.namespace_history('hub/admin')
+
+# Get history for a controller
+AuthorizationService.controller_history('hub/admin', 'users')
+
+# Get recent changes across the system
+AuthorizationService.recent_changes(limit: 100)
+
+# Get change statistics
+AuthorizationService.change_statistics(days: 30)
+```
+
+### Automatic Auditing
+
+Audit records are automatically created during these operations:
+
+- Permission discovery (recording new or updated permissions)
+- Permission archival (when permissions are no longer found in the codebase)
+- Manual permission changes through the admin interface
+
 ## Troubleshooting
 
 ### Common Issues

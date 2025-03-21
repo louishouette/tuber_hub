@@ -65,8 +65,31 @@ module Authorization
         end
       end
       
-      # Update database with discovered permissions
+      # Update database with discovered permissions and audit the changes
       store_permissions(controller_permissions)
+    end
+    
+    # Creates an audit trail entry for a permission change
+    # @param permission [Hub::Admin::Permission] the permission being changed
+    # @param change_type [String] the type of change (created, updated, archived, etc.)
+    # @param user [Hub::Admin::User, nil] the user making the change (nil for system changes)
+    # @param previous_state [Hash, nil] the previous state of the permission if applicable
+    # @return [Hub::Admin::PermissionAudit] the created audit record
+    def self.audit_permission_change(permission, change_type, user: nil, previous_state: nil)
+      Hub::Admin::PermissionAudit.record_change(
+        permission,
+        change_type,
+        user: user,
+        previous_state: previous_state
+      )
+    end
+    
+    # Creates audit trail entries for bulk permission changes
+    # @param permissions [Array<Hub::Admin::Permission>] the permissions being changed
+    # @param change_type [String] the type of change (created, updated, archived, etc.)
+    # @return [Integer] the number of audit records created
+    def self.audit_bulk_permission_changes(permissions, change_type)
+      Hub::Admin::PermissionAudit.record_bulk_change(permissions, change_type)
     end
     
     # Archives permissions that no longer exist in the application
@@ -84,10 +107,23 @@ module Authorization
         !discovered_keys.include?(permission_key)
       end
       
-      # Archive the unused permissions
+      # Archive the unused permissions and record audits
       permissions_to_archive.each do |p|
+        # Store previous state for audit
+        previous_state = {
+          status: p.status,
+          archived_at: p.archived_at
+        }
+        
+        # Update permission status
         p.update(status: 'archived', archived_at: Time.zone.now)
+        
+        # Create audit record
+        audit_permission_change(p, 'archived', previous_state: previous_state)
       end
+      
+      # Create bulk audit entry if multiple permissions were archived
+      audit_bulk_permission_changes(permissions_to_archive, 'archived') if permissions_to_archive.size > 5
       
       # Return the count of archived permissions
       permissions_to_archive.size
@@ -187,6 +223,10 @@ module Authorization
     # @param controller_permissions [Array<Hash>] array of permission hashes
     # @return [Integer] the number of active permissions
     def self.store_permissions(controller_permissions)
+      # Track newly created permissions for bulk audit
+      newly_created_permissions = []
+      updated_permissions = []
+      
       controller_permissions.each do |permission_data|
         permission = Hub::Admin::Permission.find_or_initialize_by(
           namespace: permission_data[:namespace],
@@ -194,17 +234,44 @@ module Authorization
           action: permission_data[:action]
         )
         
+        # Check if this is a new permission or needs updating
+        is_new = !permission.persisted?
+        needs_update = permission.persisted? && (permission.status != 'active' || permission.discovered_at.nil?)
+        
+        # Save the previous state for audit purposes if updating
+        previous_state = needs_update ? {
+          status: permission.status,
+          description: permission.description,
+          discovered_at: permission.discovered_at
+        } : nil
+        
         # Update or create the permission
-        unless permission.persisted? && permission.status == 'active'
+        if is_new || needs_update
           description = generate_permission_description(permission_data) 
           
+          # Update the permission
           permission.update(
             description: description,
             status: 'active',
             discovered_at: Time.zone.now
           )
+          
+          # Add to appropriate tracking list for audit
+          if is_new
+            newly_created_permissions << permission
+            # Individual audit for new permissions
+            audit_permission_change(permission, 'created')
+          elsif needs_update
+            updated_permissions << permission
+            # Individual audit for status changes (e.g., from archived to active)
+            audit_permission_change(permission, 'updated', previous_state: previous_state)
+          end
         end
       end
+      
+      # Create bulk audit entries if many permissions were affected
+      audit_bulk_permission_changes(newly_created_permissions, 'created') if newly_created_permissions.size > 5
+      audit_bulk_permission_changes(updated_permissions, 'updated') if updated_permissions.size > 5
       
       # Archive permissions that no longer exist
       archive_unused_permissions(controller_permissions)

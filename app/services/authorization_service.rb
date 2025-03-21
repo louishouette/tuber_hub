@@ -36,9 +36,50 @@ class AuthorizationService
     Authorization::ManagementService.refresh_permissions
   end
   
-  # Archives permissions that no longer exist in the application
+  # Discovers permissions from controllers and creates/updates them in the database
   def self.discover_permissions
     Authorization::ManagementService.discover_permissions
+  end
+  
+  # Archives permissions that no longer exist in the application
+  def self.archive_unused_permissions(discovered_permissions)
+    Authorization::ManagementService.archive_unused_permissions(discovered_permissions)
+  end
+  
+  # Creates an audit record for a permission change
+  def self.audit_permission_change(permission, change_type, user: nil, previous_state: nil)
+    Authorization::ManagementService.audit_permission_change(
+      permission, change_type, user: user, previous_state: previous_state
+    )
+  end
+  
+  #===========================================================================
+  # Audit Methods - Delegated to AuditService
+  #===========================================================================
+  
+  # Gets audit history for a specific permission
+  def self.permission_history(permission, limit = 50)
+    Authorization::AuditService.permission_history(permission, limit)
+  end
+  
+  # Gets audit history for a namespace
+  def self.namespace_history(namespace, limit = 50)
+    Authorization::AuditService.namespace_history(namespace, limit)
+  end
+  
+  # Gets audit history for a controller
+  def self.controller_history(namespace, controller, limit = 50)
+    Authorization::AuditService.controller_history(namespace, controller, limit)
+  end
+  
+  # Gets recent permission changes across the system
+  def self.recent_changes(limit = 100, change_types = nil)
+    Authorization::AuditService.recent_changes(limit, change_types)
+  end
+  
+  # Gets statistics about permission changes
+  def self.change_statistics(days = 30)
+    Authorization::AuditService.change_statistics(days)
   end
   
   #===========================================================================

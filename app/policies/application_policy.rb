@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ApplicationPolicy
-  include PermissionIntegration
+  include PermissionPolicyConcern
   
   attr_reader :user, :record
 

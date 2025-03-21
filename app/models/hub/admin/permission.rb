@@ -58,9 +58,9 @@ module Hub
       def self.available_namespaces
         # Use Solid Cache to improve performance
         Rails.cache.fetch('hub_admin_permission:available_namespaces', expires_in: 1.hour) do
-          # Get namespaces from the PermissionService (dynamically discovered)
-          app_namespaces = if defined?(PermissionService)
-                            PermissionService.main_namespaces
+          # Get namespaces from the AuthorizationService (dynamically discovered)
+          app_namespaces = if defined?(AuthorizationService)
+                            AuthorizationService.main_namespaces
                           else
                             []
                           end

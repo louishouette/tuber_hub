@@ -56,7 +56,7 @@ class NamespacePolicy < ApplicationPolicy
         controller = extract_controller_from_scope
         
         # Pass the farm parameter to check farm-specific permissions when appropriate
-        if namespace && controller && PermissionService.user_has_permission?(user, namespace, controller, 'index', farm: farm)
+        if namespace && controller && AuthorizationService.user_has_permission?(user, namespace, controller, 'index', farm: farm)
           scope.all
         else
           scope.none

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class RolePolicy < ApplicationPolicy
-  include PermissionIntegration
+  include PermissionPolicyConcern
   
   def index?
     user.admin? || permission_check

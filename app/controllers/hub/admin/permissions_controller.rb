@@ -15,12 +15,12 @@ module Hub
         # Filter by type (CRUD vs custom actions vs Pundit-compatible)
         case @filter_type
         when 'crud'
-          permissions_scope = permissions_scope.where(action: PermissionService.crud_actions)
+          permissions_scope = permissions_scope.where(action: AuthorizationService.crud_actions)
         when 'custom'
-          permissions_scope = permissions_scope.where.not(action: PermissionService.crud_actions)
+          permissions_scope = permissions_scope.where.not(action: AuthorizationService.crud_actions)
         when 'pundit'
           # Fetch all Pundit-compatible actions - both standard CRUD and custom ones
-          pundit_actions = PermissionService.pundit_controllable_actions(include_all: true)
+          pundit_actions = AuthorizationService.pundit_controllable_actions(include_all: true)
           permissions_scope = permissions_scope.where(action: pundit_actions)
         end
         
@@ -37,11 +37,11 @@ module Hub
         if @filter_namespace == 'public'
           # If we're specifically viewing public namespace permissions, show all of them
           # but still filter out any other unauthenticated controllers
-          unauthenticated_controllers = PermissionService.find_unauthenticated_controllers.reject { |c| c.starts_with?('public/') }
+          unauthenticated_controllers = AuthorizationService.find_unauthenticated_controllers.reject { |c| c.starts_with?('public/') }
           permissions_scope = permissions_scope.where.not(controller: unauthenticated_controllers) if unauthenticated_controllers.any?
         else
           # For other namespaces, filter out all unauthenticated controllers
-          unauthenticated_controllers = PermissionService.find_unauthenticated_controllers
+          unauthenticated_controllers = AuthorizationService.find_unauthenticated_controllers
           permissions_scope = permissions_scope.where.not(controller: unauthenticated_controllers) if unauthenticated_controllers.any?
         end
         
@@ -77,7 +77,7 @@ module Hub
         
         # Handle different formats based on the request
         respond_to do |format|
-          if PermissionService.refresh_permissions
+          if AuthorizationService.refresh_permissions
             # Get the count of active permissions for notification
             permission_count = Hub::Admin::Permission.count
             
@@ -101,12 +101,12 @@ module Hub
               # Filter by type (CRUD vs custom actions vs Pundit-compatible)
               case @filter_type
               when 'crud'
-                permissions_scope = permissions_scope.where(action: PermissionService.crud_actions)
+                permissions_scope = permissions_scope.where(action: AuthorizationService.crud_actions)
               when 'custom'
-                permissions_scope = permissions_scope.where.not(action: PermissionService.crud_actions)
+                permissions_scope = permissions_scope.where.not(action: AuthorizationService.crud_actions)
               when 'pundit'
                 # Fetch all Pundit-compatible actions - both standard CRUD and custom ones
-                pundit_actions = PermissionService.pundit_controllable_actions(include_all: true)
+                pundit_actions = AuthorizationService.pundit_controllable_actions(include_all: true)
                 permissions_scope = permissions_scope.where(action: pundit_actions)
               end
               
@@ -120,11 +120,11 @@ module Hub
               if @filter_namespace == 'public'
                 # If we're specifically viewing public namespace permissions, show all of them
                 # but still filter out any other unauthenticated controllers
-                unauthenticated_controllers = PermissionService.find_unauthenticated_controllers.reject { |c| c.starts_with?('public/') }
+                unauthenticated_controllers = AuthorizationService.find_unauthenticated_controllers.reject { |c| c.starts_with?('public/') }
                 permissions_scope = permissions_scope.where.not(controller: unauthenticated_controllers) if unauthenticated_controllers.any?
               else
                 # For other namespaces, filter out all unauthenticated controllers
-                unauthenticated_controllers = PermissionService.find_unauthenticated_controllers
+                unauthenticated_controllers = AuthorizationService.find_unauthenticated_controllers
                 permissions_scope = permissions_scope.where.not(controller: unauthenticated_controllers) if unauthenticated_controllers.any?
               end
               
@@ -152,6 +152,6 @@ module Hub
     
     private
     
-    # Private methods have been moved to PermissionService
+    # Private methods have been moved to AuthorizationService (specifically to Authorization::ManagementService)
   end
 end

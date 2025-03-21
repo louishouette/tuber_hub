@@ -1,10 +1,17 @@
 # frozen_string_literal: true
 
-# This module provides a bridge between the application's database-driven permission system
-# and Pundit's policy-based authorization. It allows Pundit policies to leverage the existing
-# roles and permissions model.
+# DEPRECATED: This module is being phased out in favor of PermissionPolicyConcern.
+# This module now acts as a proxy to maintain backward compatibility.
+# New policies should include PermissionPolicyConcern instead.
 module PermissionIntegration
   extend ActiveSupport::Concern
+  
+  included do
+    ActiveSupport::Deprecation.warn(
+      "PermissionIntegration is deprecated and will be removed in a future version. " +
+      "Use PermissionPolicyConcern instead."
+    )
+  end
   
   # Check if the current user has permission for the given action
   # This automatically maps the calling method (e.g., update?) to a database permission
@@ -20,8 +27,8 @@ module PermissionIntegration
     controller ||= extract_controller_from_record
     farm ||= extract_farm_from_record
     
-    # Delegate to the centralized permission service
-    PermissionService.user_has_permission?(user, namespace, controller, action, farm: farm)
+    # Delegate to the centralized authorization service
+    AuthorizationService.user_has_permission?(user, namespace, controller, action, farm: farm)
   end
   
   private

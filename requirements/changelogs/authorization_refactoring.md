@@ -154,3 +154,4 @@ The TuberHub authorization system currently implements a robust Role-Based Acces
      - Added statistics and historical data retrieval
    - Enhanced permission discovery to properly track controller changes
    - Implemented automatic archiving of unused permissions
+   - Created a [plan for legacy code cleanup](../changelogs/authorization_legacy_code_cleanup.md)

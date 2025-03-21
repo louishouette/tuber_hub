@@ -1,8 +1,28 @@
 # frozen_string_literal: true
 
-# Service class for handling database-driven permissions and integrating with Pundit policies
-# Manages permission discovery, assignment, and access control throughout the application
+# DEPRECATED: This service is being phased out in favor of AuthorizationService.
+# This class now acts as a proxy to AuthorizationService for backward compatibility.
+# New code should use AuthorizationService directly.
 class PermissionService
+  # Show a deprecation warning for each method call
+  def self.method_missing(method_name, *args, &block)
+    ActiveSupport::Deprecation.warn(
+      "#{method_name} is deprecated and will be removed. " +
+      "Use AuthorizationService.#{method_name} instead."
+    )
+    
+    # Delegate to AuthorizationService if it responds to the method
+    if AuthorizationService.respond_to?(method_name)
+      AuthorizationService.send(method_name, *args, &block)
+    else
+      super
+    end
+  end
+  
+  # Ensure respond_to? works correctly with method_missing
+  def self.respond_to_missing?(method_name, include_private = false)
+    AuthorizationService.respond_to?(method_name) || super
+  end
   #===========================================================================
   # Constants
   #===========================================================================

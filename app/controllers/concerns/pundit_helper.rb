@@ -72,7 +72,7 @@ module PunditHelper
   # @return [true] if authorized
   def authorize_namespace(namespace, controller, action = nil, farm: nil)
     action ||= action_name
-    authorized = PermissionService.user_has_permission?(Current.user, namespace, controller, action, farm: farm)
+    authorized = AuthorizationService.user_has_permission?(Current.user, namespace, controller, action, farm: farm)
     
     unless authorized
       # If not authorized, raise the same error Pundit would, for consistent error handling
@@ -99,7 +99,7 @@ module PunditHelper
     
     # If user has index permission for this namespace/controller, return all records
     # Pass the farm context to check farm-specific permissions when appropriate
-    if PermissionService.user_has_permission?(Current.user, namespace, controller, 'index', farm: farm)
+    if AuthorizationService.user_has_permission?(Current.user, namespace, controller, 'index', farm: farm)
       scope_class.all
     else
       # Otherwise return an empty relation

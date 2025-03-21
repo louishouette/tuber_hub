@@ -37,7 +37,11 @@ TuberHub employs a sophisticated role-based access control (RBAC) system built o
 ## Authorization Flow
 
 1. When a request comes in, `ApplicationController` checks if the current user is authorized for the requested action.
-2. The check is performed by Pundit policies, which consult the database-driven permission system.
+2. The authorization check is handled through the following flow:
+   - The controller calls Pundit's `authorize` method or uses helpers from `AuthorizationConcern`
+   - Pundit policies leverage `PermissionPolicyConcern` which delegates to `AuthorizationService`
+   - `AuthorizationService` delegates to `Authorization::QueryService` for permission checks
+   - Permissions are checked against the database, with results cached for performance
 3. Authorization may be skipped for certain controllers (public pages, authentication controllers).
 4. Admin users automatically have access to all resources.
 
@@ -113,6 +117,9 @@ authorize_action!(:create, 'users', 'hub/admin')
 
 # For farm-specific permissions
 user_can?(:create, 'users', 'hub/admin', farm: @farm)
+
+# For checking a user's ability to access a feature
+feature_enabled_for_user?(:some_feature)
 ```
 
 ### In Views and Helpers
@@ -270,7 +277,7 @@ The authorization system uses several interconnected tables:
 
 ### Cache Management
 
-To improve performance, the system uses caching extensively:
+To improve performance, the system uses caching extensively, managed by `Authorization::CacheService`:
 
 ```ruby
 # For global permissions
@@ -288,16 +295,16 @@ To avoid N+1 queries when checking multiple permissions for a user, the system s
 
 ```ruby
 # Preload global permissions for a user
-PermissionService.preload_user_permissions(user)
+AuthorizationService.preload_user_permissions(user)
 
 # Preload farm-specific permissions
-PermissionService.preload_user_permissions(user, farm: @farm)
+AuthorizationService.preload_user_permissions(user, farm: @farm)
 
 # Check permissions using preloaded data (faster)
-PermissionService.user_has_permission?(user, namespace, controller, action, use_preloaded: true)
+AuthorizationService.user_has_permission?(user, namespace, controller, action, use_preloaded: true)
 
 # Check farm-specific permissions using preloaded data
-PermissionService.user_has_permission?(user, namespace, controller, action, farm: @farm, use_preloaded: true)
+AuthorizationService.user_has_permission?(user, namespace, controller, action, farm: @farm, use_preloaded: true)
 ```
 
 This approach significantly reduces database queries in pages that perform multiple permission checks.
@@ -378,11 +385,12 @@ Audit records are automatically created during these operations:
 
 ### Debugging Tools
 
-The `PermissionService` provides several helpful methods for debugging:
+The `AuthorizationService` provides several helpful methods for debugging:
 
-- `PermissionService.find_unauthenticated_controllers`: Lists controllers that don't require authentication
-- `PermissionService.main_namespaces`: Shows all application namespaces
-- `PermissionService.active_permissions`: Lists all active permissions
+- `AuthorizationService.find_unauthenticated_controllers`: Lists controllers that don't require authentication
+- `AuthorizationService.main_namespaces`: Shows all application namespaces
+- `AuthorizationService.active_permissions`: Lists all active permissions
+- `AuthorizationService.change_statistics`: Shows recent permission changes and statistics
 
 ## Conclusion
 

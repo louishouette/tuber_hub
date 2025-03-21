@@ -1,7 +1,7 @@
 module Hub
   module Admin
     class PermissionPolicy < ApplicationPolicy
-      include PermissionIntegration
+      include PermissionPolicyConcern
       
       def index?
         user.admin? || permission_check

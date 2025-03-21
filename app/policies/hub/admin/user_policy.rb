@@ -3,7 +3,7 @@
 module Hub
   module Admin
     class UserPolicy < ApplicationPolicy
-      include PermissionIntegration
+      include PermissionPolicyConcern
       
       # Policy for Hub::Admin::User with role-based permissions
       def index?

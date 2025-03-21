@@ -74,7 +74,7 @@
           <div id="permissions-container" class="space-y-6">
             <% 
               # Get only Pundit-compatible actions
-              pundit_actions = PermissionService.pundit_controllable_actions(include_all: true)
+              pundit_actions = AuthorizationService.pundit_controllable_actions(include_all: true)
               
               # Filter permissions list - only Pundit-compatible and exclude system controllers/actions
               system_controllers = %w[application sessions passwords]

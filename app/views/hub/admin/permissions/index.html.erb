@@ -47,7 +47,7 @@
                         <% permissions.each do |permission| %>
                           <% 
                           # Determine if this is a Pundit-compatible action
-                          is_pundit_action = PermissionService.pundit_controllable_actions(include_all: true).include?(permission.action)
+                          is_pundit_action = AuthorizationService.pundit_controllable_actions(include_all: true).include?(permission.action)
                         %>
                         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-4 py-2 font-medium text-gray-900 dark:text-white">

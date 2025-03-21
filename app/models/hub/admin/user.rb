@@ -68,10 +68,27 @@ module Hub
       # @param action [String, Symbol] the action to check permission for
       # @param namespace [String, Symbol] the namespace to check permission in
       # @param controller [String, Symbol] the controller to check permission for
+      # @param farm [Hub::Admin::Farm, nil] optional farm to check farm-specific permissions for
+      # @param use_preloaded [Boolean] whether to use preloaded permissions if available
       # @return [Boolean] whether user has permission
-      def can?(action, namespace, controller)
-        # Delegate to the centralized permission service
-        PermissionService.user_has_permission?(self, namespace, controller, action)
+      def can?(action, namespace, controller, farm: nil, use_preloaded: false)
+        return true if admin?
+        
+        # Delegate to the centralized authorization service
+        AuthorizationService.user_has_permission?(self, namespace, controller, action, farm: farm, use_preloaded: use_preloaded)
+      end
+
+      # Check if user has a farm-specific role
+      # @param role_name [String, Symbol] the role name to check for
+      # @param farm [Hub::Admin::Farm] the farm to check roles for
+      # @return [Boolean] whether user has the role in the specific farm context
+      def has_farm_role?(role_name, farm)
+        return false if farm.nil?
+        role_assignments
+          .joins(:role)
+          .where(farm: farm, global: false)
+          .where('LOWER(hub_admin_roles.name) = ?', role_name.to_s.downcase)
+          .exists?
       end
       
       # Check if user account is active

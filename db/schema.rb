@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_20_134708) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_21_090853) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -101,9 +101,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_20_134708) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "revoked_by_id"
+    t.bigint "farm_id"
+    t.boolean "global", default: true
+    t.index ["farm_id"], name: "index_hub_admin_role_assignments_on_farm_id"
     t.index ["granted_by_id"], name: "index_hub_admin_role_assignments_on_granted_by_id"
     t.index ["revoked_by_id"], name: "index_hub_admin_role_assignments_on_revoked_by_id"
     t.index ["role_id"], name: "index_hub_admin_role_assignments_on_role_id"
+    t.index ["user_id", "role_id", "farm_id"], name: "idx_role_assignments_user_role_farm", unique: true
     t.index ["user_id"], name: "index_hub_admin_role_assignments_on_user_id"
   end
 
@@ -148,6 +152,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_20_134708) do
   add_foreign_key "hub_admin_permission_assignments", "hub_admin_roles", column: "role_id"
   add_foreign_key "hub_admin_permission_assignments", "hub_admin_users", column: "granted_by_id"
   add_foreign_key "hub_admin_permission_assignments", "hub_admin_users", column: "revoked_by_id"
+  add_foreign_key "hub_admin_role_assignments", "hub_admin_farms", column: "farm_id"
   add_foreign_key "hub_admin_role_assignments", "hub_admin_roles", column: "role_id"
   add_foreign_key "hub_admin_role_assignments", "hub_admin_users", column: "granted_by_id"
   add_foreign_key "hub_admin_role_assignments", "hub_admin_users", column: "revoked_by_id"

@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: hub_core_farm_users
+# Table name: hub_admin_farm_users
 #
 #  id         :bigint           not null, primary key
 #  created_at :datetime         not null
@@ -10,13 +10,13 @@
 #
 # Indexes
 #
-#  idx_farm_users_lookup                 (farm_id,user_id) UNIQUE
-#  index_hub_core_farm_users_on_farm_id  (farm_id)
-#  index_hub_core_farm_users_on_user_id  (user_id)
+#  idx_admin_farm_users_lookup            (farm_id,user_id) UNIQUE
+#  index_hub_admin_farm_users_on_farm_id  (farm_id)
+#  index_hub_admin_farm_users_on_user_id  (user_id)
 #
 # Foreign Keys
 #
-#  fk_rails_...  (farm_id => hub_core_farms.id)
+#  fk_rails_...  (farm_id => hub_admin_farms.id)
 #  fk_rails_...  (user_id => hub_admin_users.id)
 #
 module Hub

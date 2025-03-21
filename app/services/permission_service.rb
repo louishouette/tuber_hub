@@ -63,8 +63,9 @@ class PermissionService
   # @param controller [String] controller name
   # @param action [String] action name
   # @param use_preloaded [Boolean] whether to use preloaded permissions if available
+  # @param farm [Hub::Admin::Farm, nil] the farm to check farm-specific permissions for
   # @return [Boolean] whether the user has permission
-  def self.user_has_permission?(user, namespace, controller, action, use_preloaded: false)
+  def self.user_has_permission?(user, namespace, controller, action, use_preloaded: false, farm: nil)
     # Fast path for admin users and nil users
     return true if user&.admin? # Admin users can do everything
     return false unless user    # No user, no permissions
@@ -75,17 +76,39 @@ class PermissionService
     action = action.to_s
     
     # Try to use preloaded permissions if requested and available
-    if use_preloaded && user.instance_variable_defined?(:@preloaded_permissions)
-      permission_key = "#{namespace}:#{controller}:#{action}"
-      return user.instance_variable_get(:@preloaded_permissions).include?(permission_key)
+    if use_preloaded
+      # Check for farm-specific preloaded permissions if a farm was specified
+      if farm.present? && user.instance_variable_defined?("@preloaded_farm_#{farm.id}_permissions")
+        permission_key = "#{namespace}:#{controller}:#{action}"
+        return user.instance_variable_get("@preloaded_farm_#{farm.id}_permissions").include?(permission_key)
+      # Otherwise check regular global permissions
+      elsif user.instance_variable_defined?(:@preloaded_permissions)
+        permission_key = "#{namespace}:#{controller}:#{action}"
+        return user.instance_variable_get(:@preloaded_permissions).include?(permission_key)
+      end
     end
     
     # Generate a unique cache key for this permission check
-    cache_key = "user_#{user.id}_permission_#{namespace}:#{controller}:#{action}"
+    farm_key = farm.present? ? "_farm_#{farm.id}" : ""
+    cache_key = "user_#{user.id}_permission_#{namespace}:#{controller}:#{action}#{farm_key}"
     
     Rails.cache.fetch(cache_key, expires_in: 1.hour) do
-      # Get the user's role IDs efficiently
-      role_ids = user.roles.pluck(:id)
+      # Get the user's role IDs efficiently, considering farm-specific permissions
+      if farm.present?
+        # When a farm is specified, check both global roles and farm-specific roles
+        # Use a more specific query to get role IDs based on farm context
+        role_ids = user.role_assignments
+                     .where('(farm_id = ? AND global = ?) OR global = ?', farm.id, false, true)
+                     .active
+                     .pluck(:role_id)
+      else
+        # When no farm is specified, only check global roles (not farm-specific ones)
+        role_ids = user.role_assignments
+                     .where(global: true)
+                     .active
+                     .pluck(:role_id)
+      end
+      
       return false if role_ids.empty?
       
       # Query whether any of the user's roles have this permission
@@ -96,8 +119,7 @@ class PermissionService
         .where(namespace: namespace, controller: controller, action: action)
         .where(hub_admin_permission_assignments: { role_id: role_ids })
         .where(
-          'hub_admin_permission_assignments.expires_at IS NULL OR ' 
-          'hub_admin_permission_assignments.expires_at > ?', 
+          'hub_admin_permission_assignments.expires_at IS NULL OR hub_admin_permission_assignments.expires_at > ?', 
           Time.zone.now
         )
         .exists?
@@ -107,12 +129,26 @@ class PermissionService
   # Preloads all permissions for a user to avoid N+1 queries
   # @param user [Hub::Admin::User] the user to preload permissions for
   # @param namespaces [Array<String>] optional array of namespaces to limit preloading
+  # @param farm [Hub::Admin::Farm, nil] optional farm to preload farm-specific permissions for
   # @return [Array<String>] array of permission strings in format "namespace:controller:action"
-  def self.preload_user_permissions(user, namespaces: nil)
+  def self.preload_user_permissions(user, namespaces: nil, farm: nil)
     return [] unless user && !user.admin?
     
-    # Get user's role IDs
-    role_ids = user.roles.pluck(:id)
+    # Get user's role IDs based on farm context
+    if farm.present?
+      # When a farm is specified, check both global roles and farm-specific roles
+      role_ids = user.role_assignments
+                   .where('(farm_id = ? AND global = ?) OR global = ?', farm.id, false, true)
+                   .active
+                   .pluck(:role_id)
+    else
+      # When no farm is specified, only check global roles (not farm-specific ones)
+      role_ids = user.role_assignments
+                   .where(global: true)
+                   .active
+                   .pluck(:role_id)
+    end
+    
     return [] if role_ids.empty?
     
     # Build the query for the user's permissions, optimized with proper indices
@@ -123,8 +159,7 @@ class PermissionService
       .where(status: 'active')
       .where(hub_admin_permission_assignments: { role_id: role_ids })
       .where(
-        'hub_admin_permission_assignments.expires_at IS NULL OR ' 
-        'hub_admin_permission_assignments.expires_at > ?', 
+        'hub_admin_permission_assignments.expires_at IS NULL OR hub_admin_permission_assignments.expires_at > ?', 
         Time.zone.now
       )
     
@@ -137,7 +172,12 @@ class PermissionService
     end
     
     # Store on user instance for later use
-    user.instance_variable_set(:@preloaded_permissions, permission_strings)
+    # If farm-specific, store in a farm-specific variable
+    if farm.present?
+      user.instance_variable_set("@preloaded_farm_#{farm.id}_permissions", permission_strings)
+    else
+      user.instance_variable_set(:@preloaded_permissions, permission_strings)
+    end
     
     # Return the permission strings
     permission_strings
@@ -171,18 +211,31 @@ class PermissionService
     # Clear the general permissions cache
     Rails.cache.delete('grouped_permissions')
     
-    # Clear all user permission caches
+    # Clear all user permission caches (both global and farm-specific)
     Rails.cache.delete_matched("user_*_permission_*")
+    Rails.cache.delete_matched("user_*_farm_*_permission_*")
   end
   
   # Clears permission caches for a specific user
   # @param user [Hub::Admin::User] the user whose caches to clear
+  # @param farm [Hub::Admin::Farm, nil] optional farm to clear farm-specific caches for
   # @return [void]
-  def self.clear_user_permission_caches(user)
+  def self.clear_user_permission_caches(user, farm: nil)
     return unless user&.id
     
-    # Clear all permissions for this specific user
-    Rails.cache.delete_matched("user_#{user.id}_permission_*")
+    # Clear instance variable caches
+    if farm.present?
+      # Clear farm-specific cache on user instance if it exists
+      user.remove_instance_variable("@preloaded_farm_#{farm.id}_permissions") if user.instance_variable_defined?("@preloaded_farm_#{farm.id}_permissions")
+      # Clear farm-specific cache in Rails cache
+      Rails.cache.delete_matched("user_#{user.id}_farm_#{farm.id}_permission_*")
+    else
+      # Clear global permission cache on user instance
+      user.remove_instance_variable(:@preloaded_permissions) if user.instance_variable_defined?(:@preloaded_permissions)
+      # Clear all user permission caches (both global and farm-specific)
+      Rails.cache.delete_matched("user_#{user.id}_permission_*")
+      Rails.cache.delete_matched("user_#{user.id}_farm_*_permission_*")
+    end
   end
   
   # Clears permission caches for a specific permission

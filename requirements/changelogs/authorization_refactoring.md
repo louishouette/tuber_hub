@@ -55,10 +55,13 @@ The TuberHub authorization system currently implements a robust Role-Based Acces
 
 ### Phase 4: Feature Enhancements
 
-7. **Implement Farm-Level Authorization**
-   - Extend the permission system to include farm-specific permissions : a User role is scoped to a Farm
-   - Add scoping based on farm membership
-   - Support farm-specific roles
+7. **✓ Implement Farm-Level Authorization** (Completed March 21, 2025)
+   - Extended the permission system to include farm-specific permissions: User roles scoped to Farms
+   - Added scoping based on farm context in permission checks
+   - Implemented support for farm-specific roles with proper validation
+   - Added farm context handling in PunditHelper, NamespacePolicy, and PermissionService
+   - Updated caching system to handle farm-specific permission caches
+   - Updated documentation in docs/tuber_hub/AUTHORIZATION.md
 
 8. **Add Automatic Permission Discovery**
    - Implement hooks to automatically discover permissions when controllers are added/changed
@@ -114,7 +117,30 @@ The TuberHub authorization system currently implements a robust Role-Based Acces
   - Added support for efficient querying of both unlimited and expiring permissions
 - Updated documentation to reflect the new architecture
 
-**Next Steps**
-- Phase 3: Structural Improvements
-- Implement farm-level authorization
-- Add more comprehensive tests for the refactored components
+### [2025-03-21] Phase 3: Structural Improvements
+
+**Plan**
+1. Reorganize authorization code for better structure and maintainability
+   - Split PermissionService into more focused components
+   - Standardize interfaces between components
+   - Reduce duplication between PermissionIntegration and PunditHelper
+   - Implement a clearer separation of concerns
+   - Create a proper organization in app/services/authorization
+
+2. Streamline legacy permission handling
+   - Add support for archiving unused permissions
+   - Implement better tracking of controller changes
+   - Add historical permission audit system
+
+**Completed**
+1. Reorganized authorization code for better structure:
+   - Created dedicated Authorization module with specialized services:
+     - Authorization::BaseService for shared constants and functionality
+     - Authorization::QueryService for permission checks
+     - Authorization::ManagementService for permission discovery and management
+     - Authorization::CacheService for cache invalidation
+   - Created a facade AuthorizationService that delegates to specialized services
+   - Created new concerns for better integration:
+     - PermissionPolicyConcern for Pundit policies
+     - AuthorizationConcern for controllers
+   - Updated User model to use the new services

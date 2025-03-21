@@ -11,15 +11,17 @@ module PermissionIntegration
   # @param namespace [String, nil] controller namespace, will be extracted from record if nil
   # @param controller [String, nil] controller name, will be extracted from record if nil
   # @param custom_action [String, nil] custom action name, will be extracted from caller if nil
+  # @param farm [Hub::Admin::Farm, nil] optional farm to check farm-specific permissions for
   # @return [Boolean] whether the user has permission
-  def permission_check(namespace: nil, controller: nil, custom_action: nil)
-    # Determine the correct action, namespace, and controller
+  def permission_check(namespace: nil, controller: nil, custom_action: nil, farm: nil)
+    # Determine the correct action, namespace, controller, and farm
     action = custom_action || extract_action_from_caller
     namespace ||= extract_namespace_from_record
     controller ||= extract_controller_from_record
+    farm ||= extract_farm_from_record
     
     # Delegate to the centralized permission service
-    PermissionService.user_has_permission?(user, namespace, controller, action)
+    PermissionService.user_has_permission?(user, namespace, controller, action, farm: farm)
   end
   
   private
@@ -49,6 +51,19 @@ module PermissionIntegration
     else
       # Default to table_name from record's class if possible
       record.class.table_name.split('_').last if record.respond_to?(:class) && record.class.respond_to?(:table_name)
+    end
+  end
+  
+  # Try to extract farm from the record if it's a hash with farm key
+  def extract_farm_from_record
+    if record.is_a?(Hash) && record[:farm]
+      record[:farm]
+    elsif record.respond_to?(:farm)
+      # If the record has a farm association, use that
+      record.farm
+    elsif record.is_a?(Hash) && record[:farm_id] && defined?(Hub::Admin::Farm)
+      # If we have a farm_id but not a farm object, try to load it
+      Hub::Admin::Farm.find_by(id: record[:farm_id])
     end
   end
   

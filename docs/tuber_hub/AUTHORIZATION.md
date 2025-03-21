@@ -16,13 +16,23 @@ TuberHub employs a sophisticated role-based access control (RBAC) system built o
 
 ### 2. Key Classes
 
+#### Models
 - `Hub::Admin::User`: The user model that includes authentication and role-based capabilities.
 - `Hub::Admin::Role`: Defines roles that can be assigned to users.
 - `Hub::Admin::Permission`: Represents allowed actions on specific controllers.
-- `Hub::Admin::RoleAssignment`: Links users to roles.
-- `Hub::Admin::PermissionAssignment`: Links roles to permissions.
-- `PunditHelper`: Extends Pundit with application-specific functionality.
-- `PermissionService`: Manages permission discovery and access control throughout the application.
+- `Hub::Admin::RoleAssignment`: Links users to roles (with optional farm-specific context).
+- `Hub::Admin::PermissionAssignment`: Links roles to permissions (with optional expiration).
+
+#### Services
+- `AuthorizationService`: Main facade service that provides a unified interface to all authorization functionality.
+- `Authorization::BaseService`: Provides shared constants and base functionality.
+- `Authorization::QueryService`: Handles permission checks and user authorization queries.
+- `Authorization::ManagementService`: Manages permission discovery and maintenance.
+- `Authorization::CacheService`: Handles permission cache management and invalidation.
+
+#### Concerns
+- `AuthorizationConcern`: For controllers, provides authorization helpers like `user_can?` and `authorize_action!`.
+- `PermissionPolicyConcern`: For Pundit policies, integrates with the permission system.
 
 ## Authorization Flow
 
@@ -49,13 +59,23 @@ The system dynamically discovers and manages permissions based on the applicatio
 
 ### Permission Discovery
 
-1. The `PermissionService.discover_permissions` method scans all controllers in the application.
+1. The `AuthorizationService.discover_permissions` method (delegating to `Authorization::ManagementService`) scans all controllers in the application.
 2. For each controller that requires authentication, it extracts:   
    - The namespace (e.g., `hub/admin`)
    - The controller name (e.g., `users`)
    - Available actions (e.g., `index`, `show`, `create`)
-3. Permissions are created in the database with a standard format: `namespace/controller#action`.
-4. Legacy permissions (those no longer existing in the application) are marked as such.
+3. Permissions are created in the database with standard format and user-friendly descriptions.
+4. Unused permissions (those no longer existing in the application) are automatically archived.
+
+### Permission Refresh
+
+To refresh all permissions in the system (discover new ones and archive unused ones):
+
+```ruby
+AuthorizationService.refresh_permissions
+```
+
+This is typically run during deployment or when significant controller changes occur.
 
 ### Permission Assignment
 
@@ -79,14 +99,20 @@ Administrators can assign roles to users:
 
 ### In Controllers
 
-Authorization in controllers is handled through Pundit:  
+Authorization in controllers is handled through the `AuthorizationConcern`:  
 
 ```ruby
 # Standard Pundit approach for model-based authorization
 authorize @user
 
-# For controller/namespace-based authorization
-authorize_namespace('hub/admin', 'users', 'create')
+# For direct permission checks
+user_can?(:create, 'users', 'hub/admin')
+
+# For enforcing permission checks that raise exceptions
+authorize_action!(:create, 'users', 'hub/admin')
+
+# For farm-specific permissions
+user_can?(:create, 'users', 'hub/admin', farm: @farm)
 ```
 
 ### In Views and Helpers
@@ -126,19 +152,91 @@ Some controllers are exempt from authorization checks:
 
 Users with the 'admin' role bypass normal permission checks and have access to all resources.
 
+### Farm-Level Authorization
+
+TuberHub supports farm-scoped permissions and roles, allowing different access levels for users across different farms:
+
+#### Farm-Specific Roles
+
+- **Global Roles**: Apply across the entire application with `global=true` and `farm_id=nil`
+- **Farm-Specific Roles**: Apply only to specific farms with `global=false` and a specific `farm_id`
+
+#### Checking Farm-Specific Permissions
+
+In controllers and views, you can check farm-specific permissions:  
+
+```ruby
+# Check if user can perform an action in the context of a specific farm
+Current.user.can?(:manage, 'hub/admin', 'tubers', farm: @farm)
+
+# Or using the allowed_to? helper
+allowed_to?(:manage, { namespace: 'hub/admin', controller: 'tubers', farm: @farm })
+
+# In a controller when using authorize_namespace
+authorize_namespace(farm: @farm)
+
+# With namespace_scope for filtering collections based on permissions
+@crops = namespace_scope(Crop, farm: @farm)
+```
+
+#### Farm Role Assignment
+
+Administrators can assign farm-specific roles to users:
+
+1. Navigate to the farm management section (hub/admin/farms)
+2. Select a farm and go to 'Manage Users'
+3. Assign farm-specific roles to users
+4. Optionally set expiration dates for temporary role assignments
+
+#### Permission Resolution Logic
+
+When checking permissions in a farm context:
+
+1. The system checks if the user has **global roles** that grant the permission
+2. The system also checks if the user has **farm-specific roles** that grant the permission
+3. If either check passes, the user has permission
+
+When checking permissions without a farm context (global context):
+
+1. Only **global roles** are considered
+2. **Farm-specific roles** are ignored
+
+#### Checking Farm Roles Directly
+
+You can check if a user has a specific role for a farm:
+
+```ruby
+# Check if user has the "Farm Manager" role for a specific farm
+user.has_farm_role?("Farm Manager", @farm)
+```
+
 ## Cache Management
 
 For performance reasons, permission checks are cached:  
 
 - User permission results are cached for 1 hour
+- Farm-specific permission results are cached separately
 - Permission groups are cached for 15 minutes
 - Available namespaces are cached for 1 hour
 
-The cache is managed through specialized methods in the `PermissionService`:
+The cache is managed through the `Authorization::CacheService` and accessed via the `AuthorizationService` facade:
 
-- `clear_all_permission_caches`: Invalidates all permission-related caches
-- `clear_user_permission_caches(user)`: Clears cache for a specific user
-- `clear_permission_caches(namespace, controller, action)`: Clears cache for a specific permission
+```ruby
+# Clear all caches
+AuthorizationService.clear_all_permission_caches
+
+# Clear user-specific caches
+AuthorizationService.clear_user_permission_caches(user, farm: nil)
+
+# Clear caches for a specific permission
+AuthorizationService.clear_permission_caches('hub/admin', 'users', 'create')
+
+# Clear caches related to a role assignment change
+AuthorizationService.clear_role_assignment_caches(role_assignment)
+
+# Clear caches related to a permission assignment change
+AuthorizationService.clear_permission_assignment_caches(permission_assignment)
+```
 
 These methods are called automatically when permissions are updated, roles are changed, or user-role assignments are modified.
 
@@ -175,19 +273,31 @@ The authorization system uses several interconnected tables:
 To improve performance, the system uses caching extensively:
 
 ```ruby
+# For global permissions
 Rails.cache.fetch("user_#{user.id}_permission_#{namespace}:#{controller}:#{action}", expires_in: 1.hour) do
   # Permission check logic
+end
+
+# For farm-specific permissions
+Rails.cache.fetch("user_#{user.id}_farm_#{farm.id}_permission_#{namespace}:#{controller}:#{action}", expires_in: 1.hour) do
+  # Farm-specific permission check logic
 end
 ```
 
 To avoid N+1 queries when checking multiple permissions for a user, the system supports permission preloading:
 
 ```ruby
-# Preload all permissions for a user
+# Preload global permissions for a user
 PermissionService.preload_user_permissions(user)
+
+# Preload farm-specific permissions
+PermissionService.preload_user_permissions(user, farm: @farm)
 
 # Check permissions using preloaded data (faster)
 PermissionService.user_has_permission?(user, namespace, controller, action, use_preloaded: true)
+
+# Check farm-specific permissions using preloaded data
+PermissionService.user_has_permission?(user, namespace, controller, action, farm: @farm, use_preloaded: true)
 ```
 
 This approach significantly reduces database queries in pages that perform multiple permission checks.
@@ -197,9 +307,10 @@ This approach significantly reduces database queries in pages that perform multi
 ### Common Issues
 
 1. **User cannot access a resource they should have access to**:
-   - Check if the user has the necessary role
+   - Check if the user has the necessary role (global or farm-specific)
    - Verify the role has the required permission
    - Ensure neither the role assignment nor permission assignment has expired
+   - If checking farm-specific permissions, ensure you're passing the farm context
    - Refresh permissions to ensure they're up to date
 
 2. **Permission not appearing in the admin interface**:
@@ -223,3 +334,5 @@ The `PermissionService` provides several helpful methods for debugging:
 ## Conclusion
 
 TuberHub's authorization system provides a flexible, dynamic approach to access control. By combining the power of Pundit with a database-driven permission system, it allows for fine-grained control over who can access what in the application, while remaining adaptable to changes in the application structure.
+
+With the addition of farm-level authorization, TuberHub now supports complex multi-farm environments with different permission levels for each farm, providing a scalable solution for organizations managing multiple farms with different user access requirements.

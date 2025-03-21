@@ -47,7 +47,7 @@ class NamespacePolicy < ApplicationPolicy
   end
 
   class Scope < Scope
-    def resolve
+    def resolve(farm: nil)
       if user&.admin?
         scope.all
       else
@@ -55,7 +55,8 @@ class NamespacePolicy < ApplicationPolicy
         namespace = extract_namespace_from_scope
         controller = extract_controller_from_scope
         
-        if namespace && controller && PermissionService.user_has_permission?(user, namespace, controller, 'index')
+        # Pass the farm parameter to check farm-specific permissions when appropriate
+        if namespace && controller && PermissionService.user_has_permission?(user, namespace, controller, 'index', farm: farm)
           scope.all
         else
           scope.none

@@ -14,8 +14,8 @@
 #
 # Indexes
 #
-#  index_hub_core_farms_on_handle  (handle) UNIQUE
-#  index_hub_core_farms_on_name    (name)
+#  index_hub_admin_farms_on_handle  (handle) UNIQUE
+#  index_hub_admin_farms_on_name    (name)
 #
 module Hub
   module Admin

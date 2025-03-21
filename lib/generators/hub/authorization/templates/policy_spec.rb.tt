@@ -1,0 +1,113 @@
+# frozen_string_literal: true
+
+require 'rails_helper'
+
+<% if @namespace.present? %>
+RSpec.describe <%= @full_policy_class %>, type: :policy do
+<% else %>
+RSpec.describe <%= @policy_class_name %>, type: :policy do
+<% end %>
+  let(:user) { create(:hub_admin_user) }
+  let(:<%= @model_var %>) { create(:<%= @model_var %>) }
+<% if @farm_scoped %>
+  let(:farm) { create(:hub_admin_farm) }
+<% end %>
+
+  subject { described_class.new(user, <%= @model_var %>) }
+
+  before do
+    # Set up Current model for testing
+    Current.user = user
+<% if @farm_scoped %>
+    Current.farm = farm
+<% end %>
+  end
+
+  context 'for a regular user with no permissions' do
+    before do
+      # Ensure the user has no permissions
+      allow(AuthorizationService).to receive(:user_has_permission?).and_return(false)
+    end
+
+    it { is_expected.to forbid_action(:index) }
+    it { is_expected.to forbid_action(:show) }
+    it { is_expected.to forbid_action(:create) }
+    it { is_expected.to forbid_action(:new) }
+    it { is_expected.to forbid_action(:update) }
+    it { is_expected.to forbid_action(:edit) }
+    it { is_expected.to forbid_action(:destroy) }
+  end
+
+  context 'for a user with all permissions' do
+    before do
+      # Simulate a user with all permissions
+      allow(AuthorizationService).to receive(:user_has_permission?).and_return(true)
+    end
+
+    it { is_expected.to permit_action(:index) }
+    it { is_expected.to permit_action(:show) }
+    it { is_expected.to permit_action(:create) }
+    it { is_expected.to permit_action(:new) }
+    it { is_expected.to permit_action(:update) }
+    it { is_expected.to permit_action(:edit) }
+    it { is_expected.to permit_action(:destroy) }
+  end
+
+  context 'for an admin user' do
+    before do
+      # Admins have all permissions by default
+      allow(user).to receive(:admin?).and_return(true)
+    end
+
+    it { is_expected.to permit_action(:index) }
+    it { is_expected.to permit_action(:show) }
+    it { is_expected.to permit_action(:create) }
+    it { is_expected.to permit_action(:new) }
+    it { is_expected.to permit_action(:update) }
+    it { is_expected.to permit_action(:edit) }
+    it { is_expected.to permit_action(:destroy) }
+  end
+
+  describe 'Scope' do
+    let(:scope) { <%= @model_class %>.all }
+    let(:resolved_scope) { described_class::Scope.new(user, scope).resolve }
+
+    context 'for a regular user with permission' do
+      before do
+        allow(AuthorizationService).to receive(:user_has_permission?).and_return(true)
+      end
+
+<% if @farm_scoped %>
+      it 'includes only records for the current farm' do
+        # Create records for the current farm
+        record1 = create(:<%= @model_var %>, farm: farm)
+        # Create records for a different farm
+        other_farm = create(:hub_admin_farm)
+        record2 = create(:<%= @model_var %>, farm: other_farm)
+
+        expect(resolved_scope).to include(record1)
+        expect(resolved_scope).not_to include(record2)
+      end
+<% else %>
+      it 'includes all records' do
+        # Create some test records
+        record1 = create(:<%= @model_var %>)
+        record2 = create(:<%= @model_var %>)
+
+        expect(resolved_scope).to include(record1, record2)
+      end
+<% end %>
+    end
+
+    context 'for a user without permission' do
+      before do
+        allow(AuthorizationService).to receive(:user_has_permission?).and_return(false)
+      end
+
+      it 'returns no records' do
+        create(:<%= @model_var %>)
+        expect(resolved_scope).to be_empty
+      end
+    end
+  end
+end

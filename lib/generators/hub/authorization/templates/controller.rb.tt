@@ -1,0 +1,114 @@
+# frozen_string_literal: true
+
+module <%= @namespace.camelize %>
+  # Controller for <%= @controller.humanize %>
+  class <%= @controller.camelize %>Controller < ApplicationController
+    include AuthorizationConcern
+<% if @farm_scoped %>
+    before_action :require_farm
+<% end %>
+<% if @actions.include?('show') || @actions.include?('edit') || @actions.include?('update') || @actions.include?('destroy') %>
+    before_action :set_<%= @resource_name %>, only: [<%= @actions.select { |a| %w[show edit update destroy].include?(a) }.map { |a| ":#{a}" }.join(', ') %>]
+<% end %>
+
+<% if @actions.include?('index') %>
+    # GET /<%= @namespace %>/<%= @controller %>
+    def index
+      @<%= @controller %> = policy_scope(<%= @resource_class %>)
+<% if @farm_scoped %>
+                             .where(farm: Current.farm)
+<% end %>
+                             .page(params[:page])
+    end
+<% end %>
+
+<% if @actions.include?('show') %>
+    # GET /<%= @namespace %>/<%= @controller %>/1
+    def show
+      authorize @<%= @resource_name %>
+    end
+<% end %>
+
+<% if @actions.include?('new') %>
+    # GET /<%= @namespace %>/<%= @controller %>/new
+    def new
+      @<%= @resource_name %> = <%= @resource_class %>.new
+<% if @farm_scoped %>
+      @<%= @resource_name %>.farm = Current.farm
+<% end %>
+      authorize @<%= @resource_name %>
+    end
+<% end %>
+
+<% if @actions.include?('edit') %>
+    # GET /<%= @namespace %>/<%= @controller %>/1/edit
+    def edit
+      authorize @<%= @resource_name %>
+    end
+<% end %>
+
+<% if @actions.include?('create') %>
+    # POST /<%= @namespace %>/<%= @controller %>
+    def create
+      @<%= @resource_name %> = <%= @resource_class %>.new(<%= @resource_name %>_params)
+<% if @farm_scoped %>
+      @<%= @resource_name %>.farm = Current.farm
+<% end %>
+      authorize @<%= @resource_name %>
+
+      if @<%= @resource_name %>.save
+        redirect_to <%= @namespace %>_<%= @resource_name %>_path(@<%= @resource_name %>), notice: '<%= @resource_class %> was successfully created.'
+      else
+        render :new, status: :unprocessable_entity
+      end
+    end
+<% end %>
+
+<% if @actions.include?('update') %>
+    # PATCH/PUT /<%= @namespace %>/<%= @controller %>/1
+    def update
+      authorize @<%= @resource_name %>
+      
+      if @<%= @resource_name %>.update(<%= @resource_name %>_params)
+        redirect_to <%= @namespace %>_<%= @resource_name %>_path(@<%= @resource_name %>), notice: '<%= @resource_class %> was successfully updated.'
+      else
+        render :edit, status: :unprocessable_entity
+      end
+    end
+<% end %>
+
+<% if @actions.include?('destroy') %>
+    # DELETE /<%= @namespace %>/<%= @controller %>/1
+    def destroy
+      authorize @<%= @resource_name %>
+      @<%= @resource_name %>.destroy
+
+      redirect_to <%= @namespace %>_<%= @controller %>_path, notice: '<%= @resource_class %> was successfully destroyed.'
+    end
+<% end %>
+
+    private
+
+<% if @actions.include?('show') || @actions.include?('edit') || @actions.include?('update') || @actions.include?('destroy') %>
+    # Use callbacks to share common setup or constraints between actions.
+    def set_<%= @resource_name %>
+      @<%= @resource_name %> = <%= @resource_class %>.find(params[:id])
+    end
+<% end %>
+
+    # Only allow a list of trusted parameters through.
+    def <%= @resource_name %>_params
+      # Use Rails 8 params.expect method for more concise parameter sanitization
+      params.expect(:<%= @resource_name %>, fields: [:name, :description])
+    end
+<% if @farm_scoped %>
+    
+    # Require a farm context for this controller
+    def require_farm
+      return if Current.farm.present?
+      
+      redirect_to root_path, alert: 'You must select a farm to access this section.'
+    end
+<% end %>
+  end
+end

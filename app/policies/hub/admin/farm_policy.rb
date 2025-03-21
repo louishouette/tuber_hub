@@ -1,33 +1,35 @@
 module Hub
   module Admin
     class FarmPolicy < ApplicationPolicy
+      include PermissionPolicyConcern
+
       def index?
-        user.can?('index', 'hub/admin', 'farms') || user.admin?
+        user.admin? || permission_check
       end
 
       def show?
-        user.can?('show', 'hub/admin', 'farms') || 
+        user.admin? || 
           user.farms.include?(record) || 
-          user.admin?
+          permission_check
       end
 
       def create?
-        user.can?('create', 'hub/admin', 'farms') || user.admin?
+        user.admin? || permission_check
       end
 
       def update?
-        user.can?('update', 'hub/admin', 'farms') || user.admin?
+        user.admin? || permission_check
       end
       
       # Used for controlling who can add or remove farm members
       def edit?
-        user.can?('update', 'hub/admin', 'farms') || 
+        user.admin? || 
           user.farms.include?(record) || 
-          user.admin?
+          permission_check(custom_action: 'update')
       end
 
       def destroy?
-        user.can?('destroy', 'hub/admin', 'farms') || user.admin?
+        user.admin? || permission_check
       end
 
       def set_current_farm?

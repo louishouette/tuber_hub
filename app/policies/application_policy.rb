@@ -5,8 +5,10 @@ class ApplicationPolicy
   
   attr_reader :user, :record
 
+  # Initialize the policy with a user and record
+  # If user is nil, automatically use Current.user if available
   def initialize(user, record)
-    @user = user
+    @user = user || (defined?(Current) ? Current.user : nil)
     @record = record
   end
 

@@ -1,0 +1,91 @@
+# frozen_string_literal: true
+
+<% if @namespace.present? %>
+module <%= @namespace.camelize %>
+<% end %>
+# Policy for <%= @model_class %> authorization
+class <%= @policy_class_name %> < ApplicationPolicy
+  include PermissionPolicyConcern
+  
+  # Define the controller and namespace for permission checks
+  def self.controller_name
+    '<%= @model_var.pluralize %>'
+  end
+  
+  def self.namespace_name
+    '<%= @namespace %>'
+  end
+  
+<% if @farm_scoped %>
+  # This policy is scoped to farms
+  def self.farm_scoped?
+    true
+  end
+<% end %>
+  
+  # Standard CRUD actions
+  
+  def index?
+    permission_check(:index)
+  end
+  
+  def show?
+    permission_check(:show)
+  end
+  
+  def create?
+    permission_check(:create)
+  end
+  
+  def new?
+    create?
+  end
+  
+  def update?
+    permission_check(:update)
+  end
+  
+  def edit?
+    update?
+  end
+  
+  def destroy?
+    permission_check(:destroy)
+  end
+  
+  # Scope class for policy
+  class Scope < Scope
+    def resolve
+      if user.admin? || permission_check(:index)
+<% if @farm_scoped %>
+        # If farm-scoped, only show records for the current farm
+        if Current.farm.present?
+          scope.where(farm: Current.farm)
+        else
+          scope.none
+        end
+<% else %>
+        scope.all
+<% end %>
+      else
+        scope.none
+      end
+    end
+    
+    private
+    
+    def permission_check(action)
+      # Use the policy's controller and namespace for permission checks
+      AuthorizationService.user_has_permission?(
+        user,
+        <%= @policy_class_name %>.namespace_name,
+        <%= @policy_class_name %>.controller_name,
+        action.to_s<% if @farm_scoped %>,
+        farm: Current.farm<% end %>
+      )
+    end
+  end
+end
+<% if @namespace.present? %>
+end
+<% end %>

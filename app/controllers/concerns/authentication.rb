@@ -10,6 +10,30 @@ module Authentication
     def allow_unauthenticated_access(**options)
       skip_before_action :require_authentication, **options
     end
+    
+    # Log an authorization failure for monitoring and analytics
+    # @param user [User] the user who experienced the failure
+    # @param policy_name [String] the name of the policy that caused the failure
+    # @param query [String] the query (method) in the policy that failed
+    # @param controller_action [String] the controller and action where the failure occurred
+    # @param farm [Farm, nil] the farm context of the failure, if applicable
+    def log_authorization_failure(user:, policy_name:, query:, controller_action:, farm: nil)
+      # Create an authorization audit entry if the model exists
+      if defined?(Hub::Admin::AuthorizationAudit)
+        Hub::Admin::AuthorizationAudit.create!(
+          user_id: user&.id,
+          farm_id: farm&.id,
+          policy_name: policy_name,
+          query: query,
+          controller_action: controller_action,
+          ip_address: Current.session&.ip_address,
+          user_agent: Current.session&.user_agent
+        )
+      end
+      
+      # You could also send this to an external monitoring service if needed
+      # For example: Monitoring.report_authorization_failure(...) if defined?(Monitoring)
+    end
   end
 
   private

@@ -38,6 +38,24 @@ class NamespacePolicy < ApplicationPolicy
   def destroy?
     permission_check
   end
+  
+  private
+  
+  # Checks if the user has permission based on record contents
+  # @param custom_action [String] optional custom action to check instead of the calling method
+  # @return [Boolean] whether the user has permission
+  def permission_check(custom_action: nil)
+    return true if user&.admin?
+    
+    # Extract namespace, controller, and action from the record
+    namespace = record[:namespace]
+    controller = record[:controller]
+    action = custom_action || caller_locations(1,1)[0].label.to_s.chomp('?')
+    farm = record[:farm]
+    
+    # Check permission through the authorization service
+    AuthorizationService.user_has_permission?(user, namespace, controller, action, farm: farm)
+  end
 
   # Legacy method for backward compatibility
   # @deprecated Use standard Pundit action methods instead (index?, show?, etc.)

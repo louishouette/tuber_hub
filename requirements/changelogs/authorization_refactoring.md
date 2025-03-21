@@ -63,14 +63,24 @@ The TuberHub authorization system currently implements a robust Role-Based Acces
    - Updated caching system to handle farm-specific permission caches
    - Updated documentation in docs/tuber_hub/AUTHORIZATION.md
 
-8. **Add Automatic Permission Discovery**
-   - Implement hooks to automatically discover permissions when controllers are added/changed
-   - Add Rails generators for authorization components
+8. **✓ Add Automatic Permission Discovery** (Completed March 26, 2025)
+   - Implemented `AutomaticPermissionDiscovery` concern to track controller actions at runtime
+   - Created background job `ProcessNewControllerActionJob` to handle newly discovered actions
+   - Created tools for authorization system management:
+     - Generators:
+       - `rails generate hub:authorization:policy` - Generate Pundit policies with RBAC integration
+       - `rails generate hub:authorization:controller` - Generate controllers with authorization
+     - Rake tasks:
+       - `rails authorization:refresh` - Refresh permissions database
+       - `rails authorization:report` - Generate detailed permission reports
+   - Updated documentation with examples and best practices
 
-9. **Improve Error Handling and Messaging**
-   - Enhance error messages for authorization failures
-   - Add better logging for permission issues
-   - Implement more user-friendly access denied messages
+9. **✓ Improve Error Handling and Messaging** (Completed March 26, 2025)
+   - Enhanced error messages for authorization failures with detailed context
+   - Implemented `Hub::Admin::AuthorizationAudit` model for tracking failures
+   - Added detailed logging for permission issues
+   - Updated `user_not_authorized` handlers for more user-friendly messages
+   - Created authorization system documentation and troubleshooting guides
 
 ### Phase 5: Documentation and Cleanup
 
@@ -155,3 +165,49 @@ The TuberHub authorization system currently implements a robust Role-Based Acces
    - Enhanced permission discovery to properly track controller changes
    - Implemented automatic archiving of unused permissions
    - Created a [plan for legacy code cleanup](../changelogs/authorization_legacy_code_cleanup.md)
+
+### [2025-03-26] Phase 4-5: Feature Enhancements and Documentation
+
+### [2025-03-21] Documentation Consolidation
+
+**Completed**
+1. Consolidated documentation:
+   - Merged `authorization_system.md` and `rbac_implementation.md` into a single comprehensive `AUTHORIZATION.md` document
+   - Enhanced documentation with additional sections on best practices and troubleshooting
+   - Updated the USAGE file for generators to reference the new consolidated documentation
+   - Added clearer guidance on when and why to use each generator
+   - Improved troubleshooting section with common issues and solutions
+   - Removed redundant automated tests in favor of more comprehensive documentation
+
+**Completed**
+1. Implemented automatic permission discovery:
+   - Created `AutomaticPermissionDiscovery` concern for controllers
+   - Added job `ProcessNewControllerActionJob` to handle new controller actions
+   - Updated ApplicationController to include automatic discovery
+
+2. Enhanced error handling and auditing:
+   - Created `Hub::Admin::AuthorizationAudit` model for tracking authorization failures
+   - Added methods in Authentication concern to log failures
+   - Improved error messages with detailed context information
+
+3. Created comprehensive tools for authorization management:
+   - `policy_generator.rb` for generating Pundit policies with RBAC integration
+   - `controller_generator.rb` for generating controllers with authorization
+   - Added rake tasks for operations:
+     - `rails authorization:refresh` to refresh the permission database
+     - `rails authorization:report` to generate detailed permission reports
+
+4. Created comprehensive documentation:
+   - Consolidated authorization documentation into a single source of truth in `docs/tuber_hub/AUTHORIZATION.md`
+   - Merged the content from `authorization_system.md` and `rbac_implementation.md` into a comprehensive guide
+   - Enhanced documentation with better tools and generators section
+   - Added troubleshooting guidance and best practices
+   - Created templates for consistent view integration
+   - Added comprehensive code comments throughout the codebase
+
+**Next Steps**
+1. Deploy the authorization system to the staging environment
+2. Conduct comprehensive testing with various role configurations
+3. Train development team on the new authorization patterns and tools
+4. Monitor authorization audits for unexpected failures
+5. Consider adding automated permission discovery during deployment process

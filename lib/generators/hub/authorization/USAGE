@@ -1,0 +1,13 @@
+Description:
+    Generators for the TuberHub authorization system
+
+Examples:
+    rails generate hub:authorization:policy MODEL_NAME [--namespace=Namespace]
+        Creates a new policy for the specified model with RBAC integration
+
+    rails generate hub:authorization:controller NAMESPACE CONTROLLER_NAME [--actions=index,show,create,update,destroy] [--farm-scoped]
+        Creates a new controller with the correct authorization setup
+
+For complete documentation on the authorization system, including these generators,
+please see the main documentation at docs/tuber_hub/AUTHORIZATION.md
+

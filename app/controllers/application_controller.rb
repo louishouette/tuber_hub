@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
   include Pundit::Authorization
   include PunditHelper
   include CurrentFarm
+  include AutomaticPermissionDiscovery
 
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
@@ -16,15 +17,68 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def user_not_authorized
+  def user_not_authorized(exception = nil)
+    # Extract policy and query information for better error messages
+    policy_name = exception&.policy&.class&.name || 'Unknown'
+    query = exception&.query || 'perform this action'
+    controller_action = "#{controller_name}##{action_name}"
+    
+    # Log the authorization failure for monitoring and debugging
+    log_authorization_failure(policy_name, query, controller_action)
+    
+    # Prepare user-friendly error message with context
+    error_message = generate_authorization_error_message(query)
+    
     respond_to do |format|
       format.html do
-        flash[:alert] = "You are not authorized to perform this action."
+        flash[:alert] = error_message
         redirect_to(request.referrer || root_path)
       end
-      format.json { render json: { error: 'Not authorized' }, status: :forbidden }
+      format.json { render json: { error: error_message, detail: policy_name }, status: :forbidden }
       format.js { head :forbidden }
+      format.turbo_stream { render turbo_stream: turbo_stream.replace('flash', partial: 'shared/flash') }
     end
+  end
+  
+  # Generate a user-friendly error message based on the authorization context
+  def generate_authorization_error_message(query)
+    # Customize error message based on the action being attempted
+    case query.to_s
+    when 'index?'
+      'You do not have permission to view this list.'
+    when 'show?'
+      'You do not have permission to view this record.'
+    when 'create?', 'new?'
+      'You do not have permission to create new records here.'
+    when 'update?', 'edit?'
+      'You do not have permission to modify this record.'
+    when 'destroy?'
+      'You do not have permission to delete this record.'
+    else
+      # Farm-specific message if in a farm context
+      if Current.farm.present?
+        "You are not authorized to #{query.to_s.delete('?').humanize.downcase} in this farm."
+      else
+        "You are not authorized to #{query.to_s.delete('?').humanize.downcase}."
+      end
+    end
+  end
+  
+  # Log authorization failures for monitoring and auditing
+  def log_authorization_failure(policy_name, query, controller_action)
+    user_info = Current.user ? "User ID: #{Current.user.id}, Email: #{Current.user.email}" : 'Unauthenticated user'
+    farm_context = Current.farm ? "Farm ID: #{Current.farm.id}, Name: #{Current.farm.name}" : 'No farm context'
+    
+    Rails.logger.warn("Authorization Failure: #{user_info} | #{farm_context} | Policy: #{policy_name} | Query: #{query} | Controller Action: #{controller_action}")
+    
+    # Log to an audit trail if available
+    Authentication.log_authorization_failure(
+      user: Current.user,
+      policy_name: policy_name,
+      query: query,
+      controller_action: controller_action,
+      farm: Current.farm
+    ) if defined?(Authentication.log_authorization_failure)
   end
 
   # Make current_user available to policies

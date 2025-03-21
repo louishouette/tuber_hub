@@ -302,8 +302,16 @@
         <div class="mb-4 p-3 bg-gray-100 text-xs font-mono rounded dark:bg-gray-700 dark:text-gray-300">
           <p>Search URL: <%= search_url %></p>
           <p>Add URL: <%= add_url %></p>
+          <p>Farm ID: <%= @farm.id %></p>
+          <p>Rails Routes: search_hub_admin_farm_users_path: <%= search_hub_admin_farm_users_path(@farm) %></p>
+          <p>Alternate Search Path: <%= search_hub_admin_farm_users_path(farm_id: @farm.id) %></p>
+          <p>Absolute URL: <%= request.base_url + search_hub_admin_farm_users_path(@farm) %></p>
+          <p>Controller/Action: <%= controller_name %>/<%= action_name %></p>
         </div>
-        <%= form_with url: add_url, method: :post, class: "space-y-6", data: { controller: "farm-user-search", farm_user_search_search_url: search_url } do |f| %>
+        <%= form_with url: add_url, method: :post, class: "space-y-6", data: { 
+          controller: "farm-user-search", 
+          farm_user_search_search_url: search_url # Data attribute with search URL
+        } do |f| %>
           <div>
             <%= f.label :user_search, "Search Users", class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
             <div class="flex">

@@ -10,7 +10,7 @@ if admin_user.nil?
   puts "Warning: Admin user not found. Farms will not be created."
 else
   # Create main farm for admin user
-  fbh_farm = Hub::Core::Farm.find_or_initialize_by(handle: "FBH")
+  fbh_farm = Hub::Admin::Farm.find_or_initialize_by(handle: "FBH")
   fbh_farm.assign_attributes(
     name: "Truffière de Cément",
     description: "Premier producteur français de Tuber Melanosporum (truffe noire du Périgord)",
@@ -22,7 +22,7 @@ else
     
     # Associate admin user with farm if not already done
     unless admin_user.farms.include?(fbh_farm)
-      farm_user = Hub::Core::FarmUser.create!(
+      farm_user = Hub::Admin::FarmUser.create!(
         user: admin_user, 
         farm: fbh_farm
       )
@@ -33,7 +33,7 @@ else
   end
 
   # Create second farm 
-  polmar_farm = Hub::Core::Farm.find_or_initialize_by(handle: "POLMAR")
+  polmar_farm = Hub::Admin::Farm.find_or_initialize_by(handle: "POLMAR")
   polmar_farm.assign_attributes(
     name: "POLMAR",
     description: "Truffière en Espagne",
@@ -45,7 +45,7 @@ else
     
     # Associate admin user with POLMAR farm if not already done
     unless admin_user.farms.include?(polmar_farm)
-      farm_user = Hub::Core::FarmUser.create!(
+      farm_user = Hub::Admin::FarmUser.create!(
         user: admin_user, 
         farm: polmar_farm
       )

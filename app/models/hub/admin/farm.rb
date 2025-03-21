@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: hub_core_farms
+# Table name: hub_admin_farms
 #
 #  id          :bigint           not null, primary key
 #  active      :boolean          default(TRUE), not null

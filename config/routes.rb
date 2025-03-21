@@ -78,12 +78,6 @@ Rails.application.routes.draw do
     
     # Core namespace for main elements
     namespace :core do
-      resources :farms do
-        collection do
-          post 'set_current_farm'
-        end
-        resources :users, only: [:create, :destroy], controller: 'farm_users'
-      end
       resources :seasons
       resources :productions
     end

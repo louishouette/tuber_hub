@@ -3,29 +3,50 @@ module Hub
     class FarmUsersController < BaseController
       before_action :set_farm
       before_action :set_farm_user, only: [:destroy]
+      skip_after_action :verify_policy_scoped
       
       # GET /hub/admin/farms/:farm_id/users/search
       def search
+        Rails.logger.debug "DEBUG: Entering search action with farm_id=#{params[:farm_id]}"
+        Rails.logger.debug "DEBUG: Current request path=#{request.path}"
+        Rails.logger.debug "DEBUG: Query params=#{params.inspect}"
+        
+        # Check that farm was properly loaded
+        unless @farm && @farm.id.present?
+          Rails.logger.error "ERROR: Farm not properly loaded in search action"
+          render json: { error: 'Farm not found' }, status: :not_found
+          return
+        end
+        
         authorize @farm, :edit?
         
         @query = params[:query].to_s.strip
         is_recent_request = params[:recent].present?
         
+        Rails.logger.debug "DEBUG: Processing search with query=#{@query}, recent=#{is_recent_request}"
+        
         # Find users not already in this farm
         @users = if is_recent_request || @query.blank?
           # If recent parameter is present or no query, return 5 most recent users not in the farm
-          Hub::Admin::User.where.not(id: @farm.user_ids)
+          users = Hub::Admin::User.where.not(id: @farm.user_ids)
                         .order(created_at: :desc)
                         .limit(5)
+          Rails.logger.debug "DEBUG: Found #{users.size} recent users not in farm"
+          users
         else
           # If query is present, search by first name, last name, or email
-          Hub::Admin::User.where.not(id: @farm.user_ids)
+          users = Hub::Admin::User.where.not(id: @farm.user_ids)
                         .where('LOWER(first_name) LIKE ? OR LOWER(last_name) LIKE ? OR LOWER(email_address) LIKE ?', 
                                 "%#{@query.downcase}%", "%#{@query.downcase}%", "%#{@query.downcase}%")
                         .limit(10)
+          Rails.logger.debug "DEBUG: Found #{users.size} users matching '#{@query}' not in farm"
+          users
         end
         
-        render json: @users.map { |u| { id: u.id, text: "#{u.full_name} (#{u.email_address})" } }, status: :ok
+        result = @users.map { |u| { id: u.id, text: "#{u.full_name} (#{u.email_address})" } }
+        Rails.logger.debug "DEBUG: Returning #{result.size} users as JSON"
+        
+        render json: result, status: :ok
       end
       
       # POST /hub/admin/farms/:farm_id/users
@@ -106,8 +127,20 @@ module Hub
       private
       
       def set_farm
-        @farm = Hub::Admin::Farm.find(params[:farm_id])
-        authorize @farm, :show?
+        Rails.logger.debug "DEBUG: Setting farm with farm_id=#{params[:farm_id]}"
+        begin
+          @farm = Hub::Admin::Farm.find(params[:farm_id])
+          Rails.logger.debug "DEBUG: Farm found with ID #{@farm.id}, name: #{@farm.name}"
+          authorize @farm, :show?
+        rescue ActiveRecord::RecordNotFound => e
+          Rails.logger.error "ERROR: Farm not found with ID #{params[:farm_id]}: #{e.message}"
+          render json: { error: 'Farm not found' }, status: :not_found and return if request.format.json?
+          redirect_to hub_admin_farms_path, alert: "Farm not found" and return
+        rescue Pundit::NotAuthorizedError => e
+          Rails.logger.error "ERROR: User not authorized to access farm: #{e.message}"
+          render json: { error: 'Not authorized' }, status: :forbidden and return if request.format.json?
+          redirect_to hub_admin_farms_path, alert: "You don't have permission to access that farm" and return
+        end
       end
       
       def set_farm_user

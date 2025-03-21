@@ -36,15 +36,33 @@ export default class extends Controller {
   }
   
   fetchRecentUsers() {
+    // Get the search URL from data attribute
     const searchUrl = this.element.dataset.farmUserSearchSearchUrl
+    
     if (!searchUrl) {
-      console.error('Search URL not defined')
+      console.error('DEBUG - Search URL not defined in any data attribute')
+      console.log('DEBUG - Available data attributes:', Object.keys(this.element.dataset))
       // Display error in the UI
       this.showErrorMessage('Search URL not defined in data attribute')
       return
     }
     
-    console.log('Fetching recent users from:', searchUrl)
+    // Log the search URL for debugging
+    console.log('DEBUG - Using search URL:', searchUrl)
+    
+    console.log('DEBUG - Fetching recent users from:', searchUrl)
+    console.log('DEBUG - Modified search URL:', searchUrl)
+    console.log('DEBUG - Full URL with recent parameter:', `${searchUrl}?recent=true`)
+    console.log('DEBUG - Current location:', window.location.href)
+    console.log('DEBUG - Dataset attributes:', JSON.stringify(this.element.dataset))
+    
+    // Show loading state
+    this.clearResults()
+    const loadingItem = document.createElement('li')
+    loadingItem.className = 'px-4 py-2 text-gray-500 dark:text-gray-400'
+    loadingItem.textContent = 'Loading recent users...'
+    this.listTarget.appendChild(loadingItem)
+    this.showResults()
     
     // Fetch recent users by passing recent=true parameter
     fetch(`${searchUrl}?recent=true`, {
@@ -55,6 +73,10 @@ export default class extends Controller {
       credentials: 'same-origin'
     })
       .then(response => {
+        console.log('DEBUG - Response status:', response.status)
+        console.log('DEBUG - Response URL:', response.url)
+        console.log('DEBUG - Response headers:', JSON.stringify([...response.headers.entries()]))
+        
         if (!response.ok) {
           if (response.status === 401 || response.status === 403) {
             // Authentication error - could redirect to login
@@ -63,7 +85,7 @@ export default class extends Controller {
             return []
           } else if (response.status === 404) {
             console.error('Search endpoint not found (404)')
-            this.showErrorMessage('Search endpoint not found. Please check your routes configuration.')
+            this.showErrorMessage(`Search endpoint not found at ${searchUrl}. Please check your routes configuration.`)
             return []
           }
           throw new Error(`HTTP error! Status: ${response.status}`)
@@ -120,14 +142,32 @@ export default class extends Controller {
   }
 
   searchUsers(query) {
+    // Get the search URL from data attribute
     const searchUrl = this.element.dataset.farmUserSearchSearchUrl
+    
     if (!searchUrl) {
-      console.error('Search URL not defined')
+      console.error('DEBUG - Search URL not defined in any data attribute')
+      console.log('DEBUG - Available data attributes:', Object.keys(this.element.dataset))
       this.showErrorMessage("Configuration error: Search URL not defined")
       return
     }
     
-    console.log('Searching users with query:', query, 'at URL:', searchUrl)
+    // Log the search URL for debugging
+    console.log('DEBUG - Using search URL:', searchUrl)
+    
+    console.log('DEBUG - Searching users with query:', query)
+    console.log('DEBUG - Modified search URL:', searchUrl)
+    console.log('DEBUG - Full search URL:', `${searchUrl}?query=${encodeURIComponent(query)}`)
+    console.log('DEBUG - Current page URL:', window.location.href)
+    console.log('DEBUG - Dataset attributes:', JSON.stringify(this.element.dataset))
+    
+    // Clear existing results and show loading state
+    this.clearResults()
+    const loadingItem = document.createElement('li')
+    loadingItem.className = 'px-4 py-2 text-gray-500 dark:text-gray-400'
+    loadingItem.textContent = 'Searching...'
+    this.listTarget.appendChild(loadingItem)
+    this.showResults()
     
     fetch(`${searchUrl}?query=${encodeURIComponent(query)}`, {
       headers: {
@@ -137,6 +177,10 @@ export default class extends Controller {
       credentials: 'same-origin'
     })
       .then(response => {
+        console.log('DEBUG - Search response status:', response.status)
+        console.log('DEBUG - Search response URL:', response.url)
+        console.log('DEBUG - Response headers:', JSON.stringify([...response.headers.entries()]))
+        
         if (!response.ok) {
           if (response.status === 401 || response.status === 403) {
             // Authentication error - could redirect to login
@@ -145,7 +189,7 @@ export default class extends Controller {
             return []
           } else if (response.status === 404) {
             console.error('Search endpoint not found (404)')
-            this.showErrorMessage('Search endpoint not found. Please check routes configuration.')
+            this.showErrorMessage(`Search endpoint not found at ${searchUrl}. Please check routes configuration.`)
             return []
           }
           throw new Error(`HTTP error! Status: ${response.status}`)

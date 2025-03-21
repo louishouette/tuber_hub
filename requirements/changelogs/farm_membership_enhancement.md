@@ -32,6 +32,19 @@ The Farm Membership feature allows administrators to add users to a farm. The or
 - Improved error handling in farm_user_search_controller.js, particularly for 404 errors
 - Enhanced add_selected method to better handle empty or invalid user selections
 - Added proper HTTP status codes for JSON responses
+
+### [2025-03-21] Farm Model Namespace Migration and Search Debugging
+
+#### Changes Made
+- Removed Hub::Core::Farm and Hub::Core::FarmUser models as they've been migrated to Hub::Admin namespace
+- Updated references in seed files to use Hub::Admin namespace for Farm and FarmUser models
+- Improved debugging in search functionality with detailed logging
+- Enhanced error handling in set_farm method to provide better feedback for API requests
+- Fixed template error in farm search related to JavaScript debugging
+- Simplified URL handling in JavaScript controllers to avoid manipulating URLs
+- Removed farm-related routes from the Core namespace to complete the migration
+- Ensured all farm-related functionality is exclusively in the Admin namespace
+- Fixed 404 error in farm user search by skipping unnecessary policy scope verification
 - Improved debug information in the modal form to help diagnose route issues
 
 #### Implementation Details

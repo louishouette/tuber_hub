@@ -65,44 +65,13 @@ module Hub
       end
       
       # Check if user can perform action on controller in namespace
+      # @param action [String, Symbol] the action to check permission for
+      # @param namespace [String, Symbol] the namespace to check permission in
+      # @param controller [String, Symbol] the controller to check permission for
+      # @return [Boolean] whether user has permission
       def can?(action, namespace, controller)
-        # Admin can do everything
-        return true if admin?
-        
-        # Return false if user has no roles
-        return false if roles.empty?
-        
-        # Cache the permission check for better performance
-        permission_key = "user_#{id}_permission_#{namespace}:#{controller}:#{action}"
-        Rails.cache.fetch(permission_key, expires_in: 1.hour) do
-          # Check if user has role with permission for this action
-          # Account for both unlimited and non-expired permissions
-          roles.joins(permission_assignments: :permission)
-            .where(
-              hub_admin_permissions: {
-                namespace: namespace.to_s,
-                controller: controller.to_s,
-                action: action.to_s,
-                status: 'active'
-              }
-            )
-            .where(
-              hub_admin_permission_assignments: { expires_at: nil }
-            )
-            .or(
-              roles.joins(permission_assignments: :permission)
-                .where(
-                  hub_admin_permissions: {
-                    namespace: namespace.to_s,
-                    controller: controller.to_s,
-                    action: action.to_s,
-                    status: 'active'
-                  }
-                )
-                .where('hub_admin_permission_assignments.expires_at > ?', Time.zone.now)
-            )
-            .exists?
-        end
+        # Delegate to the centralized permission service
+        PermissionService.user_has_permission?(self, namespace, controller, action)
       end
       
       # Check if user account is active

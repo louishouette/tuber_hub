@@ -54,24 +54,43 @@ module PunditHelper
   # Helper for namespace-based authorization using standard Pundit patterns
   # Use this method when you need to authorize access to a specific namespace/controller
   # rather than authorizing a specific model instance
+  # @param namespace [String] the namespace to authorize
+  # @param controller [String] the controller to authorize
+  # @param action [String, nil] the action to authorize (defaults to current action_name)
+  # @raise [Pundit::NotAuthorizedError] if user is not authorized
+  # @return [true] if authorized
   def authorize_namespace(namespace, controller, action = nil)
-    namespace_params = {
-      namespace: namespace,
-      controller: controller,
-      action: action || action_name
-    }
+    action ||= action_name
+    authorized = PermissionService.user_has_permission?(Current.user, namespace, controller, action)
     
-    # Use standard authorize method with appropriate action
-    authorize namespace_params, policy_class: NamespacePolicy
+    unless authorized
+      # If not authorized, raise the same error Pundit would, for consistent error handling
+      policy = NamespacePolicy.new(Current.user, { namespace: namespace, controller: controller, action: action })
+      raise Pundit::NotAuthorizedError.new(query: action, policy: policy, record: policy.record)
+    end
+    
+    true
   end
 
   # Helper for scoping collections based on namespace permissions
   # Useful for index actions to filter records based on user permissions
+  # @param scope_class [Class] the class to scope
+  # @param namespace [String, nil] the namespace (defaults to controller namespace)
+  # @param controller [String, nil] the controller name (defaults to current controller_name)
+  # @return [ActiveRecord::Relation] the scoped records
   def namespace_scope(scope_class, namespace: nil, controller: nil)
     namespace ||= controller_path.split('/')[0..1].join('/')
     controller ||= controller_name
     
-    # Create policy scope with namespace context
-    policy_scope(scope_class, policy_scope_class: NamespacePolicy::Scope, namespace: namespace, controller: controller)
+    # If admin user, return all records
+    return scope_class.all if Current.user&.admin?
+    
+    # If user has index permission for this namespace/controller, return all records
+    if PermissionService.user_has_permission?(Current.user, namespace, controller, 'index')
+      scope_class.all
+    else
+      # Otherwise return an empty relation
+      scope_class.none
+    end
   end
 end

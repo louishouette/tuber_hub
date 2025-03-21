@@ -55,7 +55,7 @@ class NamespacePolicy < ApplicationPolicy
         namespace = extract_namespace_from_scope
         controller = extract_controller_from_scope
         
-        if namespace && controller && user&.can?('index', namespace, controller)
+        if namespace && controller && PermissionService.user_has_permission?(user, namespace, controller, 'index')
           scope.all
         else
           scope.none

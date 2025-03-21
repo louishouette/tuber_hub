@@ -8,31 +8,18 @@ module PermissionIntegration
   
   # Check if the current user has permission for the given action
   # This automatically maps the calling method (e.g., update?) to a database permission
+  # @param namespace [String, nil] controller namespace, will be extracted from record if nil
+  # @param controller [String, nil] controller name, will be extracted from record if nil
+  # @param custom_action [String, nil] custom action name, will be extracted from caller if nil
+  # @return [Boolean] whether the user has permission
   def permission_check(namespace: nil, controller: nil, custom_action: nil)
-    # Admin users can always access everything
-    return true if user&.admin?
-    return false unless user
-    
     # Determine the correct action, namespace, and controller
     action = custom_action || extract_action_from_caller
     namespace ||= extract_namespace_from_record
     controller ||= extract_controller_from_record
     
-    # Build the permission identifier
-    permission_name = "#{namespace}:#{controller}:#{action}"
-    
-    # Check permission in the database with caching
-    Rails.cache.fetch("user_#{user.id}_permission_#{permission_name}", expires_in: 1.hour) do
-      # Get all roles for the user
-      roles = user.roles
-      return false if roles.empty?
-      
-      # Check if any of the user's roles have this permission
-      Hub::Admin::Permission.joins(:permission_assignments)
-        .where(namespace: namespace, controller: controller, action: action)
-        .where(hub_admin_permission_assignments: { role_id: roles.pluck(:id) })
-        .exists?
-    end
+    # Delegate to the centralized permission service
+    PermissionService.user_has_permission?(user, namespace, controller, action)
   end
   
   private

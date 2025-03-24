@@ -1,5 +1,33 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: hub_admin_authorization_audits
+#
+#  id                :bigint           not null, primary key
+#  controller_action :string           not null
+#  ip_address        :string
+#  policy_name       :string           not null
+#  query             :string           not null
+#  user_agent        :text
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  farm_id           :bigint
+#  user_id           :bigint
+#
+# Indexes
+#
+#  index_hub_admin_authorization_audits_on_controller_action  (controller_action)
+#  index_hub_admin_authorization_audits_on_created_at         (created_at)
+#  index_hub_admin_authorization_audits_on_farm_id            (farm_id)
+#  index_hub_admin_authorization_audits_on_policy_name        (policy_name)
+#  index_hub_admin_authorization_audits_on_user_id            (user_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (farm_id => hub_admin_farms.id)
+#  fk_rails_...  (user_id => hub_admin_users.id)
+#
 module Hub
   module Admin
     # Tracks authorization failures for security and debugging purposes

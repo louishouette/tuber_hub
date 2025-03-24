@@ -57,8 +57,8 @@ group :development do
   gem "rails-erd"
 
   # https://github.com/BetterErrors/better_errors
-  # gem 'better_errors'
-  # gem 'binding_of_caller'
+  gem 'better_errors'
+  gem 'binding_of_caller'
 end
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]

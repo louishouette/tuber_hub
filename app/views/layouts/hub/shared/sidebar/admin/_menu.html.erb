@@ -1,0 +1,76 @@
+<ul class="space-y-2">
+  <!-- Dashboard -->
+  <li>
+    <a
+      href="<%= hub_admin_dashboard_path rescue "#" %>"
+      class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'dashboard' %>"
+    >
+      <%= icon "square-3-stack-3d", class: "w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
+      <span class="ml-3">Dashboard</span>
+    </a>
+  </li>
+  
+  <!-- User Management -->
+  <li>
+    <button
+      type="button"
+      class="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 <%= 'bg-blue-50 dark:bg-gray-600' if ['users', 'roles', 'permissions'].include?(controller.controller_name) %>"
+      aria-controls="dropdown-users"
+      data-collapse-toggle="dropdown-users"
+    >
+      <%= icon "users", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" %>
+      <span class="flex-1 ml-3 text-left whitespace-nowrap">Users</span>
+      <%= icon "chevron-down", class: "w-6 h-6" %>
+    </button>
+    <ul id="dropdown-users" class="<%= 'hidden' unless ['users', 'roles', 'permissions'].include?(controller.controller_name) %> py-2 space-y-2">
+      <li>
+        <%= link_to hub_admin_users_path, class: "flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 #{controller.controller_name == 'users' ? 'bg-blue-50 dark:bg-gray-600' : ''}" do %>
+          <span>Users</span>
+        <% end %>
+      </li>
+      <li>
+        <%= link_to hub_admin_roles_path, class: "flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 #{controller.controller_name == 'roles' ? 'bg-blue-50 dark:bg-gray-600' : ''}" do %>
+          <span>Roles</span>
+        <% end %>
+      </li>
+      <li>
+        <%= link_to hub_admin_permissions_path, class: "flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 #{controller.controller_name == 'permissions' ? 'bg-blue-50 dark:bg-gray-600' : ''}" do %>
+          <span>Permissions</span>
+        <% end %>
+      </li>
+    </ul>
+  </li>
+
+  <!-- Farm Management -->
+  <li>
+    <a
+      href="<%= hub_admin_farms_path %>"
+      class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'farms' %>"
+    >
+      <%= icon "building-office", class: "w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
+      <span class="ml-3">Farms</span>
+    </a>
+  </li>
+
+  <!-- System Settings -->
+  <li>
+    <a
+      href="<%= hub_admin_settings_path rescue "#" %>"
+      class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'settings' %>"
+    >
+      <%= icon "cog", class: "w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
+      <span class="ml-3">Settings</span>
+    </a>
+  </li>
+
+  <!-- Audit Logs -->
+  <li>
+    <a
+      href="<%= hub_admin_authorization_audits_path rescue "#" %>"
+      class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'authorization_audits' %>"
+    >
+      <%= icon "document-text", class: "w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
+      <span class="ml-3">Audit Logs</span>
+    </a>
+  </li>
+</ul>

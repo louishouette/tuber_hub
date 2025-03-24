@@ -1,210 +1,54 @@
 <aside
   id="drawer-navigation"
-  class="fixed top-0 left-0 z-40 w-64 h-screen p-2 overflow-y-auto transition-transform -translate-x-full md:translate-x-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700"
+  class="fixed top-16 left-0 z-40 w-64 h-[calc(100vh-4rem)] p-2 overflow-y-auto transition-transform -translate-x-full md:translate-x-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700"
   tabindex="-1"
   aria-labelledby="drawer-navigation-label"
 >
   <div class="overflow-y-auto py-5 px-3 h-full bg-white dark:bg-gray-800">
-    <form action="#" method="GET" class="md:hidden mb-2">
-      <label for="sidebar-search" class="sr-only">Search</label>
-      <div class="relative">
-        <div
-          class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none"
-        >
-          <%= icon "magnifying-glass", variant: "outline", class: "w-5 h-5 text-gray-500 dark:text-gray-400" %>
-        </div>
-        <input
-          type="text"
-          name="search"
-          id="sidebar-search"
-          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-          placeholder="Search"
-        />
-      </div>
-    </form>
+    <!-- Dynamic Namespace Sidebar -->
+    <% 
+      # Determine the current namespace based on controller path
+      namespace = "core"
+      if controller.controller_path.start_with?('hub/admin')
+        namespace = "admin"
+      elsif controller.controller_path.start_with?('hub/cultivation')
+        namespace = "cultivation"
+      elsif controller.controller_path.start_with?('hub/measure')
+        namespace = "measure"
+      elsif controller.controller_path.start_with?('hub/core')
+        namespace = "core"
+      end
+    %>
 
-    <ul class="space-y-2">
-      <li>
-        <a
-          href="#"
-          class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-        >
-          <%= icon "squares-2x2", variant: "outline", class: "w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
-          <span class="ml-3">Overview</span>
-        </a>
-      </li>
-      <li>
-        <button
-          type="button"
-          class="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-          aria-controls="dropdown-pages"
-          data-collapse-toggle="dropdown-pages"
-        >
-          <%= icon "document-text", variant: "outline", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" %>
-          <span class="flex-1 ml-3 text-left whitespace-nowrap"
-            >Pages</span
-          >
-          <%= icon "chevron-down", variant: "outline", class: "w-6 h-6" %>
-        </button>
-        <ul id="dropdown-pages" class="hidden py-2 space-y-2">
-          <li>
-            <a
-              href="#"
-              class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-              >Settings</a
-            >
-          </li>
-          <li>
-            <a
-              href="#"
-              class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-              >Kanban</a
-            >
-          </li>
-          <li>
-            <a
-              href="#"
-              class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-              >Calendar</a
-            >
-          </li>
-        </ul>
-      </li>
-      <li>
-        <button
-          type="button"
-          class="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-          aria-controls="dropdown-sales"
-          data-collapse-toggle="dropdown-sales"
-        >
-          <%= icon "banknotes", variant: "outline", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" %>
-          <span class="flex-1 ml-3 text-left whitespace-nowrap"
-            >Sales</span
-          >
-          <%= icon "chevron-down", variant: "outline", class: "w-6 h-6" %>
-        </button>
-        <ul id="dropdown-sales" class="hidden py-2 space-y-2">
-          <li>
-            <a
-              href="#"
-              class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-              >Products</a
-            >
-          </li>
-          <li>
-            <a
-              href="#"
-              class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-              >Billing</a
-            >
-          </li>
-          <li>
-            <a
-              href="#"
-              class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-              >Invoice</a
-            >
-          </li>
-        </ul>
-      </li>
-      <li>
-        <a
-          href="#"
-          class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-        >
-          <%= icon "chat-bubble-left", variant: "outline", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
-          <span class="flex-1 ml-3 whitespace-nowrap">Messages</span>
-          <span
-            class="inline-flex justify-center items-center w-5 h-5 text-xs font-semibold rounded-full text-primary-800 bg-primary-100 dark:bg-primary-200 dark:text-primary-800"
-          >
-            4
-          </span>
-        </a>
-      </li>
-      <li>
-        <button
-          type="button"
-          class="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-          aria-controls="dropdown-authentication"
-          data-collapse-toggle="dropdown-authentication"
-        >
-          <%= icon "key", variant: "outline", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" %>
-          <span class="flex-1 ml-3 text-left whitespace-nowrap"
-            >Authentication</span
-          >
-          <%= icon "chevron-down", variant: "outline", class: "w-6 h-6" %>
-        </button>
-        <ul id="dropdown-authentication" class="hidden py-2 space-y-2">
-          <li>
-            <a
-              href="#"
-              class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-              >Sign In</a
-            >
-          </li>
-          <li>
-            <a
-              href="#"
-              class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-              >Sign Up</a
-            >
-          </li>
-          <li>
-            <a
-              href="#"
-              class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-              >Forgot Password</a
-            >
-          </li>
-        </ul>
-      </li>
-    </ul>
-    <ul
-      class="pt-5 mt-5 space-y-2 border-t border-gray-200 dark:border-gray-700"
-    >
-      <% if Current.user&.admin? %>
-      <li>
-        <button
-          type="button"
-          class="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-          aria-controls="dropdown-admin"
-          data-collapse-toggle="dropdown-admin"
-        >
-          <%= icon "shield-check", variant: "outline", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" %>
-          <span class="flex-1 ml-3 text-left whitespace-nowrap">Admin</span>
-          <%= icon "chevron-down", variant: "outline", class: "w-6 h-6" %>
-        </button>
-        <ul id="dropdown-admin" class="hidden py-2 space-y-2">
-          <li>
-            <%= link_to hub_admin_users_path, class: "flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" do %>
-              <span>Users</span>
-            <% end %>
-          </li>
-          <li>
-            <%= link_to hub_admin_roles_path, class: "flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" do %>
-              <span>Roles</span>
-            <% end %>
-          </li>
-          <li>
-            <%= link_to hub_admin_permissions_path, class: "flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" do %>
-              <span>Permissions</span>
-            <% end %>
-          </li>
-          <li>
-            <%= link_to hub_admin_farms_path, class: "flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" do %>
-              <%= icon "building-office", class: "w-5 h-5 mr-2 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" %>
-              <span>Farms</span>
-            <% end %>
-          </li>
-        </ul>
-      </li>
-      <% end %>
+    <!-- Namespace Header -->
+    <div class="flex items-center mb-4 border-b border-gray-200 dark:border-gray-700 pb-3">
+      <% namespace_titles = {
+         "admin" => "Admin", 
+         "core" => "Core", 
+         "cultivation" => "Cultivation", 
+         "measure" => "Measure"
+      } %>
+      <% namespace_icons = {
+         "admin" => "shield-check", 
+         "core" => "home-modern", 
+         "cultivation" => "beaker", 
+         "measure" => "chart-bar"
+      } %>
+      <%= icon namespace_icons[namespace], class: "w-5 h-5 mr-2 text-blue-600 dark:text-blue-500" %>
+      <div class="text-lg font-medium text-blue-600 dark:text-blue-500"><%= namespace_titles[namespace] %></div>
+    </div>
+
+    <!-- Render namespace specific menu -->
+    <%= render "layouts/hub/shared/sidebar/#{namespace}/menu" rescue render "layouts/hub/shared/sidebar/core/menu" %>
+    
+    <!-- Additional Links -->
+    <ul class="pt-5 mt-5 space-y-2 border-t border-gray-200 dark:border-gray-700">
       <li>
         <a
           href="#"
           class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
         >
-          <%= icon "document-text", variant: "outline", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
+          <%= icon "document-text", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
           <span class="ml-3">Docs</span>
         </a>
       </li>
@@ -213,7 +57,7 @@
           href="#"
           class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
         >
-          <%= icon "puzzle-piece", variant: "outline", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
+          <%= icon "puzzle-piece", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
           <span class="ml-3">Components</span>
         </a>
       </li>
@@ -222,7 +66,7 @@
           href="#"
           class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
         >
-          <%= icon "question-mark-circle", variant: "outline", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
+          <%= icon "question-mark-circle", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
           <span class="ml-3">Help</span>
         </a>
       </li>
@@ -235,14 +79,14 @@
       href="#"
       class="inline-flex justify-center p-2 text-gray-500 rounded cursor-pointer dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600"
     >
-      <%= icon "user", variant: "outline", class: "w-6 h-6" %>
+      <%= icon "user", class: "w-6 h-6" %>
     </a>
     <a
       href="#"
       data-tooltip-target="tooltip-settings"
       class="inline-flex justify-center p-2 text-gray-500 rounded cursor-pointer dark:text-gray-400 dark:hover:text-white hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-600"
     >
-      <%= icon "cog", variant: "outline", class: "w-6 h-6" %>
+      <%= icon "cog", class: "w-6 h-6" %>
     </a>
     <div
       id="tooltip-settings"
@@ -252,6 +96,6 @@
       Settings page
       <div class="tooltip-arrow" data-popper-arrow></div>
     </div>
-    <%= render "layouts/hub/shared/menu/language" %>
+    <%= render "layouts/hub/shared/sidebar/language" rescue nil %>
   </div>
 </aside>

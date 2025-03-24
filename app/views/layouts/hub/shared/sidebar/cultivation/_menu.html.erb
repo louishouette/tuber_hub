@@ -1,0 +1,156 @@
+<ul class="space-y-2">
+  <!-- Dashboard -->
+  <li>
+    <a
+      href="<%= hub_cultivation_dashboard_path rescue "#" %>"
+      class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'dashboard' %>"
+    >
+      <%= icon "beaker", class: "w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
+      <span class="ml-3">Dashboard</span>
+    </a>
+  </li>
+  
+  <!-- Primary Operations -->
+  <li>
+    <button
+      type="button"
+      class="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 <%= 'bg-blue-50 dark:bg-gray-600' if ['irrigation_operations', 'fertilization_operations', 'treatment_operations', 'planting_operations', 'harvest_operations', 'tiling_operations', 'mowing_operations', 'pruning_operations'].include?(controller.controller_name) %>"
+      aria-controls="dropdown-operations"
+      data-collapse-toggle="dropdown-operations"
+    >
+      <%= icon "play", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" %>
+      <span class="flex-1 ml-3 text-left whitespace-nowrap">Operations</span>
+      <%= icon "chevron-down", class: "w-6 h-6" %>
+    </button>
+    <ul id="dropdown-operations" class="<%= 'hidden' unless ['irrigation_operations', 'fertilization_operations', 'treatment_operations', 'planting_operations', 'harvest_operations', 'tiling_operations', 'mowing_operations', 'pruning_operations'].include?(controller.controller_name) %> py-2 space-y-2">
+      <li>
+        <a
+          href="<%= hub_cultivation_irrigation_operations_path rescue "#" %>"
+          class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'irrigation_operations' %>"
+        >
+          <span>Irrigation</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href="<%= hub_cultivation_fertilization_operations_path rescue "#" %>"
+          class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'fertilization_operations' %>"
+        >
+          <span>Fertilization</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href="<%= hub_cultivation_treatment_operations_path rescue "#" %>"
+          class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'treatment_operations' %>"
+        >
+          <span>Treatment</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href="<%= hub_cultivation_planting_operations_path rescue "#" %>"
+          class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'planting_operations' %>"
+        >
+          <span>Planting</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href="<%= hub_cultivation_harvest_operations_path rescue "#" %>"
+          class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'harvest_operations' %>"
+        >
+          <span>Harvest</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href="<%= hub_cultivation_tiling_operations_path rescue "#" %>"
+          class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'tiling_operations' %>"
+        >
+          <span>Tiling</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href="<%= hub_cultivation_mowing_operations_path rescue "#" %>"
+          class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'mowing_operations' %>"
+        >
+          <span>Mowing</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href="<%= hub_cultivation_pruning_operations_path rescue "#" %>"
+          class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'pruning_operations' %>"
+        >
+          <span>Pruning</span>
+        </a>
+      </li>
+    </ul>
+  </li>
+  
+  <!-- Configuration -->
+  <li>
+    <button
+      type="button"
+      class="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 <%= 'bg-blue-50 dark:bg-gray-600' if ['irrigation_systems', 'fertilization_configs', 'treatment_configs', 'planting_configs', 'harvest_configs', 'tools'].include?(controller.controller_name) %>"
+      aria-controls="dropdown-configs"
+      data-collapse-toggle="dropdown-configs"
+    >
+      <%= icon "cog", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" %>
+      <span class="flex-1 ml-3 text-left whitespace-nowrap">Configuration</span>
+      <%= icon "chevron-down", class: "w-6 h-6" %>
+    </button>
+    <ul id="dropdown-configs" class="<%= 'hidden' unless ['irrigation_systems', 'fertilization_configs', 'treatment_configs', 'planting_configs', 'harvest_configs', 'tools'].include?(controller.controller_name) %> py-2 space-y-2">
+      <li>
+        <a
+          href="<%= hub_cultivation_irrigation_systems_path rescue "#" %>"
+          class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'irrigation_systems' %>"
+        >
+          <span>Irrigation System</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href="<%= hub_cultivation_fertilization_configs_path rescue "#" %>"
+          class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'fertilization_configs' %>"
+        >
+          <span>Fertilization</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href="<%= hub_cultivation_treatment_configs_path rescue "#" %>"
+          class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'treatment_configs' %>"
+        >
+          <span>Treatment</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href="<%= hub_cultivation_planting_configs_path rescue "#" %>"
+          class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'planting_configs' %>"
+        >
+          <span>Planting</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href="<%= hub_cultivation_harvest_configs_path rescue "#" %>"
+          class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'harvest_configs' %>"
+        >
+          <span>Harvest</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href="<%= hub_cultivation_tools_path rescue "#" %>"
+          class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'tools' %>"
+        >
+          <span>Tools</span>
+        </a>
+      </li>
+    </ul>
+  </li>
+</ul>

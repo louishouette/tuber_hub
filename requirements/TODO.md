@@ -1,5 +1,5 @@
-# FIX: 
-- redirect /hub/admin to /hub/admin/dashboard and build a quick dashboard for the admin dashboard
+# FIX: namespace organisation
+- check that every namespace under Hub follows the structure detailed in @docs/tuber_hub/NAMESPACE_CREATION.md
 
 # FEAT: User preferences
 - create a UserPreference model referencing the Hub::Admin::User, key (string), and value (text) plus timestamps.

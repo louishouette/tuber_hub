@@ -1,0 +1,107 @@
+<ul class="space-y-2">
+  <!-- Dashboard -->
+  <li>
+    <a
+      href="<%= hub_measure_dashboard_path rescue "#" %>"
+      class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'dashboard' %>"
+    >
+      <%= icon "chart-bar", class: "w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
+      <span class="ml-3">Dashboard</span>
+    </a>
+  </li>
+  
+  <!-- Observations -->
+  <li>
+    <a
+      href="<%= hub_measure_observations_path rescue "#" %>"
+      class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'observations' %>"
+    >
+      <%= icon "eye", class: "w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
+      <span class="ml-3">Observations</span>
+    </a>
+  </li>
+  
+  <!-- Soil Analysis -->
+  <li>
+    <a
+      href="<%= hub_measure_soil_analyses_path rescue "#" %>"
+      class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'soil_analyses' %>"
+    >
+      <%= icon "globe-alt", class: "w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
+      <span class="ml-3">Soil Analysis</span>
+    </a>
+  </li>
+  
+  <!-- Meteorological Data -->
+  <li>
+    <a
+      href="<%= hub_measure_meteorological_data_index_path rescue "#" %>"
+      class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'meteorological_data' %>"
+    >
+      <%= icon "cloud", class: "w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
+      <span class="ml-3">Meteorological Data</span>
+    </a>
+  </li>
+  
+  <!-- Plant Measurements -->
+  <li>
+    <a
+      href="<%= hub_measure_plant_measurements_path rescue "#" %>"
+      class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'plant_measurements' %>"
+    >
+      <%= icon "arrow-trending-up", class: "w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
+      <span class="ml-3">Plant Measurements</span>
+    </a>
+  </li>
+  
+  <!-- Multispectral Analysis -->
+  <li>
+    <a
+      href="<%= hub_measure_multispectral_analyses_path rescue "#" %>"
+      class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'multispectral_analyses' %>"
+    >
+      <%= icon "photo", class: "w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
+      <span class="ml-3">Multispectral Analysis</span>
+    </a>
+  </li>
+  
+  <!-- Reports & Visualizations -->
+  <li>
+    <button
+      type="button"
+      class="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'reports' %>"
+      aria-controls="dropdown-reports"
+      data-collapse-toggle="dropdown-reports"
+    >
+      <%= icon "document-chart-bar", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" %>
+      <span class="flex-1 ml-3 text-left whitespace-nowrap">Reports</span>
+      <%= icon "chevron-down", class: "w-6 h-6" %>
+    </button>
+    <ul id="dropdown-reports" class="<%= 'hidden' unless controller.controller_name == 'reports' %> py-2 space-y-2">
+      <li>
+        <a
+          href="<%= hub_measure_time_series_reports_path rescue "#" %>"
+          class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 <%= 'bg-blue-50 dark:bg-gray-600' if controller.action_name == 'time_series' %>"
+        >
+          <span>Time Series</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href="<%= hub_measure_comparison_reports_path rescue "#" %>"
+          class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 <%= 'bg-blue-50 dark:bg-gray-600' if controller.action_name == 'comparison' %>"
+        >
+          <span>Comparative Analysis</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href="<%= hub_measure_seasonal_reports_path rescue "#" %>"
+          class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 <%= 'bg-blue-50 dark:bg-gray-600' if controller.action_name == 'seasonal' %>"
+        >
+          <span>Seasonal Reports</span>
+        </a>
+      </li>
+    </ul>
+  </li>
+</ul>

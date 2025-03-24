@@ -110,4 +110,39 @@ class AuthorizationService
   def self.clear_permission_assignment_caches(permission_assignment)
     Authorization::CacheService.clear_permission_assignment_caches(permission_assignment)
   end
+  
+  #===========================================================================
+  # Helper Methods for Permissions
+  #===========================================================================
+  
+  # Returns the standard CRUD action names
+  # @return [Array<String>] array of standard CRUD action names
+  def self.crud_actions
+    Authorization::BaseService::CRUD_ACTIONS.keys
+  end
+  
+  # Returns actions that can be controlled via Pundit policies
+  # @param include_all [Boolean] whether to include all actions or just CRUD actions
+  # @return [Array<String>] array of action names
+  def self.pundit_controllable_actions(include_all: false)
+    if include_all
+      # Return all actions that have corresponding policy methods
+      # This would include both standard CRUD and custom actions
+      crud_actions + %w[search export import]
+    else
+      # Return just the standard CRUD actions
+      crud_actions
+    end
+  end
+  
+  # Returns controllers that don't require authentication
+  # @return [Array<String>] array of controller names
+  def self.find_unauthenticated_controllers
+    Authorization::ManagementService.send(:find_application_controllers).select do |controller_class|
+      Authorization::ManagementService.send(:controller_requires_no_auth?, controller_class)
+    end.map do |controller_class|
+      namespace, controller = Authorization::ManagementService.send(:extract_namespace_and_controller, controller_class)
+      namespace.present? ? "#{namespace}/#{controller}" : controller
+    end
+  end
 end

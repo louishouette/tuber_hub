@@ -1,0 +1,181 @@
+<div class="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
+  <div class="w-full mb-1">
+    <div class="mb-4">
+      <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">Dashboard</h1>
+      <% if @farm.present? %>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Farm: <%= @farm.name %></p>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<div class="flex flex-col">
+  <div class="overflow-x-auto">
+    <div class="inline-block min-w-full align-middle">
+      <div class="p-4 bg-white dark:bg-gray-800">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 mb-4">
+          <!-- Seasons Card -->
+          <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Seasons</h3>
+              <%= link_to hub_core_seasons_path, class: "text-sm font-medium text-blue-600 hover:underline dark:text-blue-500" do %>
+                View all
+              <% end %>
+            </div>
+            <div class="flex flex-col mt-2">
+              <div class="overflow-x-auto rounded-lg">
+                <div class="inline-block min-w-full align-middle">
+                  <% if @seasons.present? %>
+                    <div class="overflow-hidden shadow-md">
+                      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+                        <thead class="bg-gray-50 dark:bg-gray-700">
+                          <tr>
+                            <th scope="col" class="p-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-white">
+                              Name
+                            </th>
+                            <th scope="col" class="p-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-white">
+                              Status
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody class="bg-white dark:bg-gray-800">
+                          <% @seasons.each do |season| %>
+                            <tr class="border-b dark:border-gray-700">
+                              <td class="p-4 text-sm font-normal text-gray-900 whitespace-nowrap dark:text-white">
+                                <%= link_to season.name, hub_core_season_path(season), class: "text-blue-600 hover:underline dark:text-blue-500" %>
+                              </td>
+                              <td class="p-4 text-sm font-normal whitespace-nowrap">
+                                <span class="<%= season.active? ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' %> text-xs font-medium px-2.5 py-0.5 rounded-md">
+                                  <%= season.active? ? 'Active' : 'Inactive' %>
+                                </span>
+                              </td>
+                            </tr>
+                          <% end %>
+                        </tbody>
+                      </table>
+                    </div>
+                  <% else %>
+                    <div class="text-center py-4">
+                      <p class="text-gray-500 dark:text-gray-400">No seasons found</p>
+                      <%= link_to "Create Season", new_hub_core_season_path, class: "mt-2 inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Varieties Card -->
+          <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Varieties</h3>
+              <%= link_to hub_core_varieties_path, class: "text-sm font-medium text-blue-600 hover:underline dark:text-blue-500" do %>
+                View all
+              <% end %>
+            </div>
+            <div class="flex flex-col mt-2">
+              <div class="overflow-x-auto rounded-lg">
+                <div class="inline-block min-w-full align-middle">
+                  <div class="text-center py-4">
+                    <%= icon "beaker", class: "mx-auto h-12 w-12 text-gray-400" %>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">Manage Varieties</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">View and manage your tuber varieties</p>
+                    <div class="mt-4">
+                      <%= link_to "View Varieties", hub_core_varieties_path, class: "inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Quick Actions Card -->
+          <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Quick Actions</h3>
+            </div>
+            <div class="flex flex-col mt-2">
+              <div class="space-y-3">
+                <%= link_to hub_core_seasons_path, class: "flex items-center p-3 text-base font-bold text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white" do %>
+                  <span class="inline-flex items-center justify-center px-2 py-0.5 ml-3 text-xs font-medium text-gray-500 bg-gray-200 rounded dark:bg-gray-700 dark:text-gray-400">
+                    <%= icon "calendar", class: "w-5 h-5" %>
+                  </span>
+                  <span class="flex-1 ml-3 whitespace-nowrap">Manage Seasons</span>
+                <% end %>
+                
+                <%= link_to hub_core_varieties_path, class: "flex items-center p-3 text-base font-bold text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white" do %>
+                  <span class="inline-flex items-center justify-center px-2 py-0.5 ml-3 text-xs font-medium text-gray-500 bg-gray-200 rounded dark:bg-gray-700 dark:text-gray-400">
+                    <%= icon "beaker", class: "w-5 h-5" %>
+                  </span>
+                  <span class="flex-1 ml-3 whitespace-nowrap">Manage Varieties</span>
+                <% end %>
+                
+                <%= link_to hub_core_reports_path, class: "flex items-center p-3 text-base font-bold text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white" do %>
+                  <span class="inline-flex items-center justify-center px-2 py-0.5 ml-3 text-xs font-medium text-gray-500 bg-gray-200 rounded dark:bg-gray-700 dark:text-gray-400">
+                    <%= icon "chart-bar", class: "w-5 h-5" %>
+                  </span>
+                  <span class="flex-1 ml-3 whitespace-nowrap">View Reports</span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Recent Activity</h3>
+          </div>
+          <div class="flex flex-col mt-2">
+            <div class="overflow-x-auto rounded-lg">
+              <div class="inline-block min-w-full align-middle">
+                <div class="overflow-hidden shadow-md">
+                  <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                      <tr>
+                        <th scope="col" class="p-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-white">
+                          Action
+                        </th>
+                        <th scope="col" class="p-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-white">
+                          User
+                        </th>
+                        <th scope="col" class="p-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-white">
+                          Date
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800">
+                      <!-- Sample activity rows - will be replaced with actual data -->
+                      <tr class="border-b dark:border-gray-700">
+                        <td class="p-4 text-sm font-normal text-gray-900 whitespace-nowrap dark:text-white">
+                          Season created
+                        </td>
+                        <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400">
+                          <%= Current.user&.email_address || 'user@example.com' %>
+                        </td>
+                        <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400">
+                          <%= Time.zone.now.strftime("%B %d, %Y") %>
+                        </td>
+                      </tr>
+                      <tr class="border-b dark:border-gray-700">
+                        <td class="p-4 text-sm font-normal text-gray-900 whitespace-nowrap dark:text-white">
+                          Variety updated
+                        </td>
+                        <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400">
+                          <%= Current.user&.email_address || 'user@example.com' %>
+                        </td>
+                        <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400">
+                          <%= (Time.zone.now - 1.day).strftime("%B %d, %Y") %>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,28 @@
+<%= form_with(model: [:<%= @namespace %>, base], class: "space-y-6") do |form| %>
+  <% if base.errors.any? %>
+    <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-red-100 dark:text-red-800" role="alert">
+      <h2 class="font-semibold"><%= pluralize(base.errors.count, "error") %> prohibited this base from being saved:</h2>
+      <ul class="mt-1.5 list-disc list-inside">
+        <% base.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :name, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+    <%= form.text_field :name, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" %>
+  </div>
+
+  <div>
+    <%= form.label :description, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+    <%= form.text_area :description, rows: 4, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" %>
+  </div>
+
+  <!-- Add more form fields as needed -->
+
+  <div class="flex justify-end">
+    <%= form.submit class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" %>
+  </div>
+<% end %>

@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 module Hub
-  module Admin
-    # Base controller for the Admin namespace
+  module Measure
+    # Base controller for the Measure namespace
     class BaseController < Hub::BaseController
       include NamespaceViewPath
-      include AdminAuthorization
+      include FarmSelection
     end
   end
 end

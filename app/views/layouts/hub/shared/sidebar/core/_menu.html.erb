@@ -1,0 +1,77 @@
+<ul class="space-y-2">
+  <!-- Dashboard -->
+  <li>
+    <a
+      href="<%= hub_core_dashboard_path rescue "#" %>"
+      class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'dashboard' %>"
+    >
+      <%= icon "home-modern", class: "w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
+      <span class="ml-3">Dashboard</span>
+    </a>
+  </li>
+  
+  <!-- Farm Overview -->
+  <li>
+    <a
+      href="<%= hub_core_farm_path(current_farm) rescue "#" %>"
+      class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'farms' && controller.action_name == 'show' %>"
+    >
+      <%= icon "building-office", class: "w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
+      <span class="ml-3">Farm Overview</span>
+    </a>
+  </li>
+  
+  <!-- Seasons Management -->
+  <li>
+    <a
+      href="<%= hub_core_seasons_path rescue "#" %>"
+      class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'seasons' %>"
+    >
+      <%= icon "calendar", class: "w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
+      <span class="ml-3">Seasons</span>
+    </a>
+  </li>
+  
+  <!-- Productions Management -->
+  <li>
+    <a
+      href="<%= hub_core_productions_path rescue "#" %>"
+      class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'productions' %>"
+    >
+      <%= icon "truck", class: "w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" %>
+      <span class="ml-3">Productions</span>
+    </a>
+  </li>
+  
+  <!-- Reports -->
+  <li>
+    <button
+      type="button"
+      class="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 <%= 'bg-blue-50 dark:bg-gray-600' if controller.controller_name == 'reports' %>"
+      aria-controls="dropdown-reports"
+      data-collapse-toggle="dropdown-reports"
+    >
+      <%= icon "document-chart-bar", class: "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" %>
+      <span class="flex-1 ml-3 text-left whitespace-nowrap">Reports</span>
+      <%= icon "chevron-down", class: "w-6 h-6" %>
+    </button>
+    <ul id="dropdown-reports" class="<%= 'hidden' unless controller.controller_name == 'reports' %> py-2 space-y-2">
+      <li>
+        <a
+          href="<%= hub_core_seasonal_reports_path rescue "#" %>"
+          class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 <%= 'bg-blue-50 dark:bg-gray-600' if controller.action_name == 'seasonal' %>"
+        >
+          <span>Seasonal Reports</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href="<%= hub_core_production_reports_path rescue "#" %>"
+          class="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 <%= 'bg-blue-50 dark:bg-gray-600' if controller.action_name == 'production' %>"
+        >
+          <span>Production Reports</span>
+        </a>
+      </li>
+    </ul>
+  </li>
+</ul>

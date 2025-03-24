@@ -2,15 +2,10 @@
 
 module Hub
   module Core
+    # Base controller for the Core namespace
     class BaseController < Hub::BaseController
-      before_action :set_default_view_path
-      
-      private
-      
-      # Set the default view path to include the namespace
-      def set_default_view_path
-        prepend_view_path Rails.root.join('app', 'views', 'hub', 'core')
-      end
+      include NamespaceViewPath
+      include FarmSelection
     end
   end
 end

@@ -37,6 +37,7 @@ Rails.application.routes.draw do
   namespace :hub do
 
     namespace :admin do
+      get '/', to: 'dashboard#index', as: :dashboard
       # User management
       resources :users do
         member do
@@ -78,12 +79,17 @@ Rails.application.routes.draw do
     
     # Core namespace for main elements
     namespace :core do
+      get '/', to: 'dashboard#index', as: :dashboard
       resources :seasons
       resources :productions
+      resources :varieties
+      resources :reports, only: [:index, :show]
     end
     
     # Cultivation namespace and sub-namespaces
     namespace :cultivation do
+      get '/', to: 'dashboard#index', as: :dashboard
+      resources :operations
       resources :irrigations
       resources :fertilizations
       resources :treatments
@@ -145,7 +151,9 @@ Rails.application.routes.draw do
     
     # Measure namespace and sub-namespaces
     namespace :measure do
+      get '/', to: 'dashboard#index', as: :dashboard
       resources :observations
+      resources :weather_data, only: [:index, :show]
       
       namespace :observation do
         resources :types
@@ -158,7 +166,8 @@ Rails.application.routes.draw do
       resources :plant_electrophysiologies
       resources :multispectrals
     end
-    get "/", to: "home#index"
+    # Redirect hub root to core dashboard
+    get "/", to: redirect('/hub/core')
   end
 
   # The namespace directive already handles both /namespace and /namespace/ routes

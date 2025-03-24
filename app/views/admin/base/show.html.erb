@@ -1,0 +1,60 @@
+<div class="py-4 px-6 flex items-center justify-between mb-4 bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700">
+  <h1 class="text-2xl font-bold text-gray-900 dark:text-white"><%= @base.name %></h1>
+  <div class="flex items-center gap-2">
+    <% if policy(Base).index? %>
+      <a class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-700 bg-white border border-gray-200 rounded-lg hover:bg-blue-50 focus:ring-4 focus:ring-blue-100 dark:bg-gray-800 dark:text-blue-500 dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700" href="<%= admin_base_path %>">
+        <%= icon "arrow-left", class: "w-4 h-4 mr-2" %>
+        Back to List
+      </a>
+    <% end %>
+    <% if policy(@base).edit? %>
+      <a class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700" href="<%= edit_admin_base_path(@base) %>">
+        <%= icon "pencil", class: "w-4 h-4 mr-2" %>
+        Edit
+      </a>
+    <% end %>
+  </div>
+</div>
+
+<div class="bg-white border border-gray-200 rounded-lg shadow p-6 dark:bg-gray-800 dark:border-gray-700">
+  <div class="mb-6">
+    <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Details</h2>
+    
+    <table class="w-full text-left text-gray-500 dark:text-gray-400">
+      <tbody>
+        <tr class="bg-white dark:bg-gray-800">
+          <th class="py-2 px-4 font-medium text-gray-900 dark:text-white w-1/4">Name</th>
+          <td class="py-2 px-4"><%= @base.name %></td>
+        </tr>
+        <tr class="bg-gray-50 dark:bg-gray-700">
+          <th class="py-2 px-4 font-medium text-gray-900 dark:text-white w-1/4">Description</th>
+          <td class="py-2 px-4"><%= @base.description %></td>
+        </tr>
+
+        <!-- Add more fields as needed -->
+        <tr class="bg-gray-50 dark:bg-gray-700">
+          <th class="py-2 px-4 font-medium text-gray-900 dark:text-white w-1/4">Created At</th>
+          <td class="py-2 px-4"><%= @base.created_at.strftime('%B %d, %Y %H:%M') %></td>
+        </tr>
+        <tr class="bg-white dark:bg-gray-800">
+          <th class="py-2 px-4 font-medium text-gray-900 dark:text-white w-1/4">Updated At</th>
+          <td class="py-2 px-4"><%= @base.updated_at.strftime('%B %d, %Y %H:%M') %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <!-- Add any related information or child records here -->
+  
+  <div class="flex justify-between border-t border-gray-200 dark:border-gray-700 pt-4 mt-6">
+    <% if policy(@base).destroy? %>
+      <%= button_to admin_base_path(@base),
+                  method: :delete,
+                  class: "inline-flex items-center px-4 py-2 text-sm font-medium text-red-700 bg-white border border-gray-200 rounded-lg hover:bg-red-50 focus:ring-4 focus:ring-red-100 dark:bg-gray-800 dark:text-red-500 dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700",
+                  form: { data: { turbo_confirm: 'Are you sure you want to delete this base?' } } do %>
+        <%= icon "trash", class: "w-4 h-4 mr-2" %>
+        Delete Base
+      <% end %>
+    <% end %>
+  </div>
+</div>

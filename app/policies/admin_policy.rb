@@ -2,10 +2,9 @@
 
 # This policy handles authorization for admin-specific controllers and actions
 # It replaces the custom admin authorization logic in Hub::Admin::BaseController
-module Hub
-  # Policy for Hub::Admin namespace
-  class AdminPolicy < ApplicationPolicy
-    include PermissionPolicyConcern
+# Policy for Hub::Admin namespace
+class AdminPolicy < ApplicationPolicy
+  include PermissionPolicyConcern
   
   attr_reader :user, :record
 
@@ -90,7 +89,7 @@ module Hub
     AuthorizationService.user_has_permission?(Current.user, namespace, controller, action)
   end
 
-  class Scope < Scope
+  class Scope < ApplicationPolicy::Scope
     def resolve
       if Current.user&.admin?
         scope.all

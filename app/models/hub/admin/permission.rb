@@ -2,14 +2,15 @@
 #
 # Table name: hub_admin_permissions
 #
-#  id          :bigint           not null, primary key
-#  action      :string
-#  controller  :string
-#  description :text
-#  namespace   :string
-#  status      :string
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
+#  id            :bigint           not null, primary key
+#  action        :string
+#  controller    :string
+#  description   :text
+#  discovered_at :datetime
+#  namespace     :string
+#  status        :string
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
 #
 # Indexes
 #

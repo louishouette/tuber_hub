@@ -145,4 +145,32 @@ class AuthorizationService
       namespace.present? ? "#{namespace}/#{controller}" : controller
     end
   end
+  
+  # Returns the main namespaces used in the application
+  # @return [Array<String>] array of namespace names
+  def self.main_namespaces
+    # Get all active permissions and extract unique namespaces from the database
+    db_namespaces = active_permissions.pluck(:namespace).uniq.compact
+    
+    # Dynamically discover namespaces from controllers
+    Rails.application.eager_load! if Rails.env.development?
+    discovered_namespaces = []
+    
+    # Find all controllers that inherit from ApplicationController
+    ObjectSpace.each_object(Class) do |klass|
+      next unless klass < ActionController::Base
+      next if klass.name.blank? || !klass.name.include?('Controller')
+      
+      # Extract namespace from controller name
+      if klass.name.include?('::')
+        # Convert 'Hub::Admin::UsersController' to 'hub/admin'
+        namespace = klass.name.split('::')[0...-1].join('::').underscore.gsub('/', '_')
+        namespace = namespace.gsub('_', '/')
+        discovered_namespaces << namespace if namespace.present?
+      end
+    end
+    
+    # Combine and deduplicate namespaces
+    (db_namespaces + discovered_namespaces).uniq.sort
+  end
 end

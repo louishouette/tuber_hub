@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_21_115603) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_25_085857) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -121,6 +121,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_21_115603) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "status"
+    t.datetime "discovered_at"
     t.index ["namespace", "controller", "action", "status"], name: "idx_permissions_lookup"
     t.index ["status"], name: "index_hub_admin_permissions_on_status"
   end

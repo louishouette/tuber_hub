@@ -139,7 +139,8 @@ module Authorization
       controllers = []
       ObjectSpace.each_object(Class) do |klass|
         next unless klass < ActionController::Base
-        next if klass.abstract_class?
+        # Skip abstract controllers by checking if they're marked as abstract or have 'Base' in their name
+        next if klass.name&.end_with?('BaseController') || (klass.respond_to?(:abstract) && klass.abstract)
         
         # Only include controllers from our application, not from gems
         controllers << klass if klass.instance_methods(false).any? && 
@@ -247,7 +248,8 @@ module Authorization
         
         # Update or create the permission
         if is_new || needs_update
-          description = generate_permission_description(permission_data) 
+          description = generate_permission_description(permission_data)
+          permission.discovered_at = Time.zone.now
           
           # Update the permission
           permission.update(

@@ -31,11 +31,37 @@ module Hub
         @user = User.new(user_params)
         authorize @user
         
-        if @user.save
-          redirect_to hub_admin_users_path, notice: "User #{@user.full_name} was successfully created."
-        else
-          render :new, status: :unprocessable_entity
+        # Attempt to save inside a transaction to ensure all associations are created
+        ActiveRecord::Base.transaction do
+          if @user.save
+            # Associate with farm
+            if params[:user][:farm_id].present?
+              farm = Farm.find(params[:user][:farm_id])
+              farm_user = Hub::Admin::FarmUser.new(farm: farm, user: @user)
+              farm_user.save!
+            end
+            
+            # Assign role
+            if params[:user][:role_id].present?
+              role = Role.find(params[:user][:role_id])
+              assignment = Hub::Admin::RoleAssignment.new(
+                user: @user,
+                role: role,
+                granted_by: Current.user,
+                global: true
+              )
+              assignment.save!
+            end
+            
+            redirect_to hub_admin_users_path, notice: "User #{@user.full_name} was successfully created."
+            return
+          end
         end
+        
+        # If we got here, there was an error
+        @farms = Hub::Admin::Farm.all.order(:name)
+        @roles = Hub::Admin::Role.all.order(:name)
+        render :new, status: :unprocessable_entity
       end
 
       def edit

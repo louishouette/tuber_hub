@@ -54,6 +54,26 @@
       </div>
     <% end %>
 
+    <% unless user.persisted? %>
+      <div>
+        <%= form.label :farm_id, 'Farm', class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+        <%= form.select :farm_id, 
+          Hub::Admin::Farm.all.order(:name).map { |f| [f.name, f.id] }, 
+          { include_blank: 'Select a farm (required)' }, 
+          { class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" }
+        %>
+      </div>
+
+      <div>
+        <%= form.label :role_id, 'Role', class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+        <%= form.select :role_id, 
+          Hub::Admin::Role.all.order(:name).map { |r| [r.name, r.id] }, 
+          { include_blank: 'Select a role (required)' }, 
+          { class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" }
+        %>
+      </div>
+    <% end %>
+
     <div class="md:col-span-2">
       <%= form.label :notes, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
       <%= form.text_area :notes, value: user.notes, rows: 3, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" %>

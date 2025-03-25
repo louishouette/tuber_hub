@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_25_085857) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_25_104744) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -151,6 +151,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_25_085857) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "hub_admin_user_preferences", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "key", null: false
+    t.text "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "key"], name: "index_user_preferences_on_user_id_and_key", unique: true
+    t.index ["user_id"], name: "index_hub_admin_user_preferences_on_user_id"
+  end
+
   create_table "hub_admin_users", force: :cascade do |t|
     t.string "email_address", null: false
     t.string "password_digest", null: false
@@ -194,5 +204,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_25_085857) do
   add_foreign_key "hub_admin_role_assignments", "hub_admin_users", column: "granted_by_id"
   add_foreign_key "hub_admin_role_assignments", "hub_admin_users", column: "revoked_by_id"
   add_foreign_key "hub_admin_role_assignments", "hub_admin_users", column: "user_id"
+  add_foreign_key "hub_admin_user_preferences", "hub_admin_users", column: "user_id"
   add_foreign_key "sessions", "hub_admin_users", column: "user_id"
 end

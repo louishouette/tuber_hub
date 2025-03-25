@@ -22,8 +22,6 @@
 
 <!-- Dropdown menu -->
 <div id="farmDropdown" class="hidden z-10 w-72 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
-  
-  
   <ul class="py-2 text-sm text-gray-700 dark:text-gray-200 max-h-48 overflow-y-auto" aria-labelledby="farmDropdownButton">
     <% if Current.user.farms.any? %>
       <% Current.user.farms.each do |farm| %>
@@ -43,18 +41,35 @@
               </span>
             </div>
           <% else %>
-            <%= button_to set_current_farm_hub_admin_farms_path(farm_id: farm.id), method: :post, class: "w-full py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" do %>
-              <div class="flex items-center">
-                <div class="flex-shrink-0">
-                  <% if farm&.logo&.attached? %>
-                    <%= image_tag farm.logo.variant(resize_to_limit: [20, 20]), class: "w-5 h-5 rounded" %>
-                  <% else %>
-                    <%= icon "building-office-2", class: "w-5 h-5" %>
+            <div class="flex flex-col w-full">
+              <%= button_to set_current_farm_hub_admin_farms_path(farm_id: farm.id), method: :post, class: "w-full py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" do %>
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                      <% if farm&.logo&.attached? %>
+                        <%= image_tag farm.logo.variant(resize_to_limit: [20, 20]), class: "w-5 h-5 rounded" %>
+                      <% else %>
+                        <%= icon "building-office-2", class: "w-5 h-5" %>
+                      <% end %>
+                    </div>
+                    <span class="ml-2"><%= farm.name %></span>
+                  </div>
+                  <% if Current.user.default_farm == farm %>
+                    <span class="inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium text-blue-500 bg-blue-100 rounded dark:bg-gray-800 dark:text-blue-400">
+                      Default
+                    </span>
                   <% end %>
                 </div>
-                <span class="ml-2"><%= farm.name %></span>
-              <!-- Default farm indicator will be added in future UserPreference implementation -->
-            <% end %>
+              <% end %>
+              <div class="px-4 py-1">
+                <%= button_to set_current_farm_hub_admin_farms_path(farm_id: farm.id, set_as_default: true), method: :post, class: "text-xs text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400" do %>
+                  <div class="flex items-center">
+                    <%= icon "star", class: "w-3 h-3 mr-1" %>
+                    Set as default
+                  </div>
+                <% end %>
+              </div>
+            </div>
           <% end %>
         </li>
       <% end %>
@@ -64,6 +79,4 @@
       </li>
     <% end %>
   </ul>
-  
-
 </div>

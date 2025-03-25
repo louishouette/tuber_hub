@@ -1,0 +1,13 @@
+<div class="py-4 px-6 flex items-center justify-between mb-4 bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700">
+  <h1 class="text-2xl font-bold text-gray-900 dark:text-white">New Preference</h1>
+  <div class="flex items-center gap-2">
+    <%= link_to hub_admin_user_preferences_path, class: "inline-flex items-center px-4 py-2 text-sm font-medium text-blue-700 bg-white border border-gray-200 rounded-lg hover:bg-blue-50 focus:ring-4 focus:ring-blue-100 dark:bg-gray-800 dark:text-blue-500 dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700" do %>
+      <%= icon "arrow-left", class: "w-4 h-4 mr-2" %>
+      Back to Preferences
+    <% end %>
+  </div>
+</div>
+
+<div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 dark:bg-gray-800">
+  <%= render "form", user_preference: @user_preference %>
+</div>

@@ -38,6 +38,15 @@ Rails.application.routes.draw do
 
     namespace :admin do
       get '/', to: 'dashboard#index', as: :dashboard
+      
+      # User preferences
+      resources :user_preferences do
+        collection do
+          get 'settings', to: 'user_preferences#settings', as: 'settings'
+          post 'update_preference', to: 'user_preferences#update_preference', as: 'update_preference'
+        end
+      end
+      post 'user_preferences/set_default_farm', to: 'user_preferences#set_default_farm', as: 'set_default_farm'
       # User management
       resources :users do
         member do

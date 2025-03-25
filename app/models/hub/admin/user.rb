@@ -42,12 +42,30 @@ module Hub
       # Farm associations
       has_many :farm_users, dependent: :destroy
       has_many :farms, through: :farm_users
+      
+      # User preferences association
+      has_many :user_preferences, dependent: :destroy
 
       normalizes :email_address, with: ->(e) { e.strip.downcase }
       normalizes :first_name, :last_name, :job_title, with: ->(value) { value.to_s.strip.presence }
       normalizes :phone_number, with: ->(value) { value.to_s.strip.gsub(/\D/, '').presence }
 
       validates :first_name, :last_name, presence: true, on: :update
+      validate :must_have_farm, on: :create
+      validate :must_have_role, on: :create
+
+      # Custom validation to ensure user has at least one farm
+      def must_have_farm
+        errors.add(:base, 'User must be associated with at least one farm') if farm_id.blank?
+      end
+
+      # Custom validation to ensure user has at least one role
+      def must_have_role
+        errors.add(:base, 'User must be assigned at least one role') if role_id.blank?
+      end
+
+      # Virtual attributes for farm assignment during user creation
+      attr_accessor :farm_id, :role_id
 
       def full_name
         [ first_name, last_name ].compact_blank.join(" ")
@@ -117,6 +135,92 @@ module Hub
         return nil unless farm
         farm_users.find_or_create_by(farm: farm)
         farm
+      end
+      
+      # User preference methods
+      
+      # Get a user preference with optional default value
+      # @param key [String] The preference key
+      # @param default [Object] Default value if preference doesn't exist
+      # @return [Object] The preference value or default
+      def preference(key, default = nil)
+        pref = user_preferences.by_key(key).first
+        pref&.value || default
+      end
+      
+      # Set a user preference
+      # @param key [String] The preference key
+      # @param value [Object] The value to store
+      # @return [Hub::Admin::UserPreference] The updated or created preference
+      def set_preference(key, value)
+        pref = user_preferences.by_key(key).first_or_initialize
+        pref.update_value(value)
+        pref
+      end
+      
+      # Delete a user preference
+      # @param key [String] The preference key to delete
+      # @return [Boolean] Whether the deletion was successful
+      def delete_preference(key)
+        pref = user_preferences.by_key(key).first
+        return true unless pref.present?
+        pref.destroy
+      end
+      
+      # Check if a preference exists
+      # @param key [String] The preference key to check
+      # @return [Boolean] Whether the preference exists
+      def has_preference?(key)
+        user_preferences.by_key(key).exists?
+      end
+      
+      # Get all user-defined preferences (not system preferences)
+      # @return [ActiveRecord::Relation] Collection of user preferences
+      def user_defined_preferences
+        user_preferences.user_defined
+      end
+      
+      # Get all system preferences
+      # @return [ActiveRecord::Relation] Collection of system preferences
+      def system_preferences
+        user_preferences.system_preferences
+      end
+      
+      # Get the user's default farm
+      # @return [Hub::Admin::Farm, nil] The default farm or nil if not set
+      def default_farm
+        farm_id = preference('default_farm_id')
+        return nil unless farm_id.present?
+        
+        # Only return farms the user has access to
+        farms.find_by(id: farm_id)
+      end
+      
+      # Set the user's default farm
+      # @param farm [Hub::Admin::Farm] The farm to set as default
+      # @return [Boolean] Whether the operation was successful
+      def set_default_farm(farm)
+        return false unless farm && farms.include?(farm)
+        set_preference('default_farm_id', farm.id)
+        true
+      end
+      
+      # Clear the user's default farm setting
+      # @return [Boolean] Whether the operation was successful
+      def clear_default_farm
+        delete_preference('default_farm_id')
+      end
+      
+      # Get the number of items to display per page
+      # @return [Integer] The number of items per page
+      def items_per_page
+        preference('items_per_page', 25).to_i
+      end
+      
+      # Check if notifications are enabled
+      # @return [Boolean] Whether notifications are enabled
+      def notifications_enabled?
+        preference('notifications_enabled', true) == true
       end
     end
   end

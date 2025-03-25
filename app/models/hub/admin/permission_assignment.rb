@@ -34,6 +34,7 @@ module Hub
       belongs_to :role
       belongs_to :permission
       belongs_to :granted_by, class_name: 'Hub::Admin::User', optional: true
+      belongs_to :revoked_by, class_name: 'Hub::Admin::User', optional: true
       
       # Validations
       validates :role_id, uniqueness: { scope: :permission_id, message: 'already has this permission' }

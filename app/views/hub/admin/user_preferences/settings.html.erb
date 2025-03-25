@@ -1,0 +1,134 @@
+<div class="py-4 px-6 flex items-center justify-between mb-4 bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700">
+  <h1 class="text-2xl font-bold text-gray-900 dark:text-white">User Settings</h1>
+  <div class="flex items-center gap-2">
+    <%= link_to hub_admin_user_preferences_path, class: "inline-flex items-center px-4 py-2 text-sm font-medium text-[#1C3835] bg-white border border-gray-200 rounded-lg hover:bg-[#E9F1F0] focus:ring-4 focus:ring-green-300 dark:bg-gray-800 dark:text-[#4ECCA3] dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700" do %>
+      <%= icon "adjustments-horizontal", class: "w-4 h-4 mr-2" %>
+      All Preferences
+    <% end %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- Left sidebar with preference categories -->
+  <div class="lg:col-span-1">
+    <div class="bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 dark:bg-gray-800 p-4">
+      <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Settings Categories</h2>
+      
+      <nav class="space-y-1">
+        <a href="#farm-settings" class="flex items-center px-3 py-2 text-sm font-medium text-[#1C3835] bg-[#E9F1F0] rounded-lg dark:bg-gray-700 dark:text-[#4ECCA3]">
+          <%= icon "building-office", class: "w-5 h-5 mr-2" %>
+          Farm Settings
+        </a>
+        <a href="#interface-settings" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg dark:text-gray-300 dark:hover:bg-gray-700">
+          <%= icon "computer-desktop", class: "w-5 h-5 mr-2" %>
+          Interface Settings
+        </a>
+        <a href="#notification-settings" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg dark:text-gray-300 dark:hover:bg-gray-700">
+          <%= icon "bell", class: "w-5 h-5 mr-2" %>
+          Notification Settings
+        </a>
+      </nav>
+    </div>
+  </div>
+  
+  <!-- Right content area with settings forms -->
+  <div class="lg:col-span-2">
+    <!-- Farm Settings Section -->
+    <div id="farm-settings" class="bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 dark:bg-gray-800 p-6 mb-6">
+      <div class="flex items-center mb-4">
+        <%= icon "building-office", class: "w-6 h-6 mr-2 text-gray-500 dark:text-gray-400" %>
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Farm Settings</h2>
+      </div>
+      
+      <div class="space-y-6">
+        <!-- Default Farm Setting -->
+        <div>
+          <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Default Farm</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Select the farm that will be automatically selected when you log in.</p>
+          
+          <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+            <% if Current.user.farms.any? %>
+              <%= form_with url: hub_admin_set_default_farm_path, method: :post, class: "space-y-4" do |form| %>
+                <div>
+                  <%= form.select :farm_id, 
+                    Current.user.farms.map { |f| [f.name, f.id, { selected: Current.user.default_farm == f }] },
+                    { include_blank: "No default farm" },
+                    class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#1C3835] focus:border-[#1C3835] block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-[#4ECCA3] dark:focus:border-[#4ECCA3]" %>
+                </div>
+                
+                <div>
+                  <%= form.submit "Save Default Farm", class: "text-white bg-[#1C3835] hover:bg-[#152A27] focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-[#1C3835] dark:hover:bg-[#152A27] focus:outline-none dark:focus:ring-green-800" %>
+                </div>
+              <% end %>
+            <% else %>
+              <p class="text-gray-500 dark:text-gray-400">You don't have access to any farms yet.</p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Interface Settings Section -->
+    <div id="interface-settings" class="bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 dark:bg-gray-800 p-6 mb-6">
+      <div class="flex items-center mb-4">
+        <%= icon "computer-desktop", class: "w-6 h-6 mr-2 text-gray-500 dark:text-gray-400" %>
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Interface Settings</h2>
+      </div>
+      
+      <div class="space-y-6">
+        <!-- Items Per Page Setting -->
+        <div>
+          <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Items Per Page</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Set how many items to display per page in lists and tables.</p>
+          
+          <%= form_with url: hub_admin_user_preferences_path, method: :post, class: "space-y-4" do |form| %>
+            <%= form.hidden_field :user_preference, value: { key: 'items_per_page' } %>
+            
+            <div>
+              <%= form.select :value, 
+                [10, 25, 50, 100].map { |n| ["#{n} items", n, { selected: Current.user.preference('items_per_page', 25) == n }] },
+                {},
+                class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" %>
+            </div>
+            
+            <div>
+              <%= form.submit "Save Setting", class: "text-white bg-[#1C3835] hover:bg-[#152A27] focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-[#1C3835] dark:hover:bg-[#152A27] focus:outline-none dark:focus:ring-green-800" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Notification Settings Section -->
+    <div id="notification-settings" class="bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 dark:bg-gray-800 p-6">
+      <div class="flex items-center mb-4">
+        <%= icon "bell", class: "w-6 h-6 mr-2 text-gray-500 dark:text-gray-400" %>
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Notification Settings</h2>
+      </div>
+      
+      <div class="space-y-6">
+        <!-- Notifications Enabled Setting -->
+        <div>
+          <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Notification Preferences</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Configure your notification preferences.</p>
+          
+          <%= form_with url: hub_admin_user_preferences_path, method: :post, class: "space-y-4" do |form| %>
+            <%= form.hidden_field :user_preference, value: { key: 'notifications_enabled' } %>
+            
+            <div class="flex items-center">
+              <%= form.check_box :value, 
+                { checked: Current.user.preference('notifications_enabled', true) == true, class: "w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" },
+                true,
+                false %>
+              <%= form.label :value, "Enable notifications", class: "ml-2 text-sm font-medium text-gray-900 dark:text-gray-300" %>
+            </div>
+            
+            <div>
+              <%= form.submit "Save Setting", class: "text-white bg-[#1C3835] hover:bg-[#152A27] focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-[#1C3835] dark:hover:bg-[#152A27] focus:outline-none dark:focus:ring-green-800" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

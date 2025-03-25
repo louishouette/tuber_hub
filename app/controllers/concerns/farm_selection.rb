@@ -13,6 +13,6 @@ module FarmSelection
   # Redirects to the farms page if no farm is selected
   # Uses Current.farm to check if a farm is selected
   def require_farm_selection
-    redirect_to hub_farms_path, alert: "Please select a farm to continue." unless Current.farm.present?
+    redirect_to hub_admin_farms_path, alert: "Please select a farm to continue." unless Current.farm.present?
   end
 end

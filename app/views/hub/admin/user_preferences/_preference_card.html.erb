@@ -1,0 +1,50 @@
+<div class="bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 flex flex-col h-full">
+  <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-white"><%= preference.key.humanize %></h3>
+    <p class="text-sm text-gray-500 dark:text-gray-400">Last updated: <%= Time.zone.parse(preference.updated_at.to_s).strftime("%b %d, %Y %H:%M") %></p>
+  </div>
+  
+  <div class="p-4 flex-grow">
+    <div class="mb-4">
+      <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Value:</h4>
+      <div class="text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 p-2 rounded-lg text-sm overflow-auto max-h-24">
+        <% if preference.key == 'default_farm_id' && preference.value.present? %>
+          <% farm = Hub::Admin::Farm.find_by(id: preference.value) %>
+          <% if farm %>
+            <div class="flex items-center">
+              <% if farm.logo.attached? %>
+                <%= image_tag farm.logo.variant(resize_to_limit: [20, 20]), class: "w-5 h-5 rounded mr-2" %>
+              <% else %>
+                <%= icon "building-office-2", class: "w-5 h-5 mr-2" %>
+              <% end %>
+              <%= farm.name %>
+            </div>
+          <% else %>
+            <%= preference.value %> (Farm not found)
+          <% end %>
+        <% else %>
+          <%= preference.value.to_s %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  
+  <div class="p-4 border-t border-gray-200 dark:border-gray-700 mt-auto">
+    <div class="flex justify-end space-x-2">
+      <%= link_to hub_admin_user_preference_path(preference), class: "inline-flex items-center px-2 py-1 text-sm font-medium text-center text-blue-700 bg-white rounded-lg hover:bg-blue-50" do %>
+        <%= icon "eye", class: "w-4 h-4 mr-1" %>
+        View
+      <% end %>
+      
+      <%= link_to edit_hub_admin_user_preference_path(preference), class: "inline-flex items-center px-2 py-1 text-sm font-medium text-center text-gray-700 bg-white rounded-lg hover:bg-gray-50" do %>
+        <%= icon "pencil", class: "w-4 h-4 mr-1" %>
+        Edit
+      <% end %>
+      
+      <%= button_to hub_admin_user_preference_path(preference), method: :delete, form: { data: { turbo_confirm: "Are you sure you want to delete this preference?" } }, class: "inline-flex items-center px-2 py-1 text-sm font-medium text-center text-red-700 bg-white rounded-lg hover:bg-red-50" do %>
+        <%= icon "trash", class: "w-4 h-4 mr-1" %>
+        Delete
+      <% end %>
+    </div>
+  </div>
+</div>

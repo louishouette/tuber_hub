@@ -25,7 +25,11 @@ module CurrentFarm
       return farm if farm && farm.active? && Current.user&.farms&.include?(farm)
     end
 
-    # No default farm preference at this point
+    # Try to use the user's default farm preference if available
+    if Current.user&.default_farm.present?
+      default_farm = Current.user.default_farm
+      return default_farm if default_farm.active?
+    end
 
     # Final fallback: first active farm the user belongs to
     Current.user&.farms&.where(active: true)&.first

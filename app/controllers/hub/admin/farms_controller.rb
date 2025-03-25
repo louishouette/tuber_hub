@@ -58,8 +58,16 @@ module Hub
         # Store the current farm_id in session
         session[:current_farm_id] = @farm.id
         
+        # Also set as default farm in user preferences if requested
+        if params[:set_as_default].present? && params[:set_as_default] == 'true'
+          Current.user.set_default_farm(@farm)
+          notice_message = "Switched to #{@farm.name} and set as your default farm"
+        else
+          notice_message = "Switched to #{@farm.name}"
+        end
+        
         # Redirect back to the previous page or default route
-        redirect_back(fallback_location: hub_path, notice: "Switched to #{@farm.name}")
+        redirect_back(fallback_location: hub_path, notice: notice_message)
       end
 
       private

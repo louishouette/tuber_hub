@@ -1,0 +1,30 @@
+<%= form_with(model: user_preference, url: user_preference.new_record? ? hub_admin_user_preferences_path : hub_admin_user_preference_path(user_preference), class: "space-y-4") do |form| %>
+  <% if user_preference.errors.any? %>
+    <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400">
+      <h2><%= pluralize(user_preference.errors.count, "error") %> prohibited this preference from being saved:</h2>
+      <ul class="mt-1.5 list-disc list-inside">
+        <% user_preference.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :key, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+    <%= form.text_field :key, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500", disabled: !user_preference.new_record? %>
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">The unique identifier for this preference</p>
+  </div>
+
+  <div>
+    <%= form.label :value, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+    <%= form.text_area :value, rows: 4, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" %>
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">The value to store for this preference</p>
+  </div>
+
+  <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+    <%= link_to "Cancel", user_preference.new_record? ? hub_admin_user_preferences_path : hub_admin_user_preference_path(user_preference), class: "text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600" %>
+    
+    <%= form.submit class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
+  </div>
+<% end %>

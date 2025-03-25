@@ -6,7 +6,7 @@ class NamespacePolicy < ApplicationPolicy
   attr_reader :user, :record
 
   def initialize(user, record)
-    @user = user
+    @user = user || (defined?(Current) ? Current.user : nil)
     @record = record # record should be a hash with namespace, controller, action keys
   end
 
@@ -45,7 +45,7 @@ class NamespacePolicy < ApplicationPolicy
   # @param custom_action [String] optional custom action to check instead of the calling method
   # @return [Boolean] whether the user has permission
   def permission_check(custom_action: nil)
-    return true if user&.admin?
+    return true if Current.user&.admin?
     
     # Extract namespace, controller, and action from the record
     namespace = record[:namespace]
@@ -54,7 +54,7 @@ class NamespacePolicy < ApplicationPolicy
     farm = record[:farm]
     
     # Check permission through the authorization service
-    AuthorizationService.user_has_permission?(user, namespace, controller, action, farm: farm)
+    AuthorizationService.user_has_permission?(Current.user, namespace, controller, action, farm: farm)
   end
 
   # Legacy method for backward compatibility
@@ -66,7 +66,7 @@ class NamespacePolicy < ApplicationPolicy
 
   class Scope < Scope
     def resolve(farm: nil)
-      if user&.admin?
+      if Current.user&.admin?
         scope.all
       else
         # Default implementation - should be overridden in specific policies
@@ -74,7 +74,7 @@ class NamespacePolicy < ApplicationPolicy
         controller = extract_controller_from_scope
         
         # Pass the farm parameter to check farm-specific permissions when appropriate
-        if namespace && controller && AuthorizationService.user_has_permission?(user, namespace, controller, 'index', farm: farm)
+        if namespace && controller && AuthorizationService.user_has_permission?(Current.user, namespace, controller, 'index', farm: farm)
           scope.all
         else
           scope.none

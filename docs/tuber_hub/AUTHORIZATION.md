@@ -197,16 +197,6 @@ AuthorizationService.user_has_permission?(user, namespace, controller, action, u
 
 ## Development Tools
 
-### Generators
-
-```bash
-# Generate policy with RBAC integration
-rails generate hub:authorization:policy Model [--namespace=Namespace]
-
-# Generate controller with authorization
-rails generate hub:authorization:controller Namespace ControllerName [--actions=index,show,create,update,destroy] [--farm-scoped]
-```
-
 ### Rake Tasks
 
 ```bash

@@ -42,7 +42,7 @@ class ApplicationPolicy
 
   class Scope
     def initialize(user, scope)
-      @user = user
+      @user = user || (defined?(Current) ? Current.user : nil)
       @scope = scope
     end
 

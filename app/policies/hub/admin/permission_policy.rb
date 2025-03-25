@@ -4,20 +4,20 @@ module Hub
       include PermissionPolicyConcern
       
       def index?
-        user.admin? || permission_check
+        Current.user.admin? || permission_check
       end
       
       def show?
-        user.admin? || permission_check
+        Current.user.admin? || permission_check
       end
       
       def refresh?
-        user.admin? # Only admins can refresh permissions
+        Current.user.admin? # Only admins can refresh permissions
       end
       
       class Scope < Scope
         def resolve
-          if user.admin?
+          if Current.user.admin?
             scope.all
           else
             scope.where(status: 'active')

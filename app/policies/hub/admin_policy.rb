@@ -4,28 +4,28 @@ module Hub
   # Policy for Hub::Admin namespace
   class AdminPolicy < ApplicationPolicy
     def index?
-      user.admin?
+      Current.user.admin?
     end
 
     def show?
-      user.admin?
+      Current.user.admin?
     end
 
     def create?
-      user.admin?
+      Current.user.admin?
     end
 
     def update?
-      user.admin?
+      Current.user.admin?
     end
 
     def destroy?
-      user.admin?
+      Current.user.admin?
     end
 
     class Scope < Scope
       def resolve
-        user.admin? ? scope.all : scope.none
+        Current.user.admin? ? scope.all : scope.none
       end
     end
   end

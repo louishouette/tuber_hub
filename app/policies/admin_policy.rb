@@ -2,8 +2,10 @@
 
 # This policy handles authorization for admin-specific controllers and actions
 # It replaces the custom admin authorization logic in Hub::Admin::BaseController
-class AdminPolicy < ApplicationPolicy
-  include PermissionPolicyConcern
+module Hub
+  # Policy for Hub::Admin namespace
+  class AdminPolicy < ApplicationPolicy
+    include PermissionPolicyConcern
   
   attr_reader :user, :record
 
@@ -14,15 +16,15 @@ class AdminPolicy < ApplicationPolicy
 
   # Standard CRUD action methods following Pundit conventions
   def index?
-    user&.admin?
+    Current.user&.admin?
   end
 
   def show?
-    user&.admin?
+    Current.user&.admin?
   end
 
   def create?
-    user&.admin?
+    Current.user&.admin?
   end
 
   def new?
@@ -30,7 +32,7 @@ class AdminPolicy < ApplicationPolicy
   end
 
   def update?
-    user&.admin?
+    Current.user&.admin?
   end
 
   def edit?
@@ -38,39 +40,39 @@ class AdminPolicy < ApplicationPolicy
   end
 
   def destroy?
-    user&.admin?
+    Current.user&.admin?
   end
 
   # Method to authorize viewing users for a role
   def users?
-    user&.admin?
+    Current.user&.admin?
   end
 
   # Legacy method for backward compatibility
   # @deprecated Use standard Pundit action methods instead (index?, show?, etc.)
   def access?
     Rails.logger.warn "[DEPRECATION] AdminPolicy#access? is deprecated. Use standard Pundit methods instead."
-    user&.admin?
+    Current.user&.admin?
   end
   
   # Method to authorize assigning roles to users
   def assign_roles?
-    user&.admin? || permission_check(custom_action: 'assign_roles')
+    Current.user&.admin? || permission_check(custom_action: 'assign_roles')
   end
   
   # Method to authorize assigning permissions to roles
   def assign_permissions?
-    user&.admin? || permission_check(custom_action: 'assign_permissions')
+    Current.user&.admin? || permission_check(custom_action: 'assign_permissions')
   end
   
   # Method to authorize searching for resources
   def search?
-    user&.admin? || permission_check(custom_action: 'search')
+    Current.user&.admin? || permission_check(custom_action: 'search')
   end
   
   # Method to authorize refreshing permissions
   def refresh?
-    user&.admin? || permission_check(custom_action: 'refresh')
+    Current.user&.admin? || permission_check(custom_action: 'refresh')
   end
   
   private
@@ -85,12 +87,12 @@ class AdminPolicy < ApplicationPolicy
     action = custom_action || caller_locations(1,1)[0].label.to_s.chomp('?')
     
     # Check permission through the authorization service
-    AuthorizationService.user_has_permission?(user, namespace, controller, action)
+    AuthorizationService.user_has_permission?(Current.user, namespace, controller, action)
   end
 
   class Scope < Scope
     def resolve
-      if user&.admin?
+      if Current.user&.admin?
         scope.all
       else
         scope.none

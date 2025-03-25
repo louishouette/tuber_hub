@@ -41,10 +41,10 @@ module PermissionPolicyConcern
     farm = extract_farm_from_record
     
     # Check admin status first (admins can do everything)
-    return true if user.admin?
+    return true if Current.user.admin?
     
     # Check for specific permission through the authorization service
-    AuthorizationService.user_has_permission?(user, namespace, controller, action, farm: farm)
+    AuthorizationService.user_has_permission?(Current.user, namespace, controller, action, farm: farm)
   end
   
   # Extract namespace and controller from a policy class name

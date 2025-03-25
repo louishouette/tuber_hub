@@ -59,18 +59,32 @@ module Hub
       def self.available_namespaces
         # Use Solid Cache to improve performance
         Rails.cache.fetch('hub_admin_permission:available_namespaces', expires_in: 1.hour) do
-          # Get namespaces from the AuthorizationService (dynamically discovered)
-          app_namespaces = if defined?(AuthorizationService)
-                            AuthorizationService.main_namespaces
-                          else
-                            []
-                          end
+          # First, get the same filtered permissions used in the permissions controller
+          permissions_scope = where(status: STATUSES[:active])
           
-          # Get existing namespaces from the database
-          db_namespaces = distinct.pluck(:namespace).compact
+          # Apply the same filtering as in the permissions controller
+          system_controllers = %w[application sessions passwords]
+          system_actions = %w[authorize_namespace namespace_scope allowed_to? user_is_admin?]
           
-          # Combine and ensure uniqueness
-          (app_namespaces + db_namespaces).uniq.sort
+          permissions_scope = permissions_scope.where.not(controller: system_controllers)
+          permissions_scope = permissions_scope.where.not(action: system_actions)
+          
+          # Filter out controllers that don't require authentication if AuthorizationService is available
+          if defined?(AuthorizationService)
+            unauthenticated_controllers = AuthorizationService.find_unauthenticated_controllers
+            permissions_scope = permissions_scope.where.not(controller: unauthenticated_controllers) if unauthenticated_controllers.any?
+          end
+          
+          # Get namespaces from filtered permissions
+          namespaces = permissions_scope.distinct.pluck(:namespace).compact
+          
+          # Get the actual permissions list to see what the controller is displaying
+          # This ensures we only show namespaces that appear in the permissions list
+          filtered_permissions = permissions_scope.order(:namespace, :controller, :action)
+          displayed_namespaces = filtered_permissions.map(&:namespace).uniq
+          
+          # Return only namespaces that are actually displayed in the permissions list
+          displayed_namespaces.sort
         end
       end
 

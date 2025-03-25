@@ -111,12 +111,11 @@ module Authorization
       permissions_to_archive.each do |p|
         # Store previous state for audit
         previous_state = {
-          status: p.status,
-          archived_at: p.archived_at
+          status: p.status
         }
         
         # Update permission status
-        p.update(status: 'archived', archived_at: Time.zone.now)
+        p.update(status: 'archived')
         
         # Create audit record
         audit_permission_change(p, 'archived', previous_state: previous_state)

@@ -45,10 +45,21 @@ module Hub
           permissions_scope = permissions_scope.where.not(controller: unauthenticated_controllers) if unauthenticated_controllers.any?
         end
         
-        # Get all available namespaces using the model method
-        @available_namespaces = Permission.available_namespaces
+        # Create a base scope for getting all valid namespaces (regardless of filtering)
+        # This is used for the dropdown and must include all namespaces even when a filter is applied
+        namespace_base_scope = Permission.where(status: Permission::STATUSES[:active])
+          .where.not(controller: system_controllers)
+          .where.not(action: system_actions)
         
-        # Final ordered result
+        # Apply the controller filtering but don't apply any namespace filtering
+        # This ensures the dropdown shows all valid namespaces regardless of current filters
+        all_unauthenticated_controllers = AuthorizationService.find_unauthenticated_controllers
+        namespace_base_scope = namespace_base_scope.where.not(controller: all_unauthenticated_controllers) if all_unauthenticated_controllers.any?
+        
+        # Get all valid namespaces for the dropdown
+        @available_namespaces = namespace_base_scope.pluck(:namespace).uniq.compact.sort
+        
+        # Final ordered result for the permissions list (includes all filtering)
         @permissions = permissions_scope.order(:namespace, :controller, :action)
           
         # Group permissions by namespace and controller for easier navigation

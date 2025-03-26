@@ -1,5 +1,25 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: hub_admin_user_preferences
+#
+#  id         :bigint           not null, primary key
+#  key        :string           not null
+#  value      :text
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  user_id    :bigint           not null
+#
+# Indexes
+#
+#  index_hub_admin_user_preferences_on_user_id  (user_id)
+#  index_user_preferences_on_user_id_and_key    (user_id,key) UNIQUE
+#
+# Foreign Keys
+#
+#  fk_rails_...  (user_id => hub_admin_users.id)
+#
 module Hub
   module Admin
     # Model for storing user preferences as key-value pairs

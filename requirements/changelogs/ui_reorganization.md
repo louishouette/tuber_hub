@@ -43,6 +43,19 @@ For each development session, please structure your entries as follows:
 - Defined namespace structure for the application
 - Outlined implementation phases and technical considerations
 
+## [2025-03-26] User Profile Page Improvements
+
+### Changes Made
+- Moved the Edit button to the User Information card header for better consistency with other cards
+- Prevented Current User from seeing the Deactivate button for themselves (users can't deactivate their own account)
+- Changed the Manage button to View All in the Roles card with proper icon styling
+- Replaced the + icon with an eye icon in the roles section to better represent the view action
+- Added a Show All button to the User Activity card header
+- Removed the icon before the User Preferences title for cleaner presentation
+- Fixed the tabs in the User Preferences section to properly show active state and enable switching between tabs
+- Updated all buttons to follow the TuberHub Action Button Styling Standards
+- Improved the Stimulus tabs controller to properly handle tab switching and active styling
+
 ### Proposed Architecture
 
 #### 1. Global Layout Components

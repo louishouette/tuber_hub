@@ -82,7 +82,6 @@ The User Preferences system will be implemented as a flexible key-value store th
 
 #### 3. Controller and Views
 - Enhanced `UserPreferencesController` with:
-  - Added `settings` action for a centralized settings page
   - Added `update_preference` action for updating preferences via AJAX or form submission
   - Improved `set_default_farm` to handle clearing the default farm
   - Updated pagination to use the user's preference for items per page
@@ -98,6 +97,34 @@ The User Preferences system will be implemented as a flexible key-value store th
 - Added settings link in the user profile dropdown menu
   - Used appropriate icon and styling
   - Made settings easily accessible from anywhere in the application
+
+## [2025-03-26] User Preferences Integration
+
+### Completed Tasks
+
+#### 1. User Show Page Integration
+- Integrated user preferences directly into the user show page
+  - Removed the separate user preferences page and routes
+  - Added tabbed interface for different preference categories
+  - Organized preferences into Farm Settings, Interface, Language, and Timezone tabs
+
+#### 2. Controller Updates
+- Updated the `Hub::Admin::UsersController` to handle preference management:
+  - Added methods for setting default farm directly in the user controller
+  - Added methods for updating user preferences
+  - Removed separate UserPreferencesController
+
+#### 3. Route Simplification
+- Simplified routes by removing separate user preferences routes
+- Added necessary routes to the users resource for preference management
+
+#### 4. Navigation Improvements
+- Removed the separate Preferences link from the profile dropdown menu
+- Streamlined access to preferences through the user show page only
+
+#### 5. Stimulus Integration
+- Implemented tabbed interface using Stimulus controller
+- Ensured proper tab switching and content display
 
 This changelog will be updated as development progresses to track changes, decisions, and any issues encountered.
 

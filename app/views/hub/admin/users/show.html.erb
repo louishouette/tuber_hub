@@ -2,12 +2,6 @@
   <div class="flex items-center justify-between mb-6">
     <h1 class="text-2xl font-bold text-gray-900 dark:text-white">User Profile</h1>
     <div class="space-x-2">
-      <%= link_to 'Edit', edit_hub_admin_user_path(@user), class: 'text-white bg-[#1C3835] hover:bg-[#152A27] font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none' %>
-      <% if policy(@user).toggle_active? %>
-        <%= button_to toggle_active_hub_admin_user_path(@user), method: :patch, class: 'text-white bg-[#1C3835] hover:bg-[#152A27] font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none' do %>
-          <%= @user.active? ? 'Deactivate User' : 'Activate User' %>
-        <% end %>
-      <% end %>
       <%= link_to 'Back to Users', hub_admin_users_path, class: 'text-gray-700 hover:text-gray-900 font-medium text-sm' %>
     </div>
   </div>
@@ -18,7 +12,21 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       <!-- User Details Card -->
       <div class="md:col-span-2 bg-white rounded-lg shadow dark:bg-gray-800 p-6">
-        <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">User Information</h2>
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-white">User Information</h2>
+          <div class="flex items-center gap-2">
+            <%= link_to edit_hub_admin_user_path(@user), class: 'inline-flex items-center px-2 py-1 text-sm font-medium text-center text-gray-700 bg-white rounded-lg hover:bg-gray-50' do %>
+              <%= icon "pencil", class: "w-4 h-4 mr-1" %>
+              Edit
+            <% end %>
+            <% unless Current.user == @user %>
+              <%= button_to toggle_active_hub_admin_user_path(@user), method: :patch, class: 'inline-flex items-center px-2 py-1 text-sm font-medium text-center text-red-700 bg-white rounded-lg hover:bg-red-50 cursor-pointer', form: { data: { turbo_confirm: 'Are you sure you want to deactivate this user?' } } do %>
+                <%= icon "user-minus", class: "w-4 h-4 mr-1" %>
+                Deactivate
+              <% end %>
+            <% end %>
+          </div>
+        </div>
         
         <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-5">
           <div>
@@ -70,23 +78,21 @@
       <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Roles</h2>
-          <%= link_to 'Manage', assign_roles_hub_admin_user_path(@user), class: 'text-sm font-medium text-white bg-[#1C3835] hover:bg-[#152A27] focus:ring-4 focus:outline-none focus:ring-green-300 rounded-lg px-4 py-2.5' %>
+          <%= link_to hub_admin_roles_path, class: 'inline-flex items-center px-4 py-2 text-sm font-medium text-[#1C3835] bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-green-100 dark:bg-gray-800 dark:text-[#4ECCA3] dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700 cursor-pointer' do %>
+            <%= icon "list-bullet", class: "w-4 h-4 mr-2" %>
+            Browse
+          <% end %>
         </div>
         
         <% if @user.roles.any? %>
           <ul class="space-y-2">
             <% @user.roles.each do |role| %>
-              <li class="flex items-center justify-between p-3 bg-gray-50 rounded-lg dark:bg-gray-700">
-                <div>
-                  <span class="block text-base font-medium text-gray-900 dark:text-white"><%= role.name %></span>
+              <li class="p-3 bg-gray-50 rounded-lg dark:bg-gray-700">
+                <%= link_to hub_admin_role_path(role), class: 'block w-full cursor-pointer' do %>
+                  <span class="block text-base font-medium text-gray-900 dark:text-white hover:text-[#1C3835] hover:underline dark:hover:text-[#4ECCA3]"><%= role.name %></span>
                   <% if role.description.present? %>
                     <span class="block text-xs text-gray-500 dark:text-gray-400"><%= role.description %></span>
                   <% end %>
-                </div>
-                <%= link_to hub_admin_role_path(role), class: 'text-[#1C3835] dark:text-[#4ECCA3] hover:underline' do %>
-                  <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 12h12m-6-6v12"/>
-                  </svg>
                 <% end %>
               </li>
             <% end %>
@@ -99,7 +105,13 @@
     
     <!-- User Activity -->
     <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
-      <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">User Activity</h2>
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">User Activity</h2>
+        <%= link_to '#', class: 'inline-flex items-center px-4 py-2 text-sm font-medium text-[#1C3835] bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-green-100 dark:bg-gray-800 dark:text-[#4ECCA3] dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700 cursor-pointer' do %>
+          <%= icon "list-bullet", class: "w-4 h-4 mr-2" %>
+          Browse
+        <% end %>
+      </div>
       
       <dl class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         <div class="p-4 bg-gray-50 rounded-lg dark:bg-gray-700">
@@ -128,9 +140,8 @@
     </div>
 
     <!-- User Preferences -->
-    <div class="mt-8 bg-white rounded-lg shadow dark:bg-gray-800 p-6">
-      <div class="flex items-center mb-4">
-        <%= icon "adjustments-horizontal", class: "w-6 h-6 mr-2 text-gray-500 dark:text-gray-400" %>
+    <div class="mt-8 bg-white rounded-lg shadow dark:bg-gray-800 p-6" data-controller="tabs">
+      <div class="mb-4">
         <h2 class="text-xl font-semibold text-gray-900 dark:text-white">User Preferences</h2>
       </div>
       
@@ -139,16 +150,16 @@
         <div class="mb-4 border-b border-gray-200 dark:border-gray-700">
           <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="preferencesTabs" role="tablist">
             <li class="mr-2" role="presentation">
-              <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-[#1C3835] hover:border-[#1C3835] dark:hover:text-[#4ECCA3]" id="farm-tab" data-tabs-target="#farm" type="button" role="tab" aria-controls="farm" aria-selected="false">Farm Settings</button>
+              <button class="inline-block p-4 border-b-2 rounded-t-lg text-[#1C3835] border-[#1C3835] dark:text-[#4ECCA3] dark:border-[#4ECCA3]" id="farm-tab" data-tabs-target="tab" data-action="tabs#switchTab" href="#farm" type="button" role="tab" aria-controls="farm" aria-selected="true">Farm Settings</button>
             </li>
             <li class="mr-2" role="presentation">
-              <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-[#1C3835] hover:border-[#1C3835] dark:hover:text-[#4ECCA3]" id="interface-tab" data-tabs-target="#interface" type="button" role="tab" aria-controls="interface" aria-selected="false">Interface</button>
+              <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-[#1C3835] hover:border-[#1C3835] dark:hover:text-[#4ECCA3]" id="interface-tab" data-tabs-target="tab" data-action="tabs#switchTab" href="#interface" type="button" role="tab" aria-controls="interface" aria-selected="false">Interface</button>
             </li>
             <li class="mr-2" role="presentation">
-              <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-[#1C3835] hover:border-[#1C3835] dark:hover:text-[#4ECCA3]" id="language-tab" data-tabs-target="#language" type="button" role="tab" aria-controls="language" aria-selected="false">Language</button>
+              <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-[#1C3835] hover:border-[#1C3835] dark:hover:text-[#4ECCA3]" id="language-tab" data-tabs-target="tab" data-action="tabs#switchTab" href="#language" type="button" role="tab" aria-controls="language" aria-selected="false">Language</button>
             </li>
             <li role="presentation">
-              <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-[#1C3835] hover:border-[#1C3835] dark:hover:text-[#4ECCA3]" id="timezone-tab" data-tabs-target="#timezone" type="button" role="tab" aria-controls="timezone" aria-selected="false">Timezone</button>
+              <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-[#1C3835] hover:border-[#1C3835] dark:hover:text-[#4ECCA3]" id="timezone-tab" data-tabs-target="tab" data-action="tabs#switchTab" href="#timezone" type="button" role="tab" aria-controls="timezone" aria-selected="false">Timezone</button>
             </li>
           </ul>
         </div>
@@ -156,13 +167,13 @@
         <!-- Tab Content -->
         <div id="preferencesContent">
           <!-- Farm Settings Tab -->
-          <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="farm" role="tabpanel" aria-labelledby="farm-tab">
+          <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="farm" role="tabpanel" aria-labelledby="farm-tab" data-tabs-target="tabContent">
             <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Default Farm</h3>
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Select the farm that will be automatically selected when you log in.</p>
             
             <div class="bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
               <% if @user.farms.any? %>
-                <%= form_with url: hub_admin_set_default_farm_path, method: :post, class: "space-y-4" do |form| %>
+                <%= form_with url: set_default_farm_hub_admin_user_path(@user), method: :post, class: "space-y-4" do |form| %>
                   <div>
                     <%= form.select :farm_id, 
                       @user.farms.map { |f| [f.name, f.id, { selected: @user.default_farm == f }] },
@@ -171,7 +182,10 @@
                   </div>
                   
                   <div>
-                    <%= form.submit "Save Default Farm", class: "text-white bg-[#1C3835] hover:bg-[#152A27] focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-[#1C3835] dark:hover:bg-[#152A27] focus:outline-none dark:focus:ring-green-800" %>
+                    <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-[#1C3835] bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-green-100 dark:bg-gray-800 dark:text-[#4ECCA3] dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+                      <%= icon "check", class: "w-4 h-4 mr-2" %>
+                      Save Default Farm
+                    </button>
                   </div>
                 <% end %>
               <% else %>
@@ -181,66 +195,134 @@
           </div>
           
           <!-- Interface Settings Tab -->
-          <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="interface" role="tabpanel" aria-labelledby="interface-tab">
+          <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="interface" role="tabpanel" aria-labelledby="interface-tab" data-tabs-target="tabContent">
             <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Items Per Page</h3>
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Set how many items to display per page in lists and tables.</p>
             
-            <%= form_with url: hub_admin_user_preferences_path, method: :post, class: "space-y-4" do |form| %>
-              <%= form.hidden_field :user_preference, value: { key: 'items_per_page' } %>
-              
-              <div>
-                <%= form.select :value, 
-                  [10, 25, 50, 100].map { |n| ["#{n} items", n, { selected: @user.preference('items_per_page', 25) == n }] },
-                  {},
-                  class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#1C3835] focus:border-[#1C3835] block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-[#4ECCA3] dark:focus:border-[#4ECCA3]" %>
-              </div>
-              
-              <div>
-                <%= form.submit "Save Setting", class: "text-white bg-[#1C3835] hover:bg-[#152A27] focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-[#1C3835] dark:hover:bg-[#152A27] focus:outline-none dark:focus:ring-green-800" %>
-              </div>
-            <% end %>
+            <div class="bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+              <%= form_with url: update_preference_hub_admin_user_path(@user), method: :post, class: "space-y-4" do |form| %>
+                <%= form.hidden_field :key, value: 'items_per_page' %>
+                
+                <div>
+                  <%= form.select :value, 
+                    [10, 25, 50, 100].map { |n| ["#{n} items", n, { selected: @user.preference('items_per_page', 25) == n }] },
+                    {},
+                    class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" %>
+                </div>
+                
+                <div>
+                  <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-[#1C3835] bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-green-100 dark:bg-gray-800 dark:text-[#4ECCA3] dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+                    <%= icon "check", class: "w-4 h-4 mr-2" %>
+                    Save Setting
+                  </button>
+                </div>
+              <% end %>
+            </div>
+          </div>
+          
+          <!-- Notification Settings Tab -->
+          <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="notification" role="tabpanel" aria-labelledby="notification-tab" data-tabs-target="tabContent">
+            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Notification Preferences</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Configure your notification preferences.</p>
+            
+            <div class="bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+              <%= form_with url: update_preference_hub_admin_user_path(@user), method: :post, class: "space-y-4" do |form| %>
+                <%= form.hidden_field :key, value: 'notifications_enabled' %>
+                
+                <div class="flex items-center">
+                  <%= form.check_box :value, 
+                    { checked: @user.preference('notifications_enabled', true) == true, class: "w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" },
+                    true,
+                    false %>
+                  <%= form.label :value, "Enable notifications", class: "ml-2 text-sm font-medium text-gray-900 dark:text-gray-300" %>
+                </div>
+                
+                <div>
+                  <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-[#1C3835] bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-green-100 dark:bg-gray-800 dark:text-[#4ECCA3] dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+                    <%= icon "check", class: "w-4 h-4 mr-2" %>
+                    Save Setting
+                  </button>
+                </div>
+              <% end %>
+            </div>
+          </div>
+          
+          <!-- Interface Settings Tab -->
+          <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="interface" role="tabpanel" aria-labelledby="interface-tab" data-tabs-target="tabContent">
+            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Items Per Page</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Set how many items to display per page in lists and tables.</p>
+            
+            <div class="bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+              <%= form_with url: update_preference_hub_admin_user_path(@user), method: :post, class: "space-y-4" do |form| %>
+                <%= form.hidden_field :key, value: 'items_per_page' %>
+                
+                <div>
+                  <%= form.select :value, 
+                    [10, 25, 50, 100].map { |n| ["#{n} items", n, { selected: @user.preference('items_per_page', 25) == n }] },
+                    {},
+                    class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#1C3835] focus:border-[#1C3835] block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-[#4ECCA3] dark:focus:border-[#4ECCA3]" %>
+                </div>
+                
+                <div>
+                  <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-[#1C3835] bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-green-100 dark:bg-gray-800 dark:text-[#4ECCA3] dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+                    <%= icon "check", class: "w-4 h-4 mr-2" %>
+                    Save Setting
+                  </button>
+                </div>
+              <% end %>
+            </div>
           </div>
           
           <!-- Language Settings Tab -->
-          <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="language" role="tabpanel" aria-labelledby="language-tab">
+          <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="language" role="tabpanel" aria-labelledby="language-tab" data-tabs-target="tabContent">
             <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Language Preference</h3>
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Select your preferred language for the application interface.</p>
             
-            <%= form_with url: hub_admin_user_preferences_path, method: :post, class: "space-y-4" do |form| %>
-              <%= form.hidden_field :user_preference, value: { key: 'language' } %>
-              
-              <div>
-                <%= form.select :value, 
-                  [['English', 'EN'], ['French', 'FR']].map { |name, code| [name, code, { selected: @user.preference('language', 'EN') == code }] },
-                  {},
-                  class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#1C3835] focus:border-[#1C3835] block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-[#4ECCA3] dark:focus:border-[#4ECCA3]" %>
-              </div>
-              
-              <div>
-                <%= form.submit "Save Setting", class: "text-white bg-[#1C3835] hover:bg-[#152A27] focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-[#1C3835] dark:hover:bg-[#152A27] focus:outline-none dark:focus:ring-green-800" %>
-              </div>
-            <% end %>
+            <div class="bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+              <%= form_with url: update_preference_hub_admin_user_path(@user), method: :post, class: "space-y-4" do |form| %>
+                <%= form.hidden_field :key, value: 'language' %>
+                
+                <div>
+                  <%= form.select :value, 
+                    [['English', 'EN'], ['French', 'FR']].map { |name, code| [name, code, { selected: @user.preference('language', 'EN') == code }] },
+                    {},
+                    class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#1C3835] focus:border-[#1C3835] block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-[#4ECCA3] dark:focus:border-[#4ECCA3]" %>
+                </div>
+                
+                <div>
+                  <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-[#1C3835] bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-green-100 dark:bg-gray-800 dark:text-[#4ECCA3] dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+                    <%= icon "check", class: "w-4 h-4 mr-2" %>
+                    Save Setting
+                  </button>
+                </div>
+              <% end %>
+            </div>
           </div>
           
           <!-- Timezone Settings Tab -->
-          <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="timezone" role="tabpanel" aria-labelledby="timezone-tab">
+          <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="timezone" role="tabpanel" aria-labelledby="timezone-tab" data-tabs-target="tabContent">
             <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Timezone Preference</h3>
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Select your preferred timezone for displaying dates and times.</p>
             
-            <%= form_with url: hub_admin_user_preferences_path, method: :post, class: "space-y-4" do |form| %>
-              <%= form.hidden_field :user_preference, value: { key: 'timezone' } %>
-              
-              <div>
-                <%= form.select :value, 
-                  ActiveSupport::TimeZone.all.map { |tz| [tz.to_s, tz.name, { selected: @user.preference('timezone', 'UTC') == tz.name }] },
-                  {},
-                  class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#1C3835] focus:border-[#1C3835] block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-[#4ECCA3] dark:focus:border-[#4ECCA3]" %>
-              </div>
-              
-              <div>
-                <%= form.submit "Save Setting", class: "text-white bg-[#1C3835] hover:bg-[#152A27] focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-[#1C3835] dark:hover:bg-[#152A27] focus:outline-none dark:focus:ring-green-800" %>
-              </div>
-            <% end %>
+            <div class="bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+              <%= form_with url: update_preference_hub_admin_user_path(@user), method: :post, class: "space-y-4" do |form| %>
+                <%= form.hidden_field :key, value: 'timezone' %>
+                
+                <div>
+                  <%= form.select :value, 
+                    ActiveSupport::TimeZone.all.map { |tz| [tz.to_s, tz.name, { selected: @user.preference('timezone', 'UTC') == tz.name }] },
+                    {},
+                    class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#1C3835] focus:border-[#1C3835] block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-[#4ECCA3] dark:focus:border-[#4ECCA3]" %>
+                </div>
+                
+                <div>
+                  <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-[#1C3835] bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-green-100 dark:bg-gray-800 dark:text-[#4ECCA3] dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+                    <%= icon "check", class: "w-4 h-4 mr-2" %>
+                    Save Setting
+                  </button>
+                </div>
+              <% end %>
+            </div>
           </div>
         </div>
       <% else %>
@@ -276,7 +358,10 @@
           </div>
 
           <div class="mt-6">
-            <%= form.submit 'Update Roles', class: "text-sm py-2.5 px-5 text-white bg-[#1C3835] hover:bg-[#152A27] focus:ring-4 focus:outline-none focus:ring-green-300 rounded-lg text-center font-medium dark:bg-[#1C3835] dark:hover:bg-[#152A27] dark:focus:ring-green-800" %>
+            <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-[#1C3835] bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-green-100 dark:bg-gray-800 dark:text-[#4ECCA3] dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+              <%= icon "check", class: "w-4 h-4 mr-2" %>
+              Update Roles
+            </button>
           </div>
         <% end %>
         
@@ -332,59 +417,35 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Initialize tabbed interface
-    const tabsElement = document.getElementById('preferencesTabs');
-    
-    if (tabsElement) {
-      // Set first tab as active by default
-      const firstTab = tabsElement.querySelector('button');
-      if (firstTab) {
-        firstTab.classList.add('text-[#1C3835]', 'border-[#1C3835]', 'dark:text-[#4ECCA3]', 'dark:border-[#4ECCA3]');
-        firstTab.classList.remove('hover:text-gray-600', 'hover:border-gray-300', 'dark:hover:text-gray-300');
-        firstTab.setAttribute('aria-selected', 'true');
-        
-        // Show first tab content
-        const firstTabId = firstTab.getAttribute('data-tabs-target');
-        if (firstTabId) {
-          const firstTabContent = document.querySelector(firstTabId);
-          if (firstTabContent) {
-            firstTabContent.classList.remove('hidden');
-          }
-        }
-      }
+    // Initialize role assignment toggle functionality
+    const toggleAllCheckbox = document.getElementById('toggle_all');
+    if (toggleAllCheckbox) {
+      const roleCheckboxes = document.querySelectorAll('input[name="user[role_ids][]"]');
       
-      // Add click handlers to tabs
-      const tabs = tabsElement.querySelectorAll('button[role=\'tab\']');
-      tabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-          // Hide all tab contents
-          const tabContents = document.querySelectorAll('#preferencesContent > div[role=\'tabpanel\']');
-          tabContents.forEach(content => {
-            content.classList.add('hidden');
-          });
-          
-          // Remove active classes from all tabs
-          tabs.forEach(t => {
-            t.classList.remove('text-[#1C3835]', 'border-[#1C3835]', 'dark:text-[#4ECCA3]', 'dark:border-[#4ECCA3]');
-            t.classList.add('hover:text-gray-600', 'hover:border-gray-300', 'dark:hover:text-gray-300');
-            t.setAttribute('aria-selected', 'false');
-          });
-          
-          // Add active classes to clicked tab
-          this.classList.add('text-[#1C3835]', 'border-[#1C3835]', 'dark:text-[#4ECCA3]', 'dark:border-[#4ECCA3]');
-          this.classList.remove('hover:text-gray-600', 'hover:border-gray-300', 'dark:hover:text-gray-300');
-          this.setAttribute('aria-selected', 'true');
-          
-          // Show selected tab content
-          const targetId = this.getAttribute('data-tabs-target');
-          if (targetId) {
-            const targetContent = document.querySelector(targetId);
-            if (targetContent) {
-              targetContent.classList.remove('hidden');
-            }
-          }
+      toggleAllCheckbox.addEventListener('change', function() {
+        const isChecked = this.checked;
+        roleCheckboxes.forEach(checkbox => {
+          checkbox.checked = isChecked;
         });
       });
+      
+      // Update toggle_all when individual checkboxes change
+      roleCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+          const allChecked = [...roleCheckboxes].every(cb => cb.checked);
+          const anyChecked = [...roleCheckboxes].some(cb => cb.checked);
+          
+          toggleAllCheckbox.checked = allChecked;
+          toggleAllCheckbox.indeterminate = anyChecked && !allChecked;
+        });
+      });
+      
+      // Initial state
+      const allCheckedInitially = [...roleCheckboxes].every(cb => cb.checked);
+      const anyCheckedInitially = [...roleCheckboxes].some(cb => cb.checked);
+      
+      toggleAllCheckbox.checked = allCheckedInitially;
+      toggleAllCheckbox.indeterminate = anyCheckedInitially && !allCheckedInitially;
     }
   });
 </script>

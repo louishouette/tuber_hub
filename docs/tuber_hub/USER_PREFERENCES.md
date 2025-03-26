@@ -236,22 +236,20 @@ This preference affects how dates and times are displayed throughout the applica
 
 ## User Interface
 
-The User Preferences are integrated directly into the user profile view. Users can access their preferences through the profile dropdown in the navigation bar.
+The User Preferences are integrated directly into the user profile view. Users can access their preferences through their user profile page.
 
 ### Accessing User Preferences
 
 1. Click on the user profile icon in the top navbar
-2. Click on "My Profile" to access your profile page with integrated preferences
+2. Click on "My Profile" to access your profile page
+3. Scroll down to the "User Preferences" section
 
 The preferences are organized into categories with a tabbed interface:
 
-- Farm Settings
-- Interface Settings
-- Notification Settings
-- Language Preferences
-- Timezone Preferences
-
-Users can also access individual preferences through the index page at `/hub/admin/user_preferences`.
+- Farm Settings - Configure your default farm
+- Interface Settings - Set display options like items per page
+- Language - Choose your preferred language
+- Timezone - Set your local timezone
 
 ## Adding New Preference Types
 
@@ -259,7 +257,7 @@ To add a new preference type:
 
 1. If it's a common preference type that needs validation, add it to the `TYPED_PREFERENCES` constant in the UserPreference model.
 2. Add convenience methods to the User model if needed.
-3. Update the settings page to include UI for managing the new preference.
+3. Update the user show page to include UI for managing the new preference in the appropriate tab section.
 4. Update this documentation.
 
 ## Best Practices

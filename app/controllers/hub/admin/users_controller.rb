@@ -1,7 +1,7 @@
 module Hub
   module Admin
     class UsersController < BaseController
-      before_action :set_user, only: [:show, :edit, :update, :destroy, :assign_roles, :toggle_active]
+      before_action :set_user, only: [:show, :edit, :update, :destroy, :assign_roles, :toggle_active, :set_default_farm, :update_preference]
       
       def index
         @users = policy_scope(User)
@@ -20,6 +20,11 @@ module Hub
 
       def show
         authorize @user
+        @farm_preferences = @user.farms.order(:name) if @user == Current.user
+        @current_preferences = {
+          items_per_page: @user.items_per_page,
+          notifications_enabled: @user.notifications_enabled?
+        } if @user == Current.user
       end
 
       def new
@@ -160,6 +165,48 @@ module Hub
         end
         
         redirect_to hub_admin_user_path(@user), notice: 'Roles updated successfully'
+      end
+      
+      # Set default farm preference
+      def set_default_farm
+        authorize @user, :update?
+        
+        farm_id = params[:farm_id]
+        
+        if farm_id.blank?
+          # Clear default farm if no farm_id provided
+          @user.clear_default_farm
+          redirect_back(fallback_location: hub_admin_user_path(@user), notice: "Default farm preference cleared")
+          return
+        end
+        
+        farm = Hub::Admin::Farm.find_by(id: farm_id)
+        
+        if farm && @user.farms.include?(farm) && @user.set_default_farm(farm)
+          redirect_back(fallback_location: hub_admin_user_path(@user), notice: "Default farm set to #{farm.name}")
+        else
+          redirect_back(fallback_location: hub_admin_user_path(@user), alert: "Could not set default farm")
+        end
+      end
+      
+      # Update user preference
+      def update_preference
+        authorize @user, :update?
+        
+        key = params[:key]
+        value = params[:value]
+        
+        if @user.set_preference(key, value)
+          respond_to do |format|
+            format.html { redirect_back(fallback_location: hub_admin_user_path(@user), notice: "Preference updated successfully") }
+            format.json { render json: { success: true } }
+          end
+        else
+          respond_to do |format|
+            format.html { redirect_back(fallback_location: hub_admin_user_path(@user), alert: "Could not update preference") }
+            format.json { render json: { success: false }, status: :unprocessable_entity }
+          end
+        end
       end
       
       private

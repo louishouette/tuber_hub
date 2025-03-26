@@ -8,22 +8,22 @@
   </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6" data-controller="tabs">
   <!-- Left sidebar with preference categories -->
   <div class="lg:col-span-1">
     <div class="bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 dark:bg-gray-800 p-4">
       <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Settings Categories</h2>
       
-      <nav class="space-y-1">
-        <a href="#farm-settings" class="flex items-center px-3 py-2 text-sm font-medium text-[#1C3835] bg-[#E9F1F0] rounded-lg dark:bg-gray-700 dark:text-[#4ECCA3]">
+      <nav class="space-y-1" data-tabs-target="tab">
+        <a href="#farm-settings" data-action="tabs#switchTab" class="flex items-center px-3 py-2 text-sm font-medium text-[#1C3835] bg-[#E9F1F0] rounded-lg dark:bg-gray-700 dark:text-[#4ECCA3]">
           <%= icon "building-office", class: "w-5 h-5 mr-2" %>
           Farm Settings
         </a>
-        <a href="#interface-settings" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg dark:text-gray-300 dark:hover:bg-gray-700">
+        <a href="#interface-settings" data-action="tabs#switchTab" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg dark:text-gray-300 dark:hover:bg-gray-700">
           <%= icon "computer-desktop", class: "w-5 h-5 mr-2" %>
           Interface Settings
         </a>
-        <a href="#notification-settings" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg dark:text-gray-300 dark:hover:bg-gray-700">
+        <a href="#notification-settings" data-action="tabs#switchTab" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg dark:text-gray-300 dark:hover:bg-gray-700">
           <%= icon "bell", class: "w-5 h-5 mr-2" %>
           Notification Settings
         </a>
@@ -32,7 +32,7 @@
   </div>
   
   <!-- Right content area with settings forms -->
-  <div class="lg:col-span-2">
+  <div class="lg:col-span-2" data-tabs-target="tabContent">
     <!-- Farm Settings Section -->
     <div id="farm-settings" class="bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 dark:bg-gray-800 p-6 mb-6">
       <div class="flex items-center mb-4">

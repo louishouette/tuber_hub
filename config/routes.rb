@@ -39,20 +39,15 @@ Rails.application.routes.draw do
     namespace :admin do
       get '/', to: 'dashboard#index', as: :dashboard
       
-      # User preferences
-      resources :user_preferences do
-        collection do
-          get 'settings', to: 'user_preferences#settings', as: 'settings'
-          post 'update_preference', to: 'user_preferences#update_preference', as: 'update_preference'
-        end
-      end
-      post 'user_preferences/set_default_farm', to: 'user_preferences#set_default_farm', as: 'set_default_farm'
+      # User preferences are now integrated into the user show page
       # User management
       resources :users do
         member do
           get 'assign_roles'
           post 'assign_roles'
           patch 'toggle_active'  # For blocking/unblocking users
+          post 'set_default_farm'  # Set default farm preference
+          post 'update_preference'  # Update user preference
         end
         collection do
           get 'roles/:role_id', to: 'users#by_role', as: :by_role
